@@ -43,6 +43,11 @@ Item {
 			const exitStatus = data["exit status"];
 			const stdout = data.stdout;
 			const stderr = data.stderr;
+
+            if (cmd == oneoffCommand) {
+                disconnectSource(oneoffCommand);
+            }
+
             if (exitCode > 0) {
                 handleError(stdout)
                 return;
@@ -57,17 +62,15 @@ Item {
                 }
             }
 
-            if (cmd.startsWith('ONCE=1')) {
-                disconnectSource(cmd);
-            }
         }
-        readonly property string command: plasmoid.configuration.executable + ' detect'
+        readonly property string command: `${plasmoid.configuration.executable} detect`
+        // add the meaningless variable `ONCE=1` in front so we can differentiate this one-off call from regular calls and disconnect it 
+        readonly property string oneoffCommand: `ONCE=1 ${command}`
         function start() {
             connectSource(command);
         }
         function runOnce() {
-            // add the meaningless variable `ONCE=1` in front so we can differentiate this one-off call from regular calls and disconnect it 
-            connectSource('ONCE=1 ' + command);
+            connectSource(oneoffCommand);
         }
         function stop() {
             disconnectSource(command);
