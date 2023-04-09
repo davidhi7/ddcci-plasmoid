@@ -134,7 +134,6 @@ Item {
                 flow: GridLayout.TopToBottom
                 columnSpacing: PlasmaCore.Units.gridUnit / 2
                 rowSpacing: PlasmaCore.Units.gridUnit / 2
-                Layout.bottomMargin: PlasmaCore.Units.gridUnit / 2
                 visible: monitorModel.count > 0
 
                 Repeater {
