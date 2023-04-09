@@ -21,7 +21,7 @@ def handle_error(error: str | subprocess.CalledProcessError) -> NoReturn:
         error = err.stderr.decode() if err.stderr else err.stdout.decode()
     print(json.dumps({
         'command': arguments['command'],
-        'error': error
+        'error': error.replace('\n', ' ')
     }))
     sys.exit(1)
 
