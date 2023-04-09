@@ -78,6 +78,17 @@ Item {
     }
 
     signal error(string message)
+    function handleError(stdout) {
+        try {
+            const errorResponse = JSON.parse(stdout);
+            console.log(`${errorResponse.command}: ${errorResponse.error}`);
+            error(errorResponse.error);
+        } catch(parse_error) {
+            console.log('Unable to parse error response ' + stdout);
+            error('Unable to parse error response ' + stdout);
+        }
+    }
+
     ListModel {
         id: monitorModel
     }
@@ -177,17 +188,6 @@ Item {
                     }
                 }
             }
-        }
-    }
-
-    function handleError(stdout) {
-        try {
-            const errorResponse = JSON.parse(stdout);
-            console.log(`${errorResponse.command}: ${errorResponse.error}`);
-            error(errorResponse.error);
-        } catch(parse_error) {
-            console.log('Unable to parse error response ' + stdout);
-            error('Unable to parse error response ' + stdout);
         }
     }
 
