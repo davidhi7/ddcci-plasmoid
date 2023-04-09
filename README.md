@@ -25,6 +25,7 @@ or load it once:
 ddcutil is a commandline utility to control external monitors.
 This widget uses ddcutil to detect supported monitors and adjust their brightness.
 For additional details, refer to the great [ddcutil documentation](http://www.ddcutil.com/).
+Note that additional steps may be required if you are using a NVIDIA GPU, see [Special Nvidia Driver Settings](https://www.ddcutil.com/nvidia/) in the ddcutil documentation.
 
 Install the `ddcutil` from your distribution's repositories. ([Arch Linux](https://archlinux.org/packages/extra/x86_64/ddcutil/))
 
@@ -75,6 +76,14 @@ Display 2
 
 ### 3. Install the backend ###
 
+`pip install ddcci-plasmoid-backend `
+
 ### 4. Install the widget itself ###
 
-
+````bash
+$ git clone https://github.com/davidhi7/ddcci-plasmoid.git
+$ cd ddcci-plasmoid
+$ kpackagetool5 --install plasmoid
+# or upgrade the plasmoid:
+$ kpackagetool5 --upgrade plasmoid
+````
