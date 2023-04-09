@@ -1,0 +1,19 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "David Himmelstoß"
+            }
+        ],
+        "Category": "System Information",
+        "Description": "DDC/CI-based brightness control utility for external monitors",
+        "Icon": "brightness-high",
+        "Id": "de.davidhi.ddcci-brightness",
+        "Name": "Display Brightness",
+        "Version": "0.1",
+        "Website": "https://github.com/davidhi7/ddcci-plasmoid"
+    },
+    "X-Plasma-API": "declarativeappletscript",
+    "X-Plasma-MainScript": "ui/main.qml",
+    "KPackageStructure": "Plasma/Applet"
+}

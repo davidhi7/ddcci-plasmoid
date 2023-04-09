@@ -1,0 +1,47 @@
+Display 1
+   I2C bus:  /dev/i2c-9
+   DRM connector:           card0-DP-1
+   EDID synopsis:
+      Mfg id:               DEL - Dell Inc.
+      Model:                DELL S2721DGF
+      Product code:         XXXXXX  (0xXXXX)
+      Serial number:        XXXXXX
+      Binary serial number: XXXXXXXX (0xXXXXXXXX)
+      Manufacture year:     2022,  Week: 35
+   VCP version:         2.1
+
+Display 2
+   I2C bus:  /dev/i2c-10
+   DRM connector:           card0-DP-2
+   EDID synopsis:
+      Mfg id:               DEL - Dell Inc.
+      Model:                DELL U2417H
+      Product code:         XXXXX  (0xXXXX)
+      Serial number:        XXXXXXXXXXXX
+      Binary serial number: XXXXXXXXXX (0xXXXXXXXX)
+      Manufacture year:     2018,  Week: 22
+
+Display 3
+   I2C bus:  /dev/i2c-11
+   DRM connector:           card0-DP-3
+   EDID synopsis:
+      Mfg id:               DEL - Dell Inc.
+      Model:                DELL U2417H
+      Product code:         XXXXX  (0xXXXX)
+      Serial number:        XXXXXXXXXXXX
+      Binary serial number: XXXXXXXXXX (0xXXXXXXXX)
+      Manufacture year:     2018,  Week: 22
+   VCP version:         2.1
+
+Display 4
+   I2C bus:  /dev/i2c-12
+   DRM connector:           card0-DP-4
+   EDID synopsis:
+      Mfg id:               BNQ - UNK
+      Model:                BenQ BL2480
+      Product code:         XXXXX  (0xXXXX)
+      Serial number:        XXXXXXXXXXX
+      Binary serial number: XXXXX (0xXXXXXXXX)
+      Manufacture year:     2020,  Week: 51
+   VCP version:         2.1
+

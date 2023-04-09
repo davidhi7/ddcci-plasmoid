@@ -1,0 +1,69 @@
+from __future__ import annotations
+
+from dataclasses import field
+from typing import Optional
+
+
+class Node:
+    parent: Optional[Node]
+    indentation: int
+    key: str
+    value: str
+    children: list[Node] = field(default_factory=list)
+
+    child_by_key: dict[str, Node]
+
+    def __init__(self, parent: Optional[Node], indentation: int, key: str = '', value: str = ''):
+        self.parent = parent
+        self.key = key
+        self.value = value
+        self.indentation = indentation
+
+        self.children = []
+        self.child_by_key = {}
+
+        if parent is not None:
+            self.parent.register_child(self)
+
+    def register_child(self, child: Node) -> None:
+        self.children.append(child)
+        self.child_by_key[child.key] = child
+
+    @staticmethod
+    def parse_indented_text(text: list[str]) -> Node:
+        root = Node(parent=None, indentation=-1)
+        previous = root
+
+        for line in text:
+            if len(line.lstrip()) == 0:
+                continue
+
+            # ddcutil output is indented by a multiple of 3 whitespaces
+            indentation_characters = (len(line) - len(line.lstrip()))
+            if indentation_characters % 3 != 0:
+                raise ValueError(f'Indentation whitespace count of line "{line.strip()}" is not a multiple of 3')
+
+            tokens = line.split(':')
+            key = tokens[0].strip()
+            value = tokens[1].strip() if len(tokens) > 1 else ''
+
+            indentation = indentation_characters // 3
+            if indentation == previous.indentation:
+                # this line is at the same level as `previous`
+                new_node = Node(parent=previous.parent, key=key, value=value, indentation=indentation)
+                previous = new_node
+            elif indentation > previous.indentation:
+                # this line is a child of `previous`
+                new_node = Node(parent=previous, key=key, value=value, indentation=indentation)
+                previous = new_node
+            elif indentation < previous.indentation:
+                # this line is a parent of `previous`, either a direct or a deeper parent
+
+                parent = previous.parent
+                while parent.indentation >= indentation:
+                    parent = parent.parent
+
+                new_node = Node(parent=parent, key=key, value=value, indentation=indentation)
+                previous = new_node
+
+        return root
