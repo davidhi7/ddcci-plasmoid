@@ -6,6 +6,7 @@ import sys
 import tempfile
 from importlib.metadata import version
 from pathlib import Path
+import os
 from typing import NoReturn
 
 import fasteners
@@ -33,7 +34,9 @@ if __name__ == '__main__':
         print(version('ddcci-plasmoid-backend'))
         sys.exit(0)
 
-    with fasteners.InterProcessLock(Path(tempfile.gettempdir()) / 'ddcci_plasmoid_backend.lock'):
+    # include the username in the lock file. Otherwise, if user A creates a lock, user B may not have the permissions
+    # to access the lock file and this program will fail until the lock file is deleted.
+    with fasteners.InterProcessLock(Path(tempfile.gettempdir()) / f'ddcci_plasmoid_backend-{os.getlogin()}.lock'):
         if arguments['command'] == 'detect':
             try:
                 result = asyncio.run(ddcci.detect())
