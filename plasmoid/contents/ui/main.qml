@@ -20,7 +20,10 @@ Item {
 			const exitStatus = data["exit status"];
 			const stdout = data.stdout;
 			const stderr = data.stderr;
-			exited(cmd, exitCode, exitStatus, stdout, stderr);
+
+            if (exitCode > 0) {
+                handleError(stdout);
+            }
 			disconnectSource(cmd);
         }
         function exec(cmd) {
@@ -28,7 +31,6 @@ Item {
                 connectSource(cmd);
             }
         }
-        signal exited(string cmd, int exitCode, int exitStatus, string stdout, string stderr)
     }
 
     PlasmaCore.DataSource {
@@ -41,101 +43,153 @@ Item {
 			const exitStatus = data["exit status"];
 			const stdout = data.stdout;
 			const stderr = data.stderr;
-            if (exitCode > 1) {
-                console.log('Failed to fetch monitor data');
+            if (exitCode > 0) {
+                handleError(stdout)
                 return;
             }
 
-			const response = JSON.parse(stdout);
             // if the lock is held, simply do nothing and wait for the next refresh
-            if (response.command === 'detect' && !valuesLock) {
+            if (!valuesLock) {
                 monitorModel.clear();
+			    const response = JSON.parse(stdout);
                 for (let instance of response.value) {
                     monitorModel.append(instance);
                 }
+            }
+
+            if (cmd.startsWith('ONCE=1')) {
+                disconnectSource(cmd);
             }
         }
         readonly property string command: plasmoid.configuration.executable + ' detect'
         function start() {
             connectSource(command);
         }
+        function runOnce() {
+            // add the meaningless variable `ONCE=1` in front so we can differentiate this one-off call from regular calls and disconnect it 
+            connectSource('ONCE=1 ' + command);
+        }
         function stop() {
             disconnectSource(command);
         }
     }
 
+    signal error(string message)
     ListModel {
         id: monitorModel
     }
 
     Plasmoid.fullRepresentation: ColumnLayout {
-        id: fullRep
-
         PlasmaExtras.PlasmoidHeading {
-            PlasmaExtras.Heading {
-                level: 1
-                text: 'Display Brightness'
+            RowLayout {
+                anchors.fill: parent
+                PlasmaExtras.Heading {
+                    level: 1
+                    text: 'Display Brightness'
+                }
+
+                PlasmaComponents.ToolButton {
+                    Layout.alignment: Qt.AlignRight
+                    icon.name: 'view-refresh-symbolic'
+                    onClicked: monitorDataSource.runOnce()
+                }
             }
         }
 
-        GridLayout {
-            columns: 3
-            rows: monitorModel.count
-            flow: GridLayout.TopToBottom
-            columnSpacing: PlasmaCore.Units.gridUnit / 2
-            rowSpacing: PlasmaCore.Units.gridUnit / 2
-            Layout.margins: PlasmaCore.Units.gridUnit / 2
+        ColumnLayout {
+            Layout.leftMargin: PlasmaCore.Units.gridUnit / 2
+            Layout.rightMargin: PlasmaCore.Units.gridUnit / 2
+            Layout.bottomMargin: PlasmaCore.Units.gridUnit / 2
 
-            Repeater {
-                model: monitorModel
-                delegate: PlasmaExtras.Heading {
-                    level: 5
-                    text: name
+            RowLayout {
+                id: error_layout
+
+                visible: false
+                Layout.minimumWidth: PlasmaCore.Units.gridUnit * 16
+                spacing: PlasmaCore.Units.gridUnit
+
+                PlasmaExtras.Paragraph {
+                    id: error_text
+                    Layout.fillWidth: true
+                    color: PlasmaCore.Theme.negativeTextColor
+                }
+
+                PlasmaComponents.ToolButton {
+                    Layout.alignment: Qt.AlignRight
+                    icon.name: 'window-close'
+                    onClicked: error_layout.visible = false
+                }
+
+                Component.onCompleted: function() {
+                    error.connect(function (message) {
+                        error_text.text = message;
+                        error_layout.visible = true;
+                    });
                 }
             }
 
-            Repeater {
-                id: sliders
-                model: monitorModel
-                delegate: PlasmaComponents.Slider {
-                    id: slider
-                    from: 0
-                    to: 100
-                    value: brightness
-                    stepSize: plasmoid.configuration.stepSize || 1
+            GridLayout {
+                columns: 3
+                rows: monitorModel.count
+                flow: GridLayout.TopToBottom
+                columnSpacing: PlasmaCore.Units.gridUnit / 2
+                rowSpacing: PlasmaCore.Units.gridUnit / 2
+                Layout.bottomMargin: PlasmaCore.Units.gridUnit / 2
+                visible: monitorModel.count > 0
 
-                    onMoved: brightness = value
-                    onPressedChanged: function() {
-                        if (pressed) {
-                            valuesLock = true
-                        } else {
-                            // Slider is released
-                            valuesLock = false
-                            executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                Repeater {
+                    model: monitorModel
+                    delegate: PlasmaExtras.Heading {
+                        level: 5
+                        text: name
+                    }
+                }
+
+                Repeater {
+                    id: sliders
+                    model: monitorModel
+                    delegate: PlasmaComponents.Slider {
+                        id: slider
+                        from: 0
+                        to: 100
+                        value: brightness
+                        stepSize: plasmoid.configuration.stepSize || 1
+
+                        onMoved: brightness = value
+                        onPressedChanged: function() {
+                            if (pressed) {
+                                valuesLock = true
+                            } else {
+                                // Slider is released
+                                valuesLock = false
+                                executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                            }
                         }
                     }
                 }
-            }
 
-            Repeater {
-                model: monitorModel
-                delegate: PlasmaComponents.Label {
-                    text: brightness + '%'
+                Repeater {
+                    model: monitorModel
+                    delegate: PlasmaComponents.Label {
+                        text: brightness + '%'
+                    }
                 }
             }
         }
+    }
 
+    function handleError(stdout) {
+        try {
+            const errorResponse = JSON.parse(stdout);
+            console.log(`${errorResponse.command}: ${errorResponse.error}`);
+            error(errorResponse.error);
+        } catch(parse_error) {
+            console.log('Unable to parse error response ' + stdout);
+            error('Unable to parse error response ' + stdout);
+        }
     }
 
     Component.onCompleted: function() {
-    //     executable.exited.connect(function(cmd, exitCode, exitStatus, stdout, stderr) {
-    //         console.log(stdout, stderr);
-    //         if (stdout) {
-    //             const response = JSON.parse(stdout);
-    //             // TODO handle
-    //         }
-    //     });
-
         monitorDataSource.start();
     }
 }
