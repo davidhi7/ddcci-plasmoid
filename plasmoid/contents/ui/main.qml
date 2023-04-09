@@ -95,6 +95,8 @@ Item {
 
     Plasmoid.fullRepresentation: ColumnLayout {
         PlasmaExtras.PlasmoidHeading {
+            leftPadding: PlasmaCore.Units.gridUnit / 4
+            rightPadding: PlasmaCore.Units.gridUnit / 4
             RowLayout {
                 anchors.fill: parent
                 PlasmaExtras.Heading {
