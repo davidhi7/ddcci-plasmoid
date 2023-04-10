@@ -9,7 +9,14 @@ packages = [{include = "ddcci_plasmoid_backend"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 fasteners = "^0.18"
+pytest = "^7.3.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+python_files = "Node_test.py"
+python_classes = "*Test"
+python_functions = "test_*"
+addopts = "--pyargs ddcci_plasmoid_backend"

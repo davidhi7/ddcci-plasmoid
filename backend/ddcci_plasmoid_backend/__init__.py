@@ -1,5 +1,5 @@
 import argparse
-import logging
+
 
 def get_parser() -> argparse.ArgumentParser:
     argument_parser = argparse.ArgumentParser(prog='plasma-ddcci-backend')
@@ -28,12 +28,3 @@ def get_parser() -> argparse.ArgumentParser:
     )
 
     return argument_parser
-
-
-arguments = vars(get_parser().parse_args())
-
-logging.basicConfig(format='%(levelname)s %(name)s: %(message)s',
-                    level=logging.DEBUG if arguments['debug'] else logging.INFO)
-# supress log message `DEBUG asyncio: Using selector: EpollSelector`
-logging.getLogger('asyncio').setLevel(logging.WARNING)
-logging.getLogger(__name__).debug('Run in debug mode')

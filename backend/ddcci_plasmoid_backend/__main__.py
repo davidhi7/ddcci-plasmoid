@@ -1,20 +1,27 @@
 import asyncio
 import json
 import logging
+import os
 import subprocess
 import sys
 import tempfile
 from importlib.metadata import version
 from pathlib import Path
-import os
 from typing import NoReturn
 
 import fasteners
 
-from ddcci_plasmoid_backend import arguments
 from ddcci_plasmoid_backend import ddcci
+from ddcci_plasmoid_backend.__init__ import get_parser
 
+arguments = vars(get_parser().parse_args())
+
+logging.basicConfig(format='%(levelname)s %(name)s: %(message)s',
+                    level=logging.DEBUG if arguments['debug'] else logging.INFO)
+# supress log message `DEBUG asyncio: Using selector: EpollSelector`
+logging.getLogger('asyncio').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
+logger.debug('Run in debug mode')
 
 
 def handle_error(error: str | subprocess.CalledProcessError) -> NoReturn:
