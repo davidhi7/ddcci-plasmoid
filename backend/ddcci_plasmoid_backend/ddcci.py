@@ -4,7 +4,7 @@ import re
 import subprocess
 from typing import TypedDict
 
-from ddcci_plasmoid_backend.ddcutil_parser import Node
+from ddcci_plasmoid_backend.Node import Node
 
 logger = logging.getLogger(__name__)
 brightness_feature_code = 0x10

@@ -14,6 +14,9 @@ class Node:
     child_by_key: dict[str, Node]
 
     def __init__(self, parent: Optional[Node], indentation: int, key: str = '', value: str = ''):
+        """
+        Create a new node and set it as the child of the parent.
+        """
         self.parent = parent
         self.key = key
         self.value = value
@@ -23,14 +26,32 @@ class Node:
         self.child_by_key = {}
 
         if parent is not None:
-            self.parent.register_child(self)
+            self.parent._register_child(self)
 
-    def register_child(self, child: Node) -> None:
+    def to_dict(self) -> dict[str | list[dict]]:
+        """
+        Return a representation of this node as a recursive dictionary, removing the `parent` attribute in the process.
+        This dict can be used for serialization or testing.
+        """
+        return {
+            'key': self.key,
+            'value': self.value,
+            'indentation': self.indentation,
+            'children': [child.to_dict() for child in self.children]
+        }
+
+    def _register_child(self, child: Node) -> None:
+        """
+        Register a new child
+        """
         self.children.append(child)
         self.child_by_key[child.key] = child
 
     @staticmethod
     def parse_indented_text(text: list[str]) -> Node:
+        """
+        Parse indented output from for example `ddcutil` into nested nodes
+        """
         root = Node(parent=None, indentation=-1)
         previous = root
 
