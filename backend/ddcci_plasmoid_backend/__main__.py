@@ -50,18 +50,23 @@ if __name__ == '__main__':
             except subprocess.CalledProcessError as err:
                 handle_error(err)
 
+            count = len(result)
             # Remove objects that are errors
-            filtered_results = [report for report in result if isinstance(report, dict)]
+            for report in result:
+                if isinstance(report, Exception):
+                    logger.debug(report)
+                    result.remove(report)
+            # filtered_results = [report for report in result if isinstance(report, dict)]
 
-            filtered_count = len(filtered_results)
-            remaining_count = len(result) - filtered_count
+            filtered_count = len(result)
+            remaining_count = count - filtered_count
 
             logger.debug(f'Detected {filtered_count} working monitor {"bus" if filtered_count == 1 else "busses"}, '
                          f'{remaining_count} non-working {"bus" if remaining_count == 1 else "busses"}.')
 
             print(json.dumps({
                 'command': 'detect',
-                'value': filtered_results
+                'value': result
             }))
         elif arguments['command'] == 'set-brightness':
             bus_id = arguments['bus']

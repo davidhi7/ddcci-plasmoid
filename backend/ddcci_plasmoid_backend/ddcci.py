@@ -16,6 +16,13 @@ class CommandOutput(TypedDict):
     stderr: str
 
 
+class MonitorData(TypedDict):
+    id: int
+    name: str
+    bus_id: int
+    brightness: int
+
+
 # Record for identifying a monitor by its `Serial number` as well as `Binary serial number` EDID value reported by
 # ddcutil to look for duplicate monitors. Issue #1 shows that comparing by Serial number only is not sufficient, as the
 # monitors of the reporter only reported a binary serial number.
@@ -36,7 +43,7 @@ class MonitorID:
 
 
 async def detect():
-    async def fetch_monitor_data(node: Node):
+    async def fetch_monitor_data(node: Node) -> MonitorData:
         display_id = get_monitor_id(node)
         display_name = get_EDID_value(node, 'Model')
         bus_id = int(re.search(r'\d+$', node.child_by_key['I2C bus'].value).group())
