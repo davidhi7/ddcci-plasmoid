@@ -48,15 +48,15 @@ async def detect():
         display_name = get_EDID_value(node, 'Model')
         bus_id = int(re.search(r'\d+$', node.child_by_key['I2C bus'].value).group())
 
-        cmd = f'ddcutil getvcp --bus {bus_id} --brief {brightness_feature_code:x}'
-        proc = await asyncio.subprocess.create_subprocess_shell(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        stdout, stderr = await proc.communicate()
-        if proc.returncode > 0:
+        try:
+            result = await async_subprocess_wrapper(
+                f'ddcutil getvcp --bus {bus_id} --brief {brightness_feature_code:x}')
+        except subprocess.CalledProcessError as err:
             logger.debug(
-                f'{display_name} id={display_id}: Return code {proc.returncode} when fetching the current brightness')
-            raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmd, output=stdout, stderr=stderr)
+                f'{display_name} id={display_id}: Return code {err.returncode} when fetching the current brightness')
+            raise
 
-        _, _, _, display_brightness_raw, _ = stdout.decode().split(' ')
+        _, _, _, display_brightness_raw, _ = result['stdout'].split(' ')
 
         return {
             'id': display_id,
@@ -104,6 +104,7 @@ def get_monitor_id(node: Node):
     return int(re.search(r'\d+', node.key).group())
 
 
+# Wrap sync and async subprocess calls for mocking
 def subprocess_wrapper(cmd: str) -> CommandOutput:
     logger.debug('Execute command: `' + cmd + '`')
     proc = subprocess.run(cmd.split(' '), capture_output=True, check=True)
@@ -113,4 +114,24 @@ def subprocess_wrapper(cmd: str) -> CommandOutput:
         'returnCode': returnCode,
         'stdout': proc.stdout.decode(),
         'stderr': proc.stderr.decode(),
+    }
+
+
+async def async_subprocess_wrapper(cmd: str) -> CommandOutput:
+    logger.debug('Execute command: `' + cmd + '`')
+    proc = await asyncio.subprocess.create_subprocess_shell(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = await proc.communicate()
+    stdout = stdout.decode()
+    stderr = stderr.decode()
+
+    if proc.returncode > 0:
+        raise subprocess.CalledProcessError(returncode=proc.returncode, cmd=cmd, output=stdout, stderr=stderr)
+
+    # it's safe to assume that the return code is not None at this point
+    return_code: int = 1 if proc.returncode is None else proc.returncode
+
+    return {
+        'returnCode': return_code,
+        'stdout': stdout,
+        'stderr': stderr,
     }
