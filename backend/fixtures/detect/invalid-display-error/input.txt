@@ -1,0 +1,29 @@
+Unable to open directory /sys/bus/i2c/devices/i2c--1: No such file or directory
+Device /dev/i2c-255 does not exist. Error = ENOENT(2): No such file or directory
+/sys/bus/i2c buses without /dev/i2c-N devices: /sys/bus/i2c/devices/i2c-255
+Driver i2c_dev must be loaded or builtin
+See https://www.ddcutil.com/kernel_module
+Invalid display
+   I2C bus:  /dev/i2c-3
+   DRM connector:           card0-eDP-1
+   EDID synopsis:
+      Mfg id:               BOE - BOE
+      Model:                
+      Product code:         1670  (0x0686)
+      Serial number:        
+      Binary serial number:
+      Manufacture year:     2015,  Week: 1
+   DDC communication failed
+   This is an eDP laptop display. Laptop displays do not support DDC/CI.
+
+Display 1
+   I2C bus:  /dev/i2c-9
+   DRM connector:           card1-HDMI-A-1
+   EDID synopsis:
+      Mfg id:               DEL - Dell Inc.
+      Model:                DELL P2419H
+      Product code:         53466  (0xd0da)
+      Serial number:
+      Binary serial number:
+      Manufacture year:     2020,  Week: 38
+   VCP version:         2.1

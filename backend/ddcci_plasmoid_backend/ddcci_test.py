@@ -41,11 +41,11 @@ def return_CommandOutput():
 
 
 @pytest.mark.parametrize('dir', [
-    'fixtures/detect/simple', 'fixtures/detect/duplicate', 'fixtures/detect/#1-wrong-duplicates',
-    'fixtures/detect/duplicate-binary-serial-numbers'
+    'simple', 'duplicate', '#1-wrong-duplicates', 'duplicate-binary-serial-numbers', 'duplicate-serial-numbers',
+    'invalid-display'
 ])
 async def test_detect(monkeypatch, dir, return_coroutine, return_CommandOutput):
-    path = Path(dir)
+    path = Path('fixtures/detect/') / dir
     with open(path / 'input.txt') as file:
         input_data = file.read()
     with open(path / 'output.json') as file:
