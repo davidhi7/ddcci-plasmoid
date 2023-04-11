@@ -1,0 +1,23 @@
+Display 2
+   I2C bus:  /dev/i2c-10
+   DRM connector:           card0-DP-2
+   EDID synopsis:
+      Mfg id:               DEL - Dell Inc.
+      Model:                DELL U2417H
+      Product code:         16615  (0x40e7)
+      Serial number:        123456789
+      Binary serial number: 1234567890 (0x1234567890)
+      Manufacture year:     2018,  Week: 22
+   VCP version:         2.1
+
+Display 3
+   I2C bus:  /dev/i2c-11
+   DRM connector:           card0-DP-3
+   EDID synopsis:
+      Mfg id:               DEL - Dell Inc.
+      Model:                DELL U2417H
+      Product code:         16615  (0x40e7)
+      Serial number:        123456789
+      Binary serial number: 1234567890 (0x1234567890)
+      Manufacture year:     2018,  Week: 22
+   VCP version:         2.1

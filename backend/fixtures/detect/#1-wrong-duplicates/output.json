@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "E2442",
+    "bus_id": 4,
+    "brightness": 50
+  },
+  {
+    "id": 2,
+    "name": "E2342",
+    "bus_id": 6,
+    "brightness": 50
+  },
+  {
+    "id": 3,
+    "name": "PHL 243V7",
+    "bus_id": 8,
+    "brightness": 50
+  }
+]

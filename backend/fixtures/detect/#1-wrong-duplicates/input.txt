@@ -1,0 +1,35 @@
+Display 1
+   I2C bus:  /dev/i2c-4
+   DRM connector:           card0-DP-2
+   EDID synopsis:
+      Mfg id:               GSM - Goldstar Company Ltd (LG)
+      Model:                E2442
+      Product code:         XXXXX  (0xXXXX)
+      Serial number:        XXXXXXXXXXXX
+      Binary serial number: XXXXXX (0xXXXXXXXX)
+      Manufacture year:     2013,  Week: 1
+   VCP version:         2.1
+
+Display 2
+   I2C bus:  /dev/i2c-6
+   DRM connector:           card0-HDMI-A-1
+   EDID synopsis:
+      Mfg id:               GSM - Goldstar Company Ltd (LG)
+      Model:                E2342
+      Product code:         XXXXX  (0xXXXX)
+      Serial number:
+      Binary serial number: XXXXXXXX (0xXXXXXXXX)
+      Manufacture year:     2011,  Week: 1
+   VCP version:         2.1
+
+Display 3
+   I2C bus:  /dev/i2c-8
+   DRM connector:           card0-DP-1
+   EDID synopsis:
+      Mfg id:               PHL - Philips Consumer Electronics Company
+      Model:                PHL 243V7
+      Product code:         XXXXX  (0xXXXX)
+      Serial number:
+      Binary serial number: XXXXX (0xXXXXXXXX)
+      Manufacture year:     2020,  Week: 30
+   VCP version:         2.2

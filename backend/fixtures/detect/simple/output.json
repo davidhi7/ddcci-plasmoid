@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "DELL S2721DGF",
+    "bus_id": 9,
+    "brightness": 50
+  },
+  {
+    "id": 2,
+    "name": "DELL U2417H",
+    "bus_id": 10,
+    "brightness": 50
+  }
+]
