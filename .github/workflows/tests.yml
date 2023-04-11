@@ -21,4 +21,4 @@ jobs:
         run: pip install poetry && cd backend && poetry install
 
       - name: Run unit tests
-        run: cd backend && pytest
+        run: poetry run pytest
