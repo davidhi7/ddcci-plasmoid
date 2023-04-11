@@ -55,10 +55,7 @@ async def test_detect(monkeypatch, dir, return_coroutine, return_CommandOutput):
     monkeypatch.setattr(ddcci, 'async_subprocess_wrapper',
                         lambda _: return_coroutine(return_CommandOutput(stdout='VCP 10 C 50 100')))
 
-    report = await ddcci.detect()
-    print(report)
-    print(output_data)
-    assert report == output_data
+    assert await ddcci.detect() == output_data
 
 
 @pytest.fixture
