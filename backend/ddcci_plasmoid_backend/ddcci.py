@@ -32,12 +32,11 @@ class MonitorID:
         self.binary_serial_number = binary_serial_number
 
     def __eq__(self, other: 'MonitorID') -> bool:
-        # If either one serial number is missing or both are unequal, the monitors are not identical.
-        if not self.serial_number or not other.serial_number \
-                or self.serial_number != other.serial_number:
+        # If at least one serial number value is not empty and they are not equal, they are different monitors
+        if (self.serial_number or other.serial_number) and self.serial_number != other.serial_number:
             return False
-        if not self.binary_serial_number or not other.binary_serial_number or \
-                self.binary_serial_number != other.binary_serial_number:
+        if (self.binary_serial_number or other.binary_serial_number)\
+                and self.binary_serial_number != other.binary_serial_number:
             return False
         return True
 
