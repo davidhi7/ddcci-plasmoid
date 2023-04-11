@@ -44,7 +44,7 @@ def test_dict(sample_nodes):
 
 
 def test_parse_indented_text_basic():
-    with open('./fixtures/basic.txt', 'r') as file:
+    with open('fixtures/basic/indented.txt', 'r') as file:
         lines = file.read().split('\n')
     node = Node.parse_indented_text(lines).to_dict()
 
