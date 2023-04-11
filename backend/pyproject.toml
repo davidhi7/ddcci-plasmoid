@@ -19,7 +19,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
-python_files = "Node_test.py"
+python_files = "*_test.py"
 python_functions = "test_*"
 addopts = "--pyargs ddcci_plasmoid_backend"
 asyncio_mode = "auto"
