@@ -72,22 +72,3 @@ def getvcp_brightness_mock() -> Callable[[], Coroutine[Any, Any, ddcci.CommandOu
         }
 
     return inner
-
-# @pytest.mark.asyncio
-# async def test_detect_default(monkeypatch, detect_mock, getvcp_brightness_mock):
-#     monkeypatch.setattr(ddcci, 'subprocess_wrapper', lambda _: detect_mock(Path('fixtures/detect/basic.txt')))
-#     monkeypatch.setattr(ddcci, 'async_subprocess_wrapper', lambda _: getvcp_brightness_mock())
-#
-#     assert await ddcci.detect() == [
-#         {
-#             'id': 1,
-#             'name': 'DELL S2721DGF',
-#             'bus_id': 9,
-#             'brightness': 50
-#         }, {
-#             'id': 2,
-#             'name': 'DELL U2417H',
-#             'bus_id': 10,
-#             'brightness': 50
-#         }
-#     ]
