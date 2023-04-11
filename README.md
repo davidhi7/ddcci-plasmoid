@@ -87,3 +87,22 @@ $ kpackagetool5 --install plasmoid
 # or upgrade the plasmoid:
 $ kpackagetool5 --upgrade plasmoid
 ````
+
+
+
+## History
+
+#### v0.1.3 2023-04-11
+
+* Add padding to widget title
+* Fix duplicate monitor detection (#1)
+* Expand debug output
+
+#### v0.1.2 2023-04-09
+
+* Fix KDE widget configuration not loading
+
+#### v0.1.1 2023-04-09
+
+First public release
+
