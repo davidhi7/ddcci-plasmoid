@@ -16,12 +16,9 @@ jobs:
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: 'poetry'
 
       - name: Install dependencies
-        run: poetry install
+        run: pip install poetry && poetry install
 
       - name: Run unit tests
         run: cd backend && pytest
