@@ -42,7 +42,7 @@ def return_CommandOutput():
 
 @pytest.mark.parametrize('dir', [
     'simple', 'duplicate', '#1-wrong-duplicates', 'duplicate-binary-serial-numbers', 'duplicate-serial-numbers',
-    'invalid-display'
+    'invalid-display-error'
 ])
 async def test_detect(monkeypatch, dir, return_coroutine, return_CommandOutput):
     path = Path('fixtures/detect/') / dir
