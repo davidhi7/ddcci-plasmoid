@@ -14,6 +14,9 @@ fasteners = "^0.18"
 pytest = "^7.3.0"
 pytest-asyncio = "^0.21.0"
 
+[tool.poetry.scripts]
+ddcci_plasmoid_backend = "ddcci_plasmoid_backend.__main__:main"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

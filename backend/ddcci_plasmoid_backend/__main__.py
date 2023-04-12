@@ -14,27 +14,27 @@ import fasteners
 from ddcci_plasmoid_backend import ddcci
 from ddcci_plasmoid_backend.__init__ import get_parser
 
-arguments = vars(get_parser().parse_args())
+def main():
+    arguments = vars(get_parser().parse_args())
 
-logging.basicConfig(format='%(levelname)s %(name)s: %(message)s',
-                    level=logging.DEBUG if arguments['debug'] else logging.INFO)
-# supress log message `DEBUG asyncio: Using selector: EpollSelector`
-logging.getLogger('asyncio').setLevel(logging.WARNING)
-logger = logging.getLogger(__name__)
-logger.debug(f'Running version {version("ddcci-plasmoid-backend")} in debug mode')
-
-
-def handle_error(error: str | subprocess.CalledProcessError) -> NoReturn:
-    if isinstance(error, subprocess.CalledProcessError):
-        error = err.stderr if err.stderr else err.stdout
-    print(json.dumps({
-        'command': arguments['command'],
-        'error': error.replace('\n', ' ')
-    }))
-    sys.exit(1)
+    logging.basicConfig(format='%(levelname)s %(name)s: %(message)s',
+                        level=logging.DEBUG if arguments['debug'] else logging.INFO)
+    # supress log message `DEBUG asyncio: Using selector: EpollSelector`
+    logging.getLogger('asyncio').setLevel(logging.WARNING)
+    logger = logging.getLogger(__name__)
+    logger.debug(f'Running version {version("ddcci-plasmoid-backend")} in debug mode')
 
 
-if __name__ == '__main__':
+    def handle_error(error: str | subprocess.CalledProcessError) -> NoReturn:
+        if isinstance(error, subprocess.CalledProcessError):
+            error = err.stderr if err.stderr else err.stdout
+        print(json.dumps({
+            'command': arguments['command'],
+            'error': error.replace('\n', ' ')
+        }))
+        sys.exit(1)
+
+
     logger.debug(f'Command: {arguments["command"]}')
 
     if arguments['command'] == 'version':
@@ -92,3 +92,7 @@ if __name__ == '__main__':
                 handle_error(err)
 
     sys.exit(0)
+
+
+if __name__ == '__main__':
+    main()
