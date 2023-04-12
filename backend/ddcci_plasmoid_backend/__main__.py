@@ -48,7 +48,11 @@ if __name__ == '__main__':
             try:
                 result = asyncio.run(ddcci.detect())
             except subprocess.CalledProcessError as err:
+                logger.debug(err)
                 handle_error(err)
+            except Exception as err:
+                logger.debug(err)
+                handle_error('Failed to fetch monitor data')
 
             count = len(result)
             # Remove objects that are errors
@@ -84,6 +88,7 @@ if __name__ == '__main__':
                     }
                 }))
             except subprocess.CalledProcessError as err:
+                logger.debug(err)
                 handle_error(err)
 
     sys.exit(0)
