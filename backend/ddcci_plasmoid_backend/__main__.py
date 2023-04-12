@@ -21,12 +21,12 @@ logging.basicConfig(format='%(levelname)s %(name)s: %(message)s',
 # supress log message `DEBUG asyncio: Using selector: EpollSelector`
 logging.getLogger('asyncio').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
-logger.debug('Run in debug mode')
+logger.debug(f'Running version {version("ddcci-plasmoid-backend")} in debug mode')
 
 
 def handle_error(error: str | subprocess.CalledProcessError) -> NoReturn:
     if isinstance(error, subprocess.CalledProcessError):
-        error = err.stderr.decode() if err.stderr else err.stdout.decode()
+        error = err.stderr if err.stderr else err.stdout
     print(json.dumps({
         'command': arguments['command'],
         'error': error.replace('\n', ' ')
