@@ -21,12 +21,12 @@ logging.basicConfig(format='%(levelname)s %(name)s: %(message)s',
 # supress log message `DEBUG asyncio: Using selector: EpollSelector`
 logging.getLogger('asyncio').setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
-logger.debug('Run in debug mode')
+logger.debug(f'Running version {version("ddcci-plasmoid-backend")} in debug mode')
 
 
 def handle_error(error: str | subprocess.CalledProcessError) -> NoReturn:
     if isinstance(error, subprocess.CalledProcessError):
-        error = err.stderr.decode() if err.stderr else err.stdout.decode()
+        error = err.stderr if err.stderr else err.stdout
     print(json.dumps({
         'command': arguments['command'],
         'error': error.replace('\n', ' ')
@@ -48,7 +48,11 @@ if __name__ == '__main__':
             try:
                 result = asyncio.run(ddcci.detect())
             except subprocess.CalledProcessError as err:
+                logger.debug(err)
                 handle_error(err)
+            except Exception as err:
+                logger.debug(err)
+                handle_error('Failed to fetch monitor data')
 
             count = len(result)
             # Remove objects that are errors
@@ -84,6 +88,7 @@ if __name__ == '__main__':
                     }
                 }))
             except subprocess.CalledProcessError as err:
+                logger.debug(err)
                 handle_error(err)
 
     sys.exit(0)

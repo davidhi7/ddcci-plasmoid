@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "name": "24MB56",
+    "bus_id": 4,
+    "brightness": 50
+  },
+  {
+    "id": 2,
+    "name": "ZOWIE XL LCD",
+    "bus_id": 7,
+    "brightness": 50
+  }
+]
