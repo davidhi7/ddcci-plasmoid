@@ -2,7 +2,7 @@ import asyncio
 import logging
 import re
 import subprocess
-from typing import TypedDict
+from typing import TypedDict, Optional
 
 from ddcci_plasmoid_backend.Node import Node
 
@@ -44,7 +44,13 @@ class MonitorID:
 async def detect():
     async def fetch_monitor_data(node: Node) -> MonitorData:
         display_id = get_monitor_id(node)
-        display_name = get_EDID_value(node, 'Model')
+        display_name = ''
+        if 'EDID synopsis' in node.child_by_key:
+            display_name = get_EDID_value(node, 'Model')
+        # Use generic name if the EDID model is either empty or not present
+        if not display_name:
+            display_name = 'Unknown display'
+
         bus_id = int(re.search(r'\d+$', node.child_by_key['I2C bus'].value).group())
 
         result = await async_subprocess_wrapper(
@@ -70,20 +76,25 @@ async def detect():
             logger.debug(
                 f'Key {child.key.strip()} does not match pattern for valid display, so skip it')
             continue
-
-        # monitors connected to DisplayPort may appear twice. This is apparently related to DisplayPort MST.
-        # Since the EDID data of both entries is identical, we simply remove duplicate monitors based on their serial
-        # number
-        monitorId = MonitorID(
-            serial_number=get_EDID_value(child, 'Serial number'),
-            binary_serial_number=get_EDID_value(child, 'Binary serial number')
-        )
-        if monitorId in found_monitors:
-            logger.debug(
-                f'{get_EDID_value(child, "Model")} id={get_monitor_id(child)}: Duplicate monitor found and removed'
+        monitor_id = get_monitor_id(child)
+        if 'EDID synopsis' in child.child_by_key:
+            # monitors connected to DisplayPort may appear twice. This is apparently related to DisplayPort MST.
+            # Since the EDID data of both entries is identical, we simply remove duplicate monitors based on their
+            # serial number
+            monitorId = MonitorID(
+                serial_number=get_EDID_value(child, 'Serial number'),
+                binary_serial_number=get_EDID_value(child, 'Binary serial number')
             )
-            continue
-        found_monitors.append(monitorId)
+            if monitorId in found_monitors:
+                logger.debug(
+                    f'{get_EDID_value(child, "Model")} id={monitor_id}: Duplicate monitor found and removed'
+                )
+                continue
+            found_monitors.append(monitorId)
+        else:
+            # For the unlikely case that no EDID synopsis is included, skip all duplication tests
+            logger.debug(f'id={monitor_id} No EDID synopsis returned')
+
         awaitables.append(fetch_monitor_data(child))
 
     return await asyncio.gather(*awaitables, return_exceptions=True)
@@ -93,8 +104,11 @@ def set_brightness(bus_id: int, brightness: int) -> None:
     subprocess_wrapper(f'ddcutil setvcp --bus {bus_id} {brightness_feature_code:x} {brightness}')
 
 
-def get_EDID_value(node: Node, value: str) -> str:
-    return node.child_by_key['EDID synopsis'].child_by_key[value].value
+def get_EDID_value(node: Node, value: str) -> Optional[str]:
+    node = node.child_by_key['EDID synopsis'].child_by_key.get(value)
+    if node:
+        return node.value
+    return None
 
 
 def get_monitor_id(node: Node):
