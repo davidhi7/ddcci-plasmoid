@@ -92,6 +92,10 @@ $ kpackagetool5 --upgrade plasmoid
 
 ## History
 
+#### v0.1.4 2023-04-12
+
+* Fix error if serial number is missing (#6)
+
 #### v0.1.3 2023-04-11
 
 * Add padding to widget title
