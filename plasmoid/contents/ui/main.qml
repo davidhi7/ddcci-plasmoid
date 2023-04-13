@@ -1,5 +1,6 @@
-import QtQuick 2.0
-import QtQuick.Layouts 1.1
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
+
 import org.kde.plasma.plasmoid 2.0
 import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents
@@ -9,6 +10,7 @@ Item {
     id: root
     // Do never apply new values if one slider is not released yet
     property bool valuesLock: false
+    property bool outsideSysTray: !(plasmoid.containmentDisplayHints & PlasmaCore.Types.ContainmentDrawsPlasmoidHeading)
 
     // https://github.com/Zren/plasma-applet-commandoutput/blob/master/package/contents/ui/main.qml
     PlasmaCore.DataSource {
@@ -44,7 +46,7 @@ Item {
 			const stdout = data.stdout;
 			const stderr = data.stderr;
 
-            if (cmd == oneoffCommand) {
+            if (cmd === oneoffCommand) {
                 disconnectSource(oneoffCommand);
             }
 
@@ -97,39 +99,62 @@ Item {
 
     Plasmoid.fullRepresentation: ColumnLayout {
         PlasmaExtras.PlasmoidHeading {
-            leftPadding: PlasmaCore.Units.gridUnit / 4
-            rightPadding: PlasmaCore.Units.gridUnit / 4
+            id: heading
+
+            Layout.alignment: Qt.AlignTop
+
+            // Don't render heading if this is part of the systemtray
+            // Inside the systray, context menu options (like `refresh monitors`) are already rendered in the systray heading, so we don't need to do deal with this
+            visible: root.outsideSysTray
+            leftPadding: PlasmaCore.Units.smallSpacing
+            rightPadding: PlasmaCore.Units.smallSpacing
+
             RowLayout {
                 anchors.fill: parent
+
                 PlasmaExtras.Heading {
                     level: 1
-                    text: 'Display Brightness'
+                    text: 'Display brightness'
                 }
 
                 PlasmaComponents.ToolButton {
                     Layout.alignment: Qt.AlignRight
+
+                    property QtObject /*QAction*/ qAction: Plasmoid.action('refreshMonitors')
+
                     icon.name: 'view-refresh-symbolic'
-                    onClicked: monitorDataSource.runOnce()
+                    PlasmaComponents.ToolTip {
+                        text: parent.qAction.text
+                    }
+                    onClicked: qAction.trigger()
                 }
             }
         }
 
         ColumnLayout {
+            spacing: PlasmaCore.Units.gridUnit
+
+            // systray widget is wider than its implicit widths, so make margins wider for aesthetics
             Layout.leftMargin: PlasmaCore.Units.gridUnit / 2
             Layout.rightMargin: PlasmaCore.Units.gridUnit / 2
             Layout.bottomMargin: PlasmaCore.Units.gridUnit / 2
+            Layout.alignment: Qt.AlignTop
 
+            // Error notifications
             RowLayout {
                 id: error_layout
+                Layout.minimumWidth: PlasmaCore.Units.gridUnit * 16
+                // Layout.alignment: Qt.AlignTop
 
                 visible: false
-                Layout.minimumWidth: PlasmaCore.Units.gridUnit * 16
                 spacing: PlasmaCore.Units.gridUnit
 
-                PlasmaExtras.Paragraph {
+                PlasmaComponents.Label {
                     id: error_text
                     Layout.fillWidth: true
                     color: PlasmaCore.Theme.negativeTextColor
+                    wrapMode: Text.WordWrap
+                    font.bold: true
                 }
 
                 PlasmaComponents.ToolButton {
@@ -146,13 +171,26 @@ Item {
                 }
             }
 
+            // Fallback if no monitors detected
+            PlasmaComponents.Label {
+                visible: monitorModel.count === 0
+
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: true
+                text: 'No monitors detected'
+            }
+
+            // Main content
             GridLayout {
+                visible: monitorModel.count > 0
+
+                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                Layout.fillHeight: true
                 columns: 3
                 rows: monitorModel.count
                 flow: GridLayout.TopToBottom
-                columnSpacing: PlasmaCore.Units.gridUnit / 2
-                rowSpacing: PlasmaCore.Units.gridUnit / 2
-                visible: monitorModel.count > 0
+                columnSpacing: PlasmaCore.Units.gridUnit
+                rowSpacing: PlasmaCore.Units.gridUnit
 
                 Repeater {
                     model: monitorModel
@@ -161,12 +199,14 @@ Item {
                         text: name
                     }
                 }
-
+                
                 Repeater {
                     id: sliders
                     model: monitorModel
                     delegate: PlasmaComponents.Slider {
                         id: slider
+                        // outside the systray, this causes layouting issues
+                        Layout.fillWidth: !root.outsideSysTray
                         from: 0
                         to: 100
                         value: brightness
@@ -188,14 +228,31 @@ Item {
                 Repeater {
                     model: monitorModel
                     delegate: PlasmaComponents.Label {
+                        id: percentageLabel
+                        horizontalAlignment: Qt.AlignRight
+
                         text: brightness + '%'
+
+                        Layout.minimumWidth: percentageMetrics.advanceWidth
+                        TextMetrics {
+                            id: percentageMetrics
+                            font: percentageLabel.font
+                            text: '100%'
+                        }
                     }
                 }
             }
         }
     }
 
+    function action_refreshMonitors() {
+        monitorDataSource.runOnce();
+    }
+
     Component.onCompleted: function() {
         monitorDataSource.start();
+        // Plasmoid.setAction("actionId", i18n("text"), "iconName")
+        Plasmoid.setAction('refreshMonitors', 'Refresh monitors', 'view-refresh-symbolic');
+        // Instead of connecting to a signal of this action, a function called `action_{actionId}` is expected (here action_refreshMonitors)
     }
 }
