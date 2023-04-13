@@ -22,7 +22,7 @@ Item {
 			const stderr = data.stderr;
 
             if (exitCode > 0) {
-                handleError(stdout);
+                handleError(stdout, stderr);
             }
 			disconnectSource(cmd);
         }
@@ -49,7 +49,7 @@ Item {
             }
 
             if (exitCode > 0) {
-                handleError(stdout)
+                handleError(stdout, stderr)
                 return;
             }
 
@@ -78,14 +78,16 @@ Item {
     }
 
     signal error(string message)
-    function handleError(stdout) {
+    function handleError(stdout, stderr) {
         try {
             const errorResponse = JSON.parse(stdout);
             console.log(`${errorResponse.command}: ${errorResponse.error}`);
             error(errorResponse.error);
         } catch(parse_error) {
-            console.log('Unable to parse error response ' + stdout);
-            error('Unable to parse error response ' + stdout);
+            stdout = stdout.trim() ? ('\n    ' + stdout.trim()) : ''
+            stderr = stderr.trim() ? ('\n    ' + stderr.trim()) : ''
+            console.log('Unable to parse error response:' + stdout + stderr);
+            error('Unable to parse error response:' + stdout + stderr);
         }
     }
 
