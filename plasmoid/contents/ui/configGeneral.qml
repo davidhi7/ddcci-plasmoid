@@ -9,7 +9,7 @@ Kirigami.FormLayout {
 
     QQC2.TextField {
         id: stepSize
-        Kirigami.FormData.label: 'Step size:'
+        Kirigami.FormData.label: i18n("Step size:")
         validator: RegExpValidator{regExp: /^[0-9,/]+$/}
     }
 }

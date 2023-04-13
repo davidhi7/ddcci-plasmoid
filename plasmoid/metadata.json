@@ -11,7 +11,10 @@
         "Id": "de.davidhi.ddcci-brightness",
         "Name": "Display Brightness",
         "Version": "0.1.4",
-        "Website": "https://github.com/davidhi7/ddcci-plasmoid"
+        "Website": "https://github.com/davidhi7/ddcci-plasmoid",
+
+        "Description[zh_CN]": "基于 DDC/CI-based 的外接显示器亮度控制工具",
+        "Name[zh_CN]": "显示器亮度"
     },
     "X-Plasma-API": "declarativeappletscript",
     "X-Plasma-MainScript": "ui/main.qml",

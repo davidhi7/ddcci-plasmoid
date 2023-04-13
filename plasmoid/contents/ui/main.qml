@@ -89,7 +89,7 @@ Item {
             stdout = stdout.trim() ? ('\n    ' + stdout.trim()) : ''
             stderr = stderr.trim() ? ('\n    ' + stderr.trim()) : ''
             console.error('Error:' + stdout + stderr);
-            error('Error:' + stdout + stderr);
+            error(i18n("Error:") + stdout + stderr);
         }
     }
 
@@ -114,7 +114,7 @@ Item {
 
                 PlasmaExtras.Heading {
                     level: 1
-                    text: 'Display Brightness'
+                    text: i18n("Display Brightness")
                 }
 
                 PlasmaComponents.ToolButton {
