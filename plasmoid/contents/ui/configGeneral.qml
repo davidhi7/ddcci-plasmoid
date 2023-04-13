@@ -6,10 +6,16 @@ Kirigami.FormLayout {
     id: page
 
     property alias cfg_stepSize: stepSize.text
+    property alias cfg_executable: executable.text
 
     QQC2.TextField {
         id: stepSize
         Kirigami.FormData.label: 'Step size:'
         validator: RegExpValidator{regExp: /^[0-9,/]+$/}
+    }
+
+    QQC2.TextField {
+        id: executable
+        Kirigami.FormData.label: 'Backend executable command:'
     }
 }
