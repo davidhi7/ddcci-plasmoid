@@ -193,7 +193,7 @@ Item {
                         text: name
                     }
                 }
-                
+
                 Repeater {
                     id: sliders
                     model: monitorModel
