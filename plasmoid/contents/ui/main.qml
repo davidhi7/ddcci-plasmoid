@@ -114,7 +114,7 @@ Item {
 
                 PlasmaExtras.Heading {
                     level: 1
-                    text: 'Display brightness'
+                    text: 'Display Brightness'
                 }
 
                 PlasmaComponents.ToolButton {
@@ -132,19 +132,15 @@ Item {
         }
 
         ColumnLayout {
-            spacing: PlasmaCore.Units.gridUnit
 
-            // systray widget is wider than its implicit widths, so make margins wider for aesthetics
-            Layout.leftMargin: PlasmaCore.Units.gridUnit / 2
-            Layout.rightMargin: PlasmaCore.Units.gridUnit / 2
-            Layout.bottomMargin: PlasmaCore.Units.gridUnit / 2
-            Layout.alignment: Qt.AlignTop
+            // spacing: PlasmaCore.Units.gridUnit
+
+            Layout.margins: PlasmaCore.Units.gridUnit
 
             // Error notifications
             RowLayout {
                 id: error_layout
                 Layout.minimumWidth: PlasmaCore.Units.gridUnit * 16
-                // Layout.alignment: Qt.AlignTop
 
                 visible: false
                 spacing: PlasmaCore.Units.gridUnit
@@ -175,8 +171,7 @@ Item {
             PlasmaComponents.Label {
                 visible: monitorModel.count === 0
 
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignHCenter
                 text: 'No monitors detected'
             }
 
@@ -184,8 +179,7 @@ Item {
             GridLayout {
                 visible: monitorModel.count > 0
 
-                Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
-                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignHCenter
                 columns: 3
                 rows: monitorModel.count
                 flow: GridLayout.TopToBottom
@@ -242,6 +236,14 @@ Item {
                     }
                 }
             }
+
+            // Item to fill entire width and the remaining height, this way all other childs of the layout can be centered horizontally
+            Item {
+                height: 0
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
         }
     }
 
