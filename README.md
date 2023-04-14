@@ -104,7 +104,7 @@ This is a bug in older ddcutil versions which it is fixed in ddcutil v1.4.1. In 
 
 ## History
 
-#### v0.1.4de 2023-04-12
+#### v0.1.4 2023-04-12
 
 * Fix error if serial number is missing (#6)
 
