@@ -29,5 +29,5 @@ Note: Also need to add translation for [metadata.json](https://github.com/davidh
 ## Status
 |  Locale  |  Lines  | % Done|
 |----------|---------|-------|
-| Template |       4 |       |
-| zh_CN    |     4/4 |  100% |
+| Template |       5 |       |
+| zh_CN    |     5/5 |  100% |

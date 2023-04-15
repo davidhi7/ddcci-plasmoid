@@ -172,7 +172,7 @@ Item {
                 visible: monitorModel.count === 0
 
                 Layout.alignment: Qt.AlignHCenter
-                text: 'No monitors detected'
+                text: i18n("No monitors detected")
             }
 
             // Main content
