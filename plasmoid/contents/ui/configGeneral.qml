@@ -16,6 +16,6 @@ Kirigami.FormLayout {
 
     QQC2.TextField {
         id: executable
-        Kirigami.FormData.label: 'Backend executable command:'
+        Kirigami.FormData.label: i18n("Backend executable command:")
     }
 }
