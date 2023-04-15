@@ -14,6 +14,7 @@ import fasteners
 from ddcci_plasmoid_backend import ddcci
 from ddcci_plasmoid_backend.__init__ import get_parser
 
+
 def main():
     arguments = vars(get_parser().parse_args())
 
@@ -24,7 +25,6 @@ def main():
     logger = logging.getLogger(__name__)
     logger.debug(f'Running version {version("ddcci-plasmoid-backend")} in debug mode')
 
-
     def handle_error(error: str | subprocess.CalledProcessError) -> NoReturn:
         if isinstance(error, subprocess.CalledProcessError):
             error = err.stderr if err.stderr else err.stdout
@@ -33,7 +33,6 @@ def main():
             'error': error.replace('\n', ' ')
         }))
         sys.exit(1)
-
 
     logger.debug(f'Command: {arguments["command"]}')
 
