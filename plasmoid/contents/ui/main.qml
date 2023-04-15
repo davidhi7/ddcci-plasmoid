@@ -206,14 +206,47 @@ Item {
                         value: brightness
                         stepSize: plasmoid.configuration.stepSize || 1
 
-                        onMoved: brightness = value
+                        Timer {
+                            id: mouseWheelScrollingDebounceTimer
+
+                            // How long does it take to trigger when the mouse wheel stops scrolling
+                            interval: 400
+
+                            // will only be triggered once after restart() called
+                            repeat: false 
+                            running: false
+                            triggeredOnStart: false
+
+                            onTriggered:  {
+                                valuesLock = false
+                                executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                                console.log("mouseWheelMoveDebounceTimer onTriggered") // TODO remove
+                            }
+                        }
+
+                        onMoved: () => {
+                            console.log("onMoved moved") // TODO remove
+                            // Should also be locked during mouse wheel scrolling.
+                            valuesLock = true
+                            brightness = value
+
+                            // Handle mouse wheel debounce only when the slider is not pressed.
+                            if (!pressed) {
+                                mouseWheelScrollingDebounceTimer.restart()
+                                console.log("onMoved Timer.restart()") // TODO remove
+                            }
+                        }
+
                         onPressedChanged: function() {
                             if (pressed) {
                                 valuesLock = true
+                                console.log("onPressedChanged pressed")  // TODO remove
                             } else {
                                 // Slider is released
                                 valuesLock = false
                                 executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                                console.log("onPressedChanged released") // TODO remove
+                                console.log("onPressedChanged exec") // TODO remove
                             }
                         }
                     }
