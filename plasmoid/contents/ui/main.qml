@@ -86,8 +86,8 @@ Item {
         } catch(parse_error) {
             stdout = stdout.trim() ? ('\n    ' + stdout.trim()) : ''
             stderr = stderr.trim() ? ('\n    ' + stderr.trim()) : ''
-            console.log('Unable to parse error response:' + stdout + stderr);
-            error('Unable to parse error response:' + stdout + stderr);
+            console.error('Error:' + stdout + stderr);
+            error('Error:' + stdout + stderr);
         }
     }
 
