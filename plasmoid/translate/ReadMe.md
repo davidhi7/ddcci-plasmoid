@@ -30,4 +30,5 @@ Note: Also need to add translation for [metadata.json](https://github.com/davidh
 |  Locale  |  Lines  | % Done|
 |----------|---------|-------|
 | Template |       6 |       |
+| de       |     6/6 |  100% |
 | zh_CN    |     6/6 |  100% |

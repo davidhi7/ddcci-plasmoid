@@ -1,4 +1,4 @@
-# Translation of ddcci-brightness in zh_CN
+# Translation of ddcci-brightness in de
 # Copyright (C) 2023
 # This file is distributed under the same license as the ddcci-brightness package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
@@ -8,35 +8,35 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ddcci-brightness\n"
 "Report-Msgid-Bugs-To: https://github.com/davidhi7/ddcci-plasmoid\n"
-"POT-Creation-Date: 2023-04-15 20:00+0800\n"
+"POT-Creation-Date: 2023-04-15 17:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: zh_CN\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../contents/config/config.qml
 msgid "General"
-msgstr "常规"
+msgstr "Allgemein"
 
 #: ../contents/ui/configGeneral.qml
 msgid "Step size:"
-msgstr "步长"
+msgstr "Schrittweite:"
 
 #: ../contents/ui/main.qml
 msgid "Error:"
-msgstr "错误："
+msgstr "Fehler:"
 
 #: ../contents/ui/main.qml
 msgid "Display Brightness"
-msgstr "显示器亮度"
+msgstr "Monitor-Helligkeit"
 
 #: ../contents/ui/main.qml
 msgid "No monitors detected"
-msgstr "没有检测到支持的显示器"
+msgstr "Keine Monitore erkannt"
 
 #: ../contents/ui/main.qml
 msgid "Refresh monitors"
-msgstr "重新检测显示器"
+msgstr "Monitore aktualisieren"

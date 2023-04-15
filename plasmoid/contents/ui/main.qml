@@ -253,7 +253,7 @@ Item {
 
     Component.onCompleted: function() {
         monitorDataSource.start();
-        // Plasmoid.setAction("actionId", i18n("text"), "iconName")
+        // Plasmoid.setAction("actionId", i18_n("text"), "iconName") (i18n without underscore)
         Plasmoid.setAction('refreshMonitors', i18n("Refresh monitors"), 'view-refresh-symbolic');
         // Instead of connecting to a signal of this action, a function called `action_{actionId}` is expected (here action_refreshMonitors)
     }

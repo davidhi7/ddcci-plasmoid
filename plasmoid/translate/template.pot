@@ -37,7 +37,6 @@ msgstr ""
 msgid "No monitors detected"
 msgstr ""
 
-#. i18n("text"), "iconName")
 #: ../contents/ui/main.qml
 msgid "Refresh monitors"
 msgstr ""
