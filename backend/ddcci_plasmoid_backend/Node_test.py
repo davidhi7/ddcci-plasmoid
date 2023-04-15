@@ -1,10 +1,12 @@
+from typing import Tuple
+
 import pytest as pytest
 
 from ddcci_plasmoid_backend.Node import Node
 
 
 @pytest.fixture
-def sample_nodes() -> tuple[Node, Node, Node]:
+def sample_nodes() -> Tuple[Node, Node, Node]:
     parent = Node(parent=None, indentation=0)
     child1 = Node(parent=parent, indentation=1, key='key1', value='val1')
     child2 = Node(parent=parent, indentation=1, key='key2', value='val2')
