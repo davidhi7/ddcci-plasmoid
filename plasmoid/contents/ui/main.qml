@@ -133,8 +133,6 @@ Item {
 
         ColumnLayout {
 
-            // spacing: PlasmaCore.Units.gridUnit
-
             Layout.margins: PlasmaCore.Units.gridUnit
 
             // Error notifications
@@ -213,11 +211,11 @@ Item {
                             interval: 400
 
                             // will only be triggered once after restart() called
-                            repeat: false 
+                            repeat: false
                             running: false
                             triggeredOnStart: false
 
-                            onTriggered:  {
+                            onTriggered: {
                                 valuesLock = false
                                 executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
                             }
