@@ -1,14 +1,29 @@
 [tool.poetry]
 name = "ddcci-plasmoid-backend"
-version = "0.1.4"
+version = "0.1.5"
 description = "Backend for ddcci-plasmoid"
 authors = ["David Himmelstoß <77309510+davidhi7@users.noreply.github.com>"]
 license = "MIT"
+readme = "README.md"
+repository = "https://github.com/davidhi7/ddcci-plasmoid"
+keywords = ["ddcci", "brightmess", "widget", "kde", "plasma"]
+classifiers = [
+    "Topic :: Desktop Environment :: K Desktop Environment (KDE)",
+    "Environment :: X11 Applications :: KDE",
+    "Topic :: System :: Hardware"
+]
 packages = [{include = "ddcci_plasmoid_backend"}]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 python = "^3.8"
 fasteners = "^0.18"
+
+[tool.poetry.group.dev]
+optional = true
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.0"
@@ -16,10 +31,6 @@ pytest-asyncio = "^0.21.0"
 
 [tool.poetry.scripts]
 ddcci_plasmoid_backend = "ddcci_plasmoid_backend.__main__:main"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 python_files = "*_test.py"

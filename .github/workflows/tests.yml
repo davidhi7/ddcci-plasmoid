@@ -22,7 +22,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./backend
-        run: pip install poetry && poetry install
+        run: pip install poetry && poetry install --with dev
 
       - name: Run unit tests
         working-directory: ./backend

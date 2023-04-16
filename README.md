@@ -6,6 +6,12 @@
 * A seamless integration into the Plasma desktop is a major goal of this project. The widget is versatile and can be used as a standalone widget or integrated into the system tray.
 * Notebook monitors are currently unsupported because they use different interfaces to communicate with the operating system.
 
+## Requirements
+
+* Python 3.8 or newer
+* python library [fasteners](https://pypi.org/project/fasteners/)
+* ddcutil 1.4.1 or newer (older versions may work but caused issues in the past)
+
 ## Setup
 
 ### 1. Load the `i2c-dev` kernel module
@@ -82,11 +88,11 @@ Display 2
 
 Install the backend from PyPI using the following command:
 
-`pip install ddcci-plasmoid-backend `
+`$ pip install --user ddcci-plasmoid-backend `
 
 ### 4. Install the widget itself ###
 
-Install the [official package](https://store.kde.org/p/2015475) from the KDE store or install directly from the repository:
+Install the [official package](https://store.kde.org/p/2015475) from the KDE store or install it directly from the repository:
 
 ````bash
 $ git clone https://github.com/davidhi7/ddcci-plasmoid.git
@@ -96,6 +102,20 @@ $ kpackagetool5 --install plasmoid
 $ kpackagetool5 --upgrade plasmoid
 ````
 
+### 5. Display the widget
+
+This widget can be displayed within the system tray or as a standalone widget.
+
+##### Integrate into systemtray:
+
+Right-click the arrow of the system tray > open settings > go to *Entries* > scroll down to the entry *Display Brightness* and set the visibility according to your preference.
+
+##### standalone widget
+
+Right-click your desktop > click *Add widgets* > search for *Display Brightness* and add the widget to your desktop or panels.
+
+
+
 ## Common issues
 
 #### The output of `ddcutil detect` starts with `Unable to open directory /sys/bus/i2c/devices/i2c--1: No such file or directory`
@@ -103,6 +123,15 @@ $ kpackagetool5 --upgrade plasmoid
 This is a bug in older ddcutil versions which it is fixed in ddcutil v1.4.1. In some cases, it may cause the backend to fail.
 
 ## History
+
+#### v0.1.5 2023-04-16
+
+* Allow integration into the system tray (#2)
+* Scrolling while hovering sliders now works (#15, thanks CatEricka)
+* Add translations for Simplified Chinese (thanks CatEricka) and German (by myself)
+* Lower minimum Python version to 3.8
+* Add option to specify the backend executable command manually (thanks CatEricka)
+
 
 #### v0.1.4 2023-04-12
 
