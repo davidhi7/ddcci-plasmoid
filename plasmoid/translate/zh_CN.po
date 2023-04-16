@@ -27,7 +27,7 @@ msgstr "步长"
 
 #: ../contents/ui/configGeneral.qml
 msgid "Backend executable command:"
-msgstr ""
+msgstr "后端命令行："
 
 #: ../contents/ui/main.qml
 msgid "Error:"
