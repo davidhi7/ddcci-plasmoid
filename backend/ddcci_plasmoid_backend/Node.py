@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import field
-from typing import Optional
+from typing import Optional, Dict
 
 
 class Node:
@@ -11,7 +11,7 @@ class Node:
     value: str
     children: list[Node] = field(default_factory=list)
 
-    child_by_key: dict[str, Node]
+    child_by_key: Dict[str, Node]
 
     def __init__(self, parent: Optional[Node], indentation: int, key: str = '', value: str = ''):
         """
