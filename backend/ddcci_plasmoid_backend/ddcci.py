@@ -101,7 +101,7 @@ async def detect():
 
 
 def set_brightness(bus_id: int, brightness: int) -> None:
-    subprocess_wrapper(f'ddcutil setvcp --bus {bus_id} {brightness_feature_code:x} {brightness}')
+    subprocess_wrapper(f'ddcutil setvcp --noverify --bus {bus_id} {brightness_feature_code:x} {brightness}')
 
 
 def get_EDID_value(node: Node, value: str) -> Optional[str]:
