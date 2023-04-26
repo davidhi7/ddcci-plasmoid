@@ -33,6 +33,12 @@ Item {
                 connectSource(cmd);
             }
         }
+        function setBrightness({ bus_id, brightness }) {
+            const command = [plasmoid.configuration.executable, 'set-brightness'];
+            if (plasmoid.configuration.ddcutilSkipVerification)
+                command.push('--noverify');
+            executable.exec(command.concat([bus_id, brightness]).join(' '));
+        }
     }
 
     PlasmaCore.DataSource {
@@ -238,7 +244,7 @@ Item {
                             } else {
                                 // Slider is released
                                 valuesLock = false
-                                executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                                executable.setBrightness({ bus_id, brightness })
                             }
                         }
                     }
