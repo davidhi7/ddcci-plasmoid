@@ -100,8 +100,10 @@ async def detect():
     return await asyncio.gather(*awaitables, return_exceptions=True)
 
 
-def set_brightness(bus_id: int, brightness: int) -> None:
-    subprocess_wrapper(f'ddcutil setvcp --bus {bus_id} {brightness_feature_code:x} {brightness}')
+def set_brightness(bus_id: int, brightness: int, ddcutil_noverify: bool) -> None:
+    # If noverify is disabled and there are two spaces between setvcp and --bus, the command fails
+    subprocess_wrapper(f'ddcutil setvcp {"--noverify " if ddcutil_noverify else ""}--bus {bus_id} '
+                       f'{brightness_feature_code:x} {brightness}')
 
 
 def get_EDID_value(node: Node, value: str) -> Optional[str]:

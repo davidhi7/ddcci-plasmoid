@@ -108,7 +108,7 @@ def main():
                 handle_error(f'Illegal value {brightness} for `brightness`, must be between 0 and 100')
 
             try:
-                ddcci.set_brightness(bus_id, brightness)
+                ddcci.set_brightness(bus_id, brightness, arguments['noverify'])
                 print(json.dumps({
                     'command': 'set-brightness',
                     'value': {

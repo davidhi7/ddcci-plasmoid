@@ -25,6 +25,11 @@ def get_parser() -> argparse.ArgumentParser:
     sub_parsers.add_parser('detect')
     set_brightness_parser = sub_parsers.add_parser('set-brightness')
     set_brightness_parser.add_argument(
+        '--noverify',
+        action='store_true',
+        help='Do not read VCP value after setting it'
+    )
+    set_brightness_parser.add_argument(
         'bus',
         type=int,
         help='Number of the i2c bus of the monitor. E.g. 1 for bus /dev/i2c-1'
