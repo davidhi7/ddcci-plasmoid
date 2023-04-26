@@ -1,7 +1,7 @@
 import asyncio
+import getpass
 import json
 import logging
-import os
 import subprocess
 import sys
 import tempfile
@@ -42,7 +42,8 @@ def main():
 
     # include the username in the lock file. Otherwise, if user A creates a lock, user B may not have the permissions
     # to access the lock file and this program will fail until the lock file is deleted.
-    with fasteners.InterProcessLock(Path(tempfile.gettempdir()) / f'ddcci_plasmoid_backend-{os.getlogin()}.lock'):
+    # Using `os.getlogin()` may fail on some configurations (#19)
+    with fasteners.InterProcessLock(Path(tempfile.gettempdir()) / f'ddcci_plasmoid_backend-{getpass.getuser()}.lock'):
         if arguments['command'] == 'detect':
             try:
                 result = asyncio.run(ddcci.detect())
