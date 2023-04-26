@@ -1,4 +1,5 @@
 import argparse
+import pathlib
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -6,7 +7,14 @@ def get_parser() -> argparse.ArgumentParser:
     argument_parser.add_argument(
         '-d', '--debug',
         action='store_true',
-        help='Run in debug mode'
+        help='Print debug messages to stdout'
+    )
+    argument_parser.add_argument(
+        '--debug-log',
+        action='store',
+        type=pathlib.Path,
+        metavar='LOG_FILE',
+        help='Write debug messages to LOG_FILE'
     )
     sub_parsers = argument_parser.add_subparsers(
         title='commands',
