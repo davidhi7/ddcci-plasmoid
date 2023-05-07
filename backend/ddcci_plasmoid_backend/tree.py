@@ -28,6 +28,17 @@ class Node:
         if parent is not None:
             self.parent._register_child(self)
 
+    def walk(self, *args: str) -> str:
+        """
+        Walk recursively into children by key and return the value of the last child of the last given key.
+        Raise a ValueError if a key in the parameters is invalid.
+        """
+        if len(args) == 1 and args[0] in self.child_by_key:
+            return self.child_by_key[args[0]].value
+        if args[0] in self.child_by_key:
+            return self.child_by_key[args[0]].walk(*args[1:])
+        raise ValueError(f'Key `{args[0]}` does not exist in the current node')
+
     def to_dict(self) -> dict[str | list[dict]]:
         """
         Return a representation of this node as a recursive dictionary, removing the `parent` attribute in the process.

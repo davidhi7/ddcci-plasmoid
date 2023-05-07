@@ -2,27 +2,34 @@ from typing import Tuple
 
 import pytest as pytest
 
-from ddcci_plasmoid_backend.Node import Node
+from ddcci_plasmoid_backend.tree import Node
 
 
 @pytest.fixture
-def sample_nodes() -> Tuple[Node, Node, Node]:
+def sample_nodes_1() -> Tuple[Node, Node, Node]:
     parent = Node(parent=None, indentation=0)
     child1 = Node(parent=parent, indentation=1, key='key1', value='val1')
     child2 = Node(parent=parent, indentation=1, key='key2', value='val2')
     return parent, child1, child2
 
 
-def test_init(sample_nodes):
-    parent, child1, child2 = sample_nodes
+@pytest.fixture
+def sample_nodes_2() -> Node:
+    with open('fixtures/nodes/node.txt', 'r') as file:
+        lines = file.read().split('\n')
+    return Node.parse_indented_text(lines)
+
+
+def test_init(sample_nodes_1):
+    parent, child1, child2 = sample_nodes_1
     assert parent.child_by_key['key1'] is child1
     assert parent.child_by_key['key2'] is child2
     assert len(parent.children) == 2
     assert len(parent.child_by_key) == 2
 
 
-def test_dict(sample_nodes):
-    parent, child1, child2 = sample_nodes
+def test_dict(sample_nodes_1):
+    parent, child1, child2 = sample_nodes_1
     dict_tree = parent.to_dict()
     assert dict_tree == {
         'key': '',
@@ -45,12 +52,13 @@ def test_dict(sample_nodes):
     }
 
 
-def test_parse_indented_text_basic():
-    with open('fixtures/basic/indented.txt', 'r') as file:
-        lines = file.read().split('\n')
-    node = Node.parse_indented_text(lines).to_dict()
+def test_walk(sample_nodes_2):
+    assert sample_nodes_2.walk('Root 1', 'Level 1a') == 'value 1a'
+    assert sample_nodes_2.walk('Root 1', 'Level 1a', 'Level 2a', 'Level 3b') == 'value 3b'
 
-    assert node == {
+
+def test_parse_indented_text_basic(sample_nodes_2):
+    assert sample_nodes_2.to_dict() == {
         'key': '',
         'value': '',
         'indentation': -1,
