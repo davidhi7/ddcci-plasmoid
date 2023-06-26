@@ -1,14 +1,20 @@
-[
-  {
-    "id": 1,
+{
+  "4": {
     "name": "24MB56",
     "bus_id": 4,
-    "brightness": 50
+    "ddcutil_id": 1,
+    "property_values": {},
+    "vcp_capabilities": {
+      "1": null
+    }
   },
-  {
-    "id": 2,
+  "7": {
     "name": "ZOWIE XL LCD",
     "bus_id": 7,
-    "brightness": 50
+    "ddcutil_id": 2,
+    "property_values": {},
+    "vcp_capabilities": {
+      "1": null
+    }
   }
-]
+}

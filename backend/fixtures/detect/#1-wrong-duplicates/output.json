@@ -1,20 +1,29 @@
-[
-  {
-    "id": 1,
+{
+  "4": {
     "name": "E2442",
     "bus_id": 4,
-    "brightness": 50
+    "ddcutil_id": 1,
+    "property_values": {},
+    "vcp_capabilities": {
+      "1": null
+    }
   },
-  {
-    "id": 2,
+  "6": {
     "name": "E2342",
     "bus_id": 6,
-    "brightness": 50
+    "ddcutil_id": 2,
+    "property_values": {},
+    "vcp_capabilities": {
+      "1": null
+    }
   },
-  {
-    "id": 3,
+  "8": {
     "name": "PHL 243V7",
     "bus_id": 8,
-    "brightness": 50
+    "ddcutil_id": 3,
+    "property_values": {},
+    "vcp_capabilities": {
+      "1": null
+    }
   }
-]
+}

@@ -57,6 +57,11 @@ def test_walk(sample_nodes_2):
     assert sample_nodes_2.walk('Root 1', 'Level 1a', 'Level 2a', 'Level 3b') == 'value 3b'
 
 
+def test_walk_error(sample_nodes_2):
+    with pytest.raises(ValueError):
+        assert sample_nodes_2.walk('Root 1', 'invalid child key') == 'value 1a'
+
+
 def test_parse_indented_text_basic(sample_nodes_2):
     assert sample_nodes_2.to_dict() == {
         'key': '',

@@ -21,3 +21,15 @@ Display 2
       Binary serial number: XXXXXXXXXX (0xXXXXXXXX)
       Manufacture year:     2018,  Week: 22
    VCP version:         2.1
+
+Invalid Display
+   I2C bus:  /dev/i2c-10
+   DRM connector:           card0-DP-2
+   EDID synopsis:
+      Mfg id:               DEL - Dell Inc.
+      Model:                DELL U2417H
+      Product code:         XXXXX  (0xXXXX)
+      Serial number:        XXXXXXXXXXXX
+      Binary serial number: XXXXXXXXXX (0xXXXXXXXX)
+      Manufacture year:     2018,  Week: 22
+   VCP version:         2.1

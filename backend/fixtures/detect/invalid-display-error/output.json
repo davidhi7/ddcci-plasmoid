@@ -1,8 +1,11 @@
-[
-  {
-    "id": 1,
+{
+  "9": {
     "name": "DELL P2419H",
     "bus_id": 9,
-    "brightness": 50
+    "ddcutil_id": 1,
+    "property_values": {},
+    "vcp_capabilities": {
+      "1": null
+    }
   }
-]
+}

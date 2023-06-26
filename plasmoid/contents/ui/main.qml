@@ -178,88 +178,144 @@ Item {
                 visible: monitorModel.count > 0
 
                 Layout.alignment: Qt.AlignHCenter
-                columns: 3
+                columns: 2
                 rows: monitorModel.count
                 flow: GridLayout.TopToBottom
-                columnSpacing: PlasmaCore.Units.gridUnit
+                columnSpacing: PlasmaCore.Units.gridUnit / 2
                 rowSpacing: PlasmaCore.Units.gridUnit
 
                 Repeater {
                     model: monitorModel
-                    delegate: PlasmaExtras.Heading {
-                        level: 5
-                        text: name
-                    }
-                }
-
-                Repeater {
-                    id: sliders
-                    model: monitorModel
-                    delegate: PlasmaComponents.Slider {
-                        id: slider
-                        // outside the systray, this causes layouting issues
-                        Layout.fillWidth: !root.outsideSysTray
-                        from: 0
-                        to: 100
-                        value: brightness
-                        stepSize: plasmoid.configuration.stepSize || 1
-
-                        Timer {
-                            id: mouseWheelScrollingDebounceTimer
-
-                            // How long does it take to trigger when the mouse wheel stops scrolling
-                            interval: 400
-
-                            // will only be triggered once after restart() called
-                            repeat: false
-                            running: false
-                            triggeredOnStart: false
-
-                            onTriggered: {
-                                valuesLock = false
-                                executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                    delegate: ColumnLayout {
+                        spacing: 0
+                        PlasmaComponents.Label {
+                            Layout.alignment: Qt.AlignRight
+                            Layout.rightMargin: 4
+                            
+                            // level: 5
+                            text: name
+                        }
+                        PlasmaComponents.ToolButton {         
+                            visible:  plasmoid.configuration.advancedMode                   
+                            Layout.alignment: Qt.AlignRight
+                            icon.name: 'system-shutdown-symbolic'
+                            PlasmaComponents.ToolTip {
+                                text: 'Shut monitors down'
+                            }
+                            icon {
+                                width: 16
+                                height: 16
                             }
                         }
-
-                        onMoved: () => {
-                            // Should also be locked during mouse wheel scrolling.
-                            valuesLock = true
-                            brightness = value
-
-                            // Handle mouse wheel debounce only when the slider is not pressed.
-                            if (!pressed) {
-                                mouseWheelScrollingDebounceTimer.restart()
-                            }
-                        }
-
-                        onPressedChanged: function() {
-                            if (pressed) {
-                                valuesLock = true
-                            } else {
-                                // Slider is released
-                                valuesLock = false
-                                executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
-                            }
+                        Item {
+                            Layout.fillWidth: true
                         }
                     }
                 }
 
                 Repeater {
                     model: monitorModel
-                    delegate: PlasmaComponents.Label {
-                        id: percentageLabel
-                        horizontalAlignment: Qt.AlignRight
+                    delegate: ColumnLayout {
+                        RowLayout {
+                            Layout.alignment: Qt.AlignRight
+                            PlasmaComponents.Label {
+                                visible:  plasmoid.configuration.advancedMode
+                                Layout.alignment: Qt.AlignRight
+                                Layout.rightMargin: 4
+                                text: 'Brightness:'
+                            }
 
-                        text: brightness + '%'
+                            PlasmaComponents.Slider {
+                                id: brightnessSlider
+                                Layout.fillWidth: !root.outsideSysTray
+                                from: 0
+                                to: 100
+                                value: brightness
+                            }
 
-                        Layout.minimumWidth: percentageMetrics.advanceWidth
-                        TextMetrics {
-                            id: percentageMetrics
-                            font: percentageLabel.font
-                            text: '100%'
+                            PlasmaComponents.Label {
+                                id: percentageLabel
+                                horizontalAlignment: Qt.AlignRight
+
+                                text: brightness + '%'
+                                Layout.minimumWidth: percentageMetrics.advanceWidth
+                            }
+                        }
+
+                        RowLayout {
+                            visible:  plasmoid.configuration.advancedMode
+                            Layout.alignment: Qt.AlignRight
+                            PlasmaComponents.Label {
+                                Layout.alignment: Qt.AlignRight
+                                Layout.rightMargin: 4
+                                text: 'Contrast:'
+                            }
+
+                            PlasmaComponents.Slider {
+                                id: contrastSlider
+                                Layout.fillWidth: !root.outsideSysTray
+                                from: 0
+                                to: 100
+                                value: brightness
+                            }
+
+                            PlasmaComponents.Label {
+                                horizontalAlignment: Qt.AlignRight
+
+                                text: brightness + '%'
+                                Layout.minimumWidth: percentageMetrics.advanceWidth
+                            }
                         }
                     }
                 }
+
+                    // delegate: PlasmaComponents.Slider {
+                    //     id: slider
+                    //     // outside the systray, this causes layouting issues
+                    //     Layout.fillWidth: !root.outsideSysTray
+                    //     from: 0
+                    //     to: 100
+                    //     value: brightness
+                    //     stepSize: plasmoid.configuration.stepSize || 1
+
+                    //     Timer {
+                    //         id: mouseWheelScrollingDebounceTimer
+
+                    //         // How long does it take to trigger when the mouse wheel stops scrolling
+                    //         interval: 400
+
+                    //         // will only be triggered once after restart() called
+                    //         repeat: false
+                    //         running: false
+                    //         triggeredOnStart: false
+
+                    //         onTriggered: {
+                    //             valuesLock = false
+                    //             executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                    //         }
+                    //     }
+
+                    //     onMoved: () => {
+                    //         // Should also be locked during mouse wheel scrolling.
+                    //         valuesLock = true
+                    //         brightness = value
+
+                    //         // Handle mouse wheel debounce only when the slider is not pressed.
+                    //         if (!pressed) {
+                    //             mouseWheelScrollingDebounceTimer.restart()
+                    //         }
+                    //     }
+
+                    //     onPressedChanged: function() {
+                    //         if (pressed) {
+                    //             valuesLock = true
+                    //         } else {
+                    //             // Slider is released
+                    //             valuesLock = false
+                    //             executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                    //         }
+                    //     }
+                    // }
             }
 
             // Item to fill entire width and the remaining height, this way all other childs of the layout can be centered horizontally
@@ -267,6 +323,12 @@ Item {
                 height: 0
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+            }
+
+            TextMetrics {
+                id: percentageMetrics
+                font: percentageLabel.font
+                text: '100%'
             }
 
         }

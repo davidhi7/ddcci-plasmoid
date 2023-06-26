@@ -1,0 +1,14 @@
+{
+  "9": {
+    "capabilities": "Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C E3 F3)vcp(02 04 05 08 10 12 14(05 08 0B 0C) 16 18 1A 52 60(0F 11 12 ) 62 AC AE B2 B6 C6 C8 C9 CA CC(02 0A 03 04 08 09 0D 06 ) D6(01 04 05) DC(00 05 ) DF E0 E1 E2(00 20 21 22 2F 04 1E 1F 1D 0E 12 14 27 23 24 3A ) E3 EA(FE00 FE01) F0(0D 0E 0C 0F 10 11 13 31 32 34 36 ) F1 F2 FD)mswhql(1)asset_eep(40)mccs_ver(2.1))\n",
+    "10": "VCP 10 C 50 100\n",
+    "12": "VCP 12 C 75 100\n",
+    "D6": "VCP D6 SNC x01\n"
+  },
+  "10": {
+    "capabilities": "Unparsed capabilities string: (prot(monitor)type(LCD)model(U2417H)cmds(01 02 03 07 0C E3 F3)vcp(02 04 05 08 10 12 14(01 04 05 06 08 09 0B 0C)16 18 1A 60(10 0F 11) AA(01 02 03 04) AC AE B6 C6 C8 C9 D6(01 04 05) DC(00 02 03 05) DF E0 E1 E2(00 01 02 04 0B 0C 0D 0F 10 11 13 14 19) F0(08) F1 F2 FD)mccs_ver(2.1)mswhql(1))\n",
+    "10": "VCP 10 C 100 100\n",
+    "12": "VCP 12 C 100 100\n",
+    "D6": "VCP D6 SNC x04\n"
+  }
+}

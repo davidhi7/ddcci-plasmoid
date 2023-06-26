@@ -1,0 +1,11 @@
+{
+  "4": {
+    "capabilities": "Unparsed capabilities string: (prot(monitor)type(LCD)model(sample)cmds(01 02 03 07 0C E3 F3)vcp(01)mswhql(1)asset_eep(40)mccs_ver(2.1))\n"
+  },
+  "6": {
+    "capabilities": "Unparsed capabilities string: (prot(monitor)type(LCD)model(sample)cmds(01 02 03 07 0C E3 F3)vcp(01)mswhql(1)asset_eep(40)mccs_ver(2.1))\n"
+  },
+  "8": {
+    "capabilities": "Unparsed capabilities string: (prot(monitor)type(LCD)model(sample)cmds(01 02 03 07 0C E3 F3)vcp(01)mswhql(1)asset_eep(40)mccs_ver(2.1))\n"
+  }
+}

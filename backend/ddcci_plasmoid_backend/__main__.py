@@ -6,23 +6,35 @@ import re
 import subprocess
 import sys
 import tempfile
+import traceback
 from importlib.metadata import version
 from pathlib import Path
 from typing import NoReturn
 
 import fasteners
 
-from ddcci_plasmoid_backend import ddcci
-from ddcci_plasmoid_backend.__init__ import get_parser
+from ddcci_plasmoid_backend import get_parser, Property
+from ddcci_plasmoid_backend.adapters import adapters
 
 
 def get_ddcutil_version() -> str:
+    # TODO log if ddcutil is not found in path
     result = subprocess.run(['ddcutil', '--version'], check=True, stdout=subprocess.PIPE)
     # First line of ddcutil output contains the version
     version_line = result.stdout.decode().split('\n')[0]
     # Remove all characters from this line except for points followed by a number
     # This is supposed to extract the version (x.y.z) from the string
     return re.sub(r'(?!\.\d)\D', '', version_line)
+
+
+def handle_error(command: str, error: str | Exception) -> NoReturn:
+    if isinstance(error, Exception):
+        error = str(error)
+    print(json.dumps({
+        'command': command,
+        'error': error.replace('\n', ' ')
+    }))
+    sys.exit(1)
 
 
 def main():
@@ -53,16 +65,6 @@ def main():
     logger = logging.getLogger(__name__)
     logger.debug(f'backend version: {version("ddcci-plasmoid-backend")}')
     logger.debug(f'ddcutil version: {get_ddcutil_version()}')
-
-    def handle_error(error: str | subprocess.CalledProcessError) -> NoReturn:
-        if isinstance(error, subprocess.CalledProcessError):
-            error = err.stderr if err.stderr else err.stdout
-        print(json.dumps({
-            'command': arguments['command'],
-            'error': error.replace('\n', ' ')
-        }))
-        sys.exit(1)
-
     logger.debug(f'argv: {" ".join(sys.argv)}')
 
     if arguments['command'] == 'version':
@@ -73,53 +75,42 @@ def main():
     # to access the lock file and this program will fail until the lock file is deleted.
     # Using `os.getlogin()` may fail on some configurations (#19)
     with fasteners.InterProcessLock(Path(tempfile.gettempdir()) / f'ddcci_plasmoid_backend-{getpass.getuser()}.lock'):
-        if arguments['command'] == 'detect':
-            try:
-                result = asyncio.run(ddcci.detect())
-            except subprocess.CalledProcessError as err:
-                logger.debug(err)
-                handle_error(err)
-            except Exception as err:
-                logger.debug(err)
-                handle_error('Failed to fetch monitor data')
-
-            count = len(result)
-            # Remove objects that are errors
-            for report in result:
-                if isinstance(report, Exception):
-                    logger.debug(report)
-                    result.remove(report)
-            # filtered_results = [report for report in result if isinstance(report, dict)]
-
-            filtered_count = len(result)
-            remaining_count = count - filtered_count
-
-            logger.debug(f'Detected {filtered_count} working monitor {"bus" if filtered_count == 1 else "busses"}, '
-                         f'{remaining_count} non-working {"bus" if remaining_count == 1 else "busses"}.')
-
-            print(json.dumps({
-                'command': 'detect',
-                'value': result
-            }))
-        elif arguments['command'] == 'set-brightness':
-            bus_id = arguments['bus']
-            brightness = arguments['brightness']
-            if brightness < 0 or brightness > 100:
-                handle_error(f'Illegal value {brightness} for `brightness`, must be between 0 and 100')
-
-            try:
-                ddcci.set_brightness(bus_id, brightness)
+        try:
+            if arguments['command'] == 'detect':
+                adapter_args = [adapters.adapter_by_label(adapter) for adapter in arguments['adapter']]
                 print(json.dumps({
-                    'command': 'set-brightness',
-                    'value': {
-                        'bus_id': bus_id,
-                        'brightness': brightness
-                    }
+                    'command': 'detect',
+                    'response': asyncio.run(adapters.detect(adapter_args))
                 }))
-            except subprocess.CalledProcessError as err:
-                logger.debug(err)
-                handle_error(err)
+            elif arguments['command'] == 'set':
+                adapter_arg = adapters.adapter_by_label(arguments['adapter'])
+                property_arg = Property(arguments['property'])
+                print(json.dumps({
+                    'command': 'detect',
+                    'response': asyncio.run(adapters.set_property(adapter_arg, property_arg, arguments['id'], arguments['value']))
+                }))
+                ...
+                # bus_id = arguments['bus']
+                # brightness = arguments['brightness']
+                # if brightness < 0 or brightness > 100:
+                #     handle_error(f'Illegal value {brightness} for `brightness`, must be between 0 and 100')
+                #
+                # try:
+                #     ddcci.set_brightness(bus_id, brightness)
+                #     print(json.dumps({
+                #         'command': 'set-brightness',
+                #         'value': {
+                #             'bus_id': bus_id,
+                #             'brightness': brightness
+                #         }
+                #     }))
+                # except subprocess.CalledProcessError as err:
+                #     logger.debug(err)
+                #     handle_error(err)
 
+        except Exception as exc:
+            logger.debug(traceback.print_exc())
+            handle_error('detect', exc)
     sys.exit(0)
 
 

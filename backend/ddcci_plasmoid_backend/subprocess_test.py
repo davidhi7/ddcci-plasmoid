@@ -1,9 +1,10 @@
 import logging
 import subprocess
+from subprocess import CalledProcessError
 
 import pytest
 
-from ddcci_plasmoid_backend.subprocess_wrapper import subprocess_wrapper, async_subprocess_wrapper, CommandOutput
+from ddcci_plasmoid_backend import subprocess
 
 
 @pytest.fixture
@@ -21,7 +22,7 @@ def stdout_stderr_test():
 
 
 def test_subprocess_wrapper_success(silent_logger, stdout_stderr_test):
-    output = subprocess_wrapper(stdout_stderr_test, logger=silent_logger)
+    output = subprocess.subprocess_wrapper(*stdout_stderr_test, logger=silent_logger)
     assert output.stdout == 'test-stdout'
     assert output.stderr == 'test-stderr'
     assert output.returnCode == 0
@@ -29,12 +30,16 @@ def test_subprocess_wrapper_success(silent_logger, stdout_stderr_test):
 
 def test_subprocess_wrapper_fail(silent_logger):
     # /usr/bin/false will always return a return code of 1
-    with pytest.raises(subprocess.CalledProcessError):
-        subprocess_wrapper('false', logger=silent_logger)
+    with pytest.raises(CalledProcessError):
+        subprocess.subprocess_wrapper('false', logger=silent_logger)
+
+
+def test_subprocess_wrapper_logger_none():
+    subprocess.subprocess_wrapper('true')
 
 
 async def test_async_subprocess_wrapper_success(silent_logger, stdout_stderr_test):
-    output = await async_subprocess_wrapper(stdout_stderr_test[0], *stdout_stderr_test[1:], logger=silent_logger)
+    output = await subprocess.async_subprocess_wrapper(*stdout_stderr_test, logger=silent_logger)
     assert output.stdout == 'test-stdout'
     assert output.stderr == 'test-stderr'
     assert output.returnCode == 0
@@ -42,5 +47,9 @@ async def test_async_subprocess_wrapper_success(silent_logger, stdout_stderr_tes
 
 async def test_async_subprocess_wrapper_fail(silent_logger):
     # /usr/bin/false will always return a return code of 1
-    with pytest.raises(subprocess.CalledProcessError) as err:
-        await async_subprocess_wrapper('false', logger=silent_logger)
+    with pytest.raises(CalledProcessError):
+        await subprocess.async_subprocess_wrapper('false', logger=silent_logger)
+
+
+def test_async_subprocess_wrapper_logger_none():
+    subprocess.subprocess_wrapper('true')

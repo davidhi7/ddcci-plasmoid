@@ -7,6 +7,7 @@ Kirigami.FormLayout {
 
     property alias cfg_stepSize: stepSize.text
     property alias cfg_executable: executable.text
+    property alias cfg_advancedMode: advancedMode.checked
 
     QQC2.TextField {
         id: stepSize
@@ -17,5 +18,10 @@ Kirigami.FormLayout {
     QQC2.TextField {
         id: executable
         Kirigami.FormData.label: i18n("Backend executable command:")
+    }
+
+    QQC2.CheckBox {
+        id: advancedMode
+        Kirigami.FormData.label: i18n("Show contrast sliders and power button:")
     }
 }
