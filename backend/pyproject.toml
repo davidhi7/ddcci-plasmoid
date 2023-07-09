@@ -28,6 +28,8 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.0"
 pytest-asyncio = "^0.21.0"
+tox = "^4.6.4"
+ruff = "^0.0.277"
 
 [tool.poetry.scripts]
 ddcci_plasmoid_backend = "ddcci_plasmoid_backend.__main__:main"
@@ -37,3 +39,32 @@ python_files = "*_test.py"
 python_functions = "test_*"
 addopts = "--pyargs ddcci_plasmoid_backend"
 asyncio_mode = "auto"
+
+[tool.ruff]
+target-version = "py38"
+select = [
+	# pycodestyle
+	"E",
+	"W",
+	# pyflakes
+	"F",
+	# pyupgrade
+	# Use modern Python features for the best possible develop experience.
+	"UP",
+	# flake8-bugbear
+	# Find obvious bugs.
+	"B",
+	# flake8-pie
+	"PIE",
+	# flake8-return
+	"RET",
+	# pep8-naming
+	"N",
+	# flake8-simplify
+	"SIM",
+]
+ignore = [
+	# Line too long
+	"E501",
+]
+
