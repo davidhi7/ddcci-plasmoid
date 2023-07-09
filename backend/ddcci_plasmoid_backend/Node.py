@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import field
-from typing import Optional, Dict
 
 
 class Node:
-    parent: Optional[Node]
+    parent: Node | None
     indentation: int
     key: str
     value: str
     children: list[Node] = field(default_factory=list)
 
-    child_by_key: Dict[str, Node]
+    child_by_key: dict[str, Node]
 
-    def __init__(self, parent: Optional[Node], indentation: int, key: str = '', value: str = ''):
+    def __init__(self, parent: Node | None, indentation: int, key: str = '', value: str = ''):
         """
         Create a new node and set it as the child of the parent.
         """
