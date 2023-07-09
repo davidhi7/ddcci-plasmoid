@@ -119,7 +119,11 @@ def get_monitor_id(node: Node):
 def subprocess_wrapper(cmd: str) -> CommandOutput:
     logger.debug('Execute command: `' + cmd + '`')
     proc = subprocess.run(cmd.split(' '), capture_output=True)
-    stdout = proc.stdout.decode()
+    # Fix #32
+    stdout = proc.stdout.decode().replace(
+        '(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future io I2C_IO_STRATEGY_FILEIO. '
+        'Retrying\n', ''
+    )
     stderr = proc.stderr.decode()
     command_output = {
         'returnCode': proc.returncode,
@@ -139,7 +143,11 @@ async def async_subprocess_wrapper(cmd: str) -> CommandOutput:
     # it's safe to assume that the return code is not None at this point
     return_code: int = 1 if proc.returncode is None else proc.returncode
     stdout, stderr = await proc.communicate()
-    stdout = stdout.decode()
+    # Fix #32
+    stdout = stdout.decode().replace(
+        '(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future io I2C_IO_STRATEGY_FILEIO. '
+        'Retrying\n', ''
+    )
     stderr = stderr.decode()
     command_output = {
         'returnCode': return_code,
