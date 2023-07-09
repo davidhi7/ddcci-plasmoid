@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import getpass
 import json
@@ -56,7 +58,7 @@ def main():
 
     def handle_error(error: str | subprocess.CalledProcessError) -> NoReturn:
         if isinstance(error, subprocess.CalledProcessError):
-            error = err.stderr if err.stderr else err.stdout
+            error = error.stderr if error.stderr else error.stdout
         print(json.dumps({
             'command': arguments['command'],
             'error': error.replace('\n', ' ')
