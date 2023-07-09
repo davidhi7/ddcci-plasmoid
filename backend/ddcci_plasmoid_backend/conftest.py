@@ -22,6 +22,7 @@ def return_command_output():
 
     return inner
 
+
 @pytest.fixture
 def return_callback_command_output():
     ...
