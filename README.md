@@ -124,6 +124,11 @@ This is a bug in older ddcutil versions which it is fixed in ddcutil v1.4.1. In 
 
 ## History
 
+#### v0.1.6 2023-07-09
+
+* Fix backend errors with certain NVIDIA GPUs
+* Fix compatibility with Python 3.9 and 3.8
+
 #### v0.1.5 2023-04-16
 
 * Allow integration into the system tray (#2)
