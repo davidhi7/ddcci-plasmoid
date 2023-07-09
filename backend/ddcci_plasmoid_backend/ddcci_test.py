@@ -26,12 +26,8 @@ def return_CommandOutput():
     return inner
 
 
-@pytest.mark.parametrize('dir', [
-    'simple', 'duplicate', '#1-wrong-duplicates', 'duplicate-binary-serial-numbers', 'duplicate-serial-numbers',
-    'invalid-display-error', 'missing-serial-numbers'
-])
-async def test_detect(monkeypatch, dir, return_coroutine, return_CommandOutput):
-    path = Path('fixtures/detect/') / dir
+@pytest.mark.parametrize('path', Path('fixtures/detect/').glob('*'))
+async def test_detect(monkeypatch, path, return_coroutine, return_CommandOutput):
     with open(path / 'input.txt') as file:
         input_data = file.read()
     with open(path / 'output.json') as file:
@@ -39,6 +35,6 @@ async def test_detect(monkeypatch, dir, return_coroutine, return_CommandOutput):
 
     monkeypatch.setattr(ddcci, 'subprocess_wrapper', lambda _: return_CommandOutput(stdout=input_data))
     monkeypatch.setattr(ddcci, 'async_subprocess_wrapper',
-                        lambda _: return_coroutine(return_CommandOutput(stdout='VCP 10 C 50 100')))
+                        lambda _: return_coroutine(return_CommandOutput(stdout='VCP 10 C 50 100\n')))
 
     assert await ddcci.detect() == output_data
