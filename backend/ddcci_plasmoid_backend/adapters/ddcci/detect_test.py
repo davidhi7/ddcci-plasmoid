@@ -1,8 +1,8 @@
 import pytest
 
-from ddcci_plasmoid_backend import subprocess
+from ddcci_plasmoid_backend import subprocess_wrappers
 from ddcci_plasmoid_backend.adapters.ddcci.SerialNumbers import SerialNumbers
-from ddcci_plasmoid_backend.subprocess import CommandOutput
+from ddcci_plasmoid_backend.subprocess_wrappers import CommandOutput
 from ddcci_plasmoid_backend.tree import Node
 from ddcci_plasmoid_backend.adapters.ddcci.detect import _get_ddcutil_monitor_id, _get_vcp_value, \
     _parse_capabilities, _get_monitor_identification, _strip_ddcutil_nvidia_warning
@@ -31,13 +31,13 @@ def test_get_ddcutil_monitor_id_exception():
 
 
 async def test_get_vcp_value_continuous(monkeypatch, return_coroutine, return_command_output):
-    monkeypatch.setattr(subprocess, 'async_subprocess_wrapper',
+    monkeypatch.setattr(subprocess_wrappers, 'async_subprocess_wrapper',
                         lambda *args, logger: return_coroutine(return_command_output(stdout='VCP 10 C 45 100')))
     assert await _get_vcp_value(0, 0x10) == 45
 
 
 async def test_get_vcp_value_noncontinuous(monkeypatch, return_coroutine, return_command_output):
-    monkeypatch.setattr(subprocess, 'async_subprocess_wrapper',
+    monkeypatch.setattr(subprocess_wrappers, 'async_subprocess_wrapper',
                         lambda *args, logger: return_coroutine(return_command_output(stdout='VCP D6 SNC x01')))
     assert await _get_vcp_value(0, 0xD6) == 1
 
@@ -46,7 +46,7 @@ async def test_parse_capabilities(monkeypatch, return_coroutine, return_command_
     vcp_feature_string = 'Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C E3' \
                          ' F3)vcp(02 04 05 08 10 12 14(05 08 0B 0C) 16 18 1A 52 60(0F 11 12 ))mswhql(1)asset_eep(40)' \
                          'mccs_ver(2.1))'
-    monkeypatch.setattr(subprocess, 'async_subprocess_wrapper',
+    monkeypatch.setattr(subprocess_wrappers, 'async_subprocess_wrapper',
                         lambda *args, logger: return_coroutine(return_command_output(stdout=vcp_feature_string)))
     assert await _parse_capabilities(0) == {
         0x02: None,
@@ -65,11 +65,11 @@ async def test_parse_capabilities(monkeypatch, return_coroutine, return_command_
 
 
 def test_strip_ddcutil_nvidia_warning():
-    without_warning = CommandOutput(returnCode=0, stdout='VCP 10 C 50 100\n', stderr='')
+    without_warning = CommandOutput(return_code=0, stdout='VCP 10 C 50 100\n', stderr='')
     assert _strip_ddcutil_nvidia_warning(without_warning) == without_warning
 
     with_warning = CommandOutput(
-        returnCode=0,
+        return_code=0,
         stdout='(is_nvidia_einval_bug          ) nvida/i2c-dev bug '
                'encountered. Forcing future io I2C_IO_STRATEGY_FILEIO.'
                ' Retrying\nVCP 10 C 50 100\n',

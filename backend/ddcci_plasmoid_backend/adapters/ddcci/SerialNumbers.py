@@ -21,14 +21,13 @@ class SerialNumbers:
         if not self.binary_serial_number:
             return
         pattern = re.compile(r'^([\dA-Za-z]+) \(0x[\dA-Za-z]+\)\s*$')
-        if value := pattern.findall(self.binary_serial_number):
-            if len(value) == 1:
-                # Remove stuff like leading zeros so that binary serial number strings with identical numbers are
-                # always equal
-                try:
-                    self.binary_serial_number = str(int(value[0]))
-                except ValueError:
-                    logger.debug(f'Failed to parse binary serial number `{self.binary_serial_number}`')
+        if (value := pattern.findall(self.binary_serial_number)) and len(value) == 1:
+            # Remove stuff like leading zeros so that binary serial number strings with identical numbers are
+            # always equal
+            try:
+                self.binary_serial_number = str(int(value[0]))
+            except ValueError:
+                logger.debug(f'Failed to parse binary serial number `{self.binary_serial_number}`')
 
     def __eq__(self, other: 'SerialNumbers') -> bool:
         """

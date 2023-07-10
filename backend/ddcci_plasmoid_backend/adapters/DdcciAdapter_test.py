@@ -2,12 +2,13 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Union
 
 import pytest
 
-from ddcci_plasmoid_backend import subprocess
+from ddcci_plasmoid_backend import subprocess_wrappers
 from ddcci_plasmoid_backend.adapters.DdcciAdapter import DdcciAdapter
-from ddcci_plasmoid_backend.subprocess import CommandOutput
+from ddcci_plasmoid_backend.subprocess_wrappers import CommandOutput
 
 
 @pytest.fixture(scope='module', params=Path('fixtures/detect/').glob('*/'))
@@ -28,7 +29,7 @@ def ddcutil_mock(request):
 
     def load_cached_json(path):
         if path not in json_file_cache:
-            with open(path, 'r') as file:
+            with open(path) as file:
                 print('file loaded')
                 json_file_cache[path] = json.load(file)
 
@@ -38,16 +39,16 @@ def ddcutil_mock(request):
         # `detect` is the only ddcutil verb that does not require or support specific monitor identifications
         if 'detect' in command:
             with open(fixture_dir / 'detect.txt') as file:
-                return CommandOutput(stdout=file.read(), stderr='', returnCode=0)
+                return CommandOutput(stdout=file.read(), stderr='', return_code=0)
 
         if '--bus' in command:
             try:
                 bus_id = int(command[command.index('--bus') + 1])
-            except ValueError | IndexError:
-                raise ValueError('Failed to parse bus id of ddcutil call')
+            except Union[ValueError, IndexError] as error:
+                raise ValueError('Failed to parse bus id of ddcutil call') from error
             if 'capabilities' in command:
                 return CommandOutput(stdout=load_cached_json(fixture_dir / 'vcp.json')[str(bus_id)]['capabilities'],
-                                     stderr='', returnCode=0)
+                                     stderr='', return_code=0)
             elif 'getvcp' in command:
                 feature_code_index = command.index('getvcp') + 1
                 if command[feature_code_index] == '--bus':
@@ -56,14 +57,15 @@ def ddcutil_mock(request):
                     feature_code_index += 1
                 try:
                     feature_code = int(command[feature_code_index], 16)
-                except ValueError:
-                    raise ValueError('Failed to parse feature code of getvcp feature code')
+                except ValueError as error:
+                    raise ValueError('Failed to parse feature code of getvcp feature code') from error
                 return CommandOutput(
                     stdout=load_cached_json(fixture_dir / 'vcp.json')[str(bus_id)][f'{feature_code:X}'],
                     stderr='',
-                    returnCode=0
+                    return_code=0
                 )
-
+            return None
+        return None
     with open(fixture_dir / 'output.json') as file:
         output = json.load(file)
     return mock, output
@@ -81,8 +83,8 @@ def async_ddcutil_mock(ddcutil_mock):
 
 async def test_detect(monkeypatch, ddcutil_mock, async_ddcutil_mock):
     sync_ddcutil_mock, expected_output = ddcutil_mock
-    monkeypatch.setattr(subprocess, 'subprocess_wrapper', sync_ddcutil_mock)
-    monkeypatch.setattr(subprocess, 'async_subprocess_wrapper', async_ddcutil_mock)
+    monkeypatch.setattr(subprocess_wrappers, 'subprocess_wrapper', sync_ddcutil_mock)
+    monkeypatch.setattr(subprocess_wrappers, 'async_subprocess_wrapper', async_ddcutil_mock)
     detected_monitors = await DdcciAdapter.detect()
     # turn output into only dicts
     dictified_output = {key: value.prepare_json_dump() for key, value in detected_monitors.items()}
@@ -90,5 +92,3 @@ async def test_detect(monkeypatch, ddcutil_mock, async_ddcutil_mock):
     # expected output
     json_output = json.loads(json.dumps(dictified_output))
     assert json_output == expected_output
-
-

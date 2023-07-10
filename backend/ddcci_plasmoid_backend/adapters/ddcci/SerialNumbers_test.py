@@ -1,4 +1,3 @@
-import pytest
 
 from ddcci_plasmoid_backend.adapters.ddcci.SerialNumbers import SerialNumbers as SN
 

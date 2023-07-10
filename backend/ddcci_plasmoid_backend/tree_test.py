@@ -15,7 +15,7 @@ def sample_nodes_1() -> Tuple[Node, Node, Node]:
 
 @pytest.fixture
 def sample_nodes_2() -> Node:
-    with open('fixtures/nodes/node.txt', 'r') as file:
+    with open('fixtures/nodes/node.txt') as file:
         lines = file.read().split('\n')
     return Node.parse_indented_text(lines)
 

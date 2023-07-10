@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import asyncio
-from typing import List, Dict
 from functools import reduce
 
 from ddcci_plasmoid_backend import Property
@@ -14,14 +15,14 @@ monitor_adapters = [
 ]
 
 
-def adapter_by_label(label: str) -> 'MonitorAdapter':
+def adapter_by_label(label: str) -> MonitorAdapter:
     for backend in monitor_adapters:
         if label == backend.label:
             return backend
     raise ValueError(f'Invalid backend label `{label}`')
 
 
-async def detect(adapters: List[MonitorAdapter]) -> Dict[str, Dict]:
+async def detect(adapters: list[MonitorAdapter]) -> dict[str, dict]:
     async def detect_call(adapter: MonitorAdapter):
         data = await adapter.detect()
         return {

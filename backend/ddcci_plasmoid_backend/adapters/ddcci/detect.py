@@ -7,18 +7,18 @@ import re
 from subprocess import CalledProcessError
 
 from ddcci_plasmoid_backend import Property
-from ddcci_plasmoid_backend import subprocess
+from ddcci_plasmoid_backend import subprocess_wrappers
 from ddcci_plasmoid_backend.adapters.Monitor import ContinuousValue, NonContinuousValue
 from ddcci_plasmoid_backend.adapters.ddcci import FeatureCode
 from ddcci_plasmoid_backend.adapters.ddcci.DdcciMonitor import DdcciMonitor, VcpFeatureList
 from ddcci_plasmoid_backend.adapters.ddcci.SerialNumbers import SerialNumbers
-from ddcci_plasmoid_backend.subprocess import CommandOutput
+from ddcci_plasmoid_backend.subprocess_wrappers import CommandOutput
 from ddcci_plasmoid_backend.tree import Node
 
 logger = logging.getLogger(__name__)
 
 
-async def ddcutil_detect_monitors() -> List[DdcciMonitor]:
+async def ddcutil_detect_monitors() -> list[DdcciMonitor]:
     """
     Detect all connected monitors supporting DDC/CI including their capabilities and feature values.
 
@@ -26,11 +26,12 @@ async def ddcutil_detect_monitors() -> List[DdcciMonitor]:
         List of all detected monitors.
     """
     logger.debug('Detect connected DDC/CI monitors')
-    detect_output = _strip_ddcutil_nvidia_warning(subprocess.subprocess_wrapper('ddcutil', 'detect', logger=logger))
+    detect_output = _strip_ddcutil_nvidia_warning(
+        subprocess_wrappers.subprocess_wrapper('ddcutil', 'detect', logger=logger))
     parsed_output = Node.parse_indented_text(detect_output.stdout.split('\n'))
     logger.debug(f'Found {len(parsed_output.children)} entries at root level')
 
-    identified_monitors: List[SerialNumbers] = []
+    identified_monitors: list[SerialNumbers] = []
     monitor_tasks = []
     for monitor_node in parsed_output.children:
         # Try to get the ddcutil monitor id. If this fails, the node is likely not representing a functional DDC/CI
@@ -51,6 +52,7 @@ async def ddcutil_detect_monitors() -> List[DdcciMonitor]:
 
     monitors = await asyncio.gather(*monitor_tasks, return_exceptions=True)
     count_all = len(monitors)
+    # Filter exception objects that indicate that monitor detection failed
     for entry in list(monitors):
         if isinstance(entry, Exception):
             logger.debug('Failed to retrieve data for one monitor: ' + str(entry))
@@ -83,7 +85,7 @@ async def _gather_monitor_data(ddcutil_id, monitor: Node) -> DdcciMonitor:
     try:
         monitor_name = monitor.walk('EDID synopsis', 'Model')
     except ValueError:
-        local_logger.debug(f'Monitor model name unavailable')
+        local_logger.debug('Monitor model name unavailable')
         monitor_name = 'Unknown monitor'
 
     # Retrieve capabilities and vcp feature values
@@ -93,7 +95,7 @@ async def _gather_monitor_data(ddcutil_id, monitor: Node) -> DdcciMonitor:
         local_logger.debug('Failed to parse monitor capabilities, skipping')
         raise
 
-    vcp_values: Dict[Property, ContinuousValue | NonContinuousValue] = {}
+    vcp_values: dict[Property, ContinuousValue | NonContinuousValue] = {}
     # Concurrent ddcutil calls on the same i2c bus would fail
     if FeatureCode.BRIGHTNESS.value in capabilities:
         vcp_values[Property.BRIGHTNESS] = \
@@ -175,7 +177,7 @@ async def _get_vcp_value(bus_id: int, feature_code: int) -> int:
     Raises:
         subprocess.CalledProcessError: The underlying ddcutil command fails.
     """
-    result = _strip_ddcutil_nvidia_warning(await subprocess.async_subprocess_wrapper(
+    result = _strip_ddcutil_nvidia_warning(await subprocess_wrappers.async_subprocess_wrapper(
         'ddcutil', 'getvcp', '--bus', str(bus_id), '--brief', hex(feature_code), logger=logger))
     feature_value = result.stdout.split(' ')[3]
     # if the value is returned in hexadecimal format, it begins with 'x'.
@@ -199,8 +201,8 @@ async def _parse_capabilities(bus_id: int) -> VcpFeatureList:
     parsed_features: VcpFeatureList = {}
 
     output = _strip_ddcutil_nvidia_warning(
-        await subprocess.async_subprocess_wrapper('ddcutil', 'capabilities', '--bus', str(bus_id), '--brief',
-                                                  logger=logger))
+        await subprocess_wrappers.async_subprocess_wrapper('ddcutil', 'capabilities', '--bus', str(bus_id), '--brief',
+                                                           logger=logger))
     # This is what a sample capabilities string looks like:
     #  Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C E3 F3)vcp(02 04 05 08 10
     #  12 14(05 08 0B 0C) 16 18 1A 52 60(0F 11 12 ))mswhql(1)asset_eep(40)mccs_ver(2.1))

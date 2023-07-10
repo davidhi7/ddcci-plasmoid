@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Dict, Optional, List
+from typing import Optional, List, Dict
 
 from ddcci_plasmoid_backend.adapters.Monitor import Monitor
 
@@ -12,7 +14,7 @@ class DdcciMonitor(Monitor):
     bus_id: int
     vcp_capabilities: VcpFeatureList
 
-    def prepare_json_dump(self) -> Dict:
+    def prepare_json_dump(self) -> dict:
         dict = super().prepare_json_dump()
         # Replace decimal integers with hexadecimal strings
         dict['vcp_capabilities'] = {f'{code:X}': value for code, value in dict['vcp_capabilities'].items()}

@@ -1,6 +1,6 @@
 import pytest
 
-from ddcci_plasmoid_backend.subprocess import CommandOutput
+from ddcci_plasmoid_backend.subprocess_wrappers import CommandOutput
 
 """
 Pytest fixtures shared throughout the entire package

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 
 @dataclass
 class CommandOutput:
-    returnCode: int
+    return_code: int
     stdout: str
     stderr: str
 
@@ -76,6 +76,6 @@ def _log_subprocess_output(cmd: str, output: CommandOutput, logger: logging.Logg
     # remove trailing newlines for better readability
     stripped_stdout = re.sub(r"\n$", "", output.stdout)
     stripped_stderr = re.sub(r"\n$", "", output.stderr)
-    logger.debug(f'[code]   {cmd}: {output.returnCode}')
+    logger.debug(f'[code]   {cmd}: {output.return_code}')
     logger.debug(f'[stdout] {cmd}: {stripped_stdout}')
     logger.debug(f'[stderr] {cmd}: {stripped_stderr}\n')
