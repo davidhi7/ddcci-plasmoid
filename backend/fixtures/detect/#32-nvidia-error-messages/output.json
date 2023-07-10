@@ -1,0 +1,36 @@
+{
+  "2": {
+    "name": "SMBX2035",
+    "bus_id": 2,
+    "ddcutil_id": 1,
+    "property_values": {
+      "brightness": {
+        "max": 100,
+        "min": 0,
+        "value": 50
+      },
+      "contrast": {
+        "max": 100,
+        "min": 0,
+        "value": 75
+      },
+      "power_mode": {
+        "choices": [
+          1,
+          4,
+          5
+        ],
+        "value": 1
+      }
+    },
+    "vcp_capabilities": {
+      "10": null,
+      "12": null,
+      "D6": [
+        1,
+        4,
+        5
+      ]
+    }
+  }
+}

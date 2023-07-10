@@ -2,10 +2,10 @@ import pytest
 
 from ddcci_plasmoid_backend import subprocess
 from ddcci_plasmoid_backend.adapters.ddcci.SerialNumbers import SerialNumbers
+from ddcci_plasmoid_backend.subprocess import CommandOutput
 from ddcci_plasmoid_backend.tree import Node
 from ddcci_plasmoid_backend.adapters.ddcci.detect import _get_ddcutil_monitor_id, _get_vcp_value, \
-    _parse_capabilities, _get_monitor_identification
-from ddcci_plasmoid_backend.adapters.ddcci import detect
+    _parse_capabilities, _get_monitor_identification, _strip_ddcutil_nvidia_warning
 
 
 def test_get_monitor_identification():
@@ -62,3 +62,20 @@ async def test_parse_capabilities(monkeypatch, return_coroutine, return_command_
         0x52: None,
         0x60: [0x0F, 0x11, 0x12]
     }
+
+
+def test_strip_ddcutil_nvidia_warning():
+    without_warning = CommandOutput(returnCode=0, stdout='VCP 10 C 50 100\n', stderr='')
+    assert _strip_ddcutil_nvidia_warning(without_warning) == without_warning
+
+    with_warning = CommandOutput(
+        returnCode=0,
+        stdout='(is_nvidia_einval_bug          ) nvida/i2c-dev bug '
+               'encountered. Forcing future io I2C_IO_STRATEGY_FILEIO.'
+               ' Retrying\nVCP 10 C 50 100\n',
+        stderr=''
+    )
+
+    assert _strip_ddcutil_nvidia_warning(with_warning) == without_warning
+    # Test that a new instance is modified
+    assert with_warning != without_warning

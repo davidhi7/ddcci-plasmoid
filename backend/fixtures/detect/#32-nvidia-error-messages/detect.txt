@@ -1,0 +1,12 @@
+(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future io I2C_IO_STRATEGY_FILEIO. Retrying
+Display 1
+   I2C bus:  /dev/i2c-2
+   DRM connector:           card0-VGA-1
+   EDID synopsis:
+      Mfg id:               SAM - Samsung Electric Company
+      Model:                SMBX2035
+      Product code:         1789  (0x06fd)
+      Serial number:        XXXXXXXX
+      Binary serial number: XXXXXXXX (0xXXXXXXXX)
+      Manufacture year:     2011,  Week: 7
+   VCP version:         2.0

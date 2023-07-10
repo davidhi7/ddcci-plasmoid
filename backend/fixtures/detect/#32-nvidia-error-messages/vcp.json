@@ -1,0 +1,8 @@
+{
+  "2": {
+    "capabilities": "Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C E3 F3)vcp(10 12 D6(01 04 05) )mswhql(1)asset_eep(40)mccs_ver(2.1))\n",
+    "10": "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future io I2C_IO_STRATEGY_FILEIO. Retrying\nVCP 10 C 50 100\n",
+    "12": "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future io I2C_IO_STRATEGY_FILEIO. Retrying\nVCP 12 C 75 100\n",
+    "D6": "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future io I2C_IO_STRATEGY_FILEIO. Retrying\nVCP D6 SNC x01\n"
+  }
+}

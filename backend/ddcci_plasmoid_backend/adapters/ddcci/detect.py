@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import asyncio
+import dataclasses
 import logging
 import re
-import subprocess
-from typing import List, Dict
+from subprocess import CalledProcessError
 
 from ddcci_plasmoid_backend import Property
+from ddcci_plasmoid_backend import subprocess
 from ddcci_plasmoid_backend.adapters.Monitor import ContinuousValue, NonContinuousValue
 from ddcci_plasmoid_backend.adapters.ddcci import FeatureCode
 from ddcci_plasmoid_backend.adapters.ddcci.DdcciMonitor import DdcciMonitor, VcpFeatureList
 from ddcci_plasmoid_backend.adapters.ddcci.SerialNumbers import SerialNumbers
-from ddcci_plasmoid_backend import subprocess
+from ddcci_plasmoid_backend.subprocess import CommandOutput
 from ddcci_plasmoid_backend.tree import Node
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,7 @@ async def ddcutil_detect_monitors() -> List[DdcciMonitor]:
         List of all detected monitors.
     """
     logger.debug('Detect connected DDC/CI monitors')
-    detect_output = subprocess.subprocess_wrapper('ddcutil', 'detect', logger=logger)
+    detect_output = _strip_ddcutil_nvidia_warning(subprocess.subprocess_wrapper('ddcutil', 'detect', logger=logger))
     parsed_output = Node.parse_indented_text(detect_output.stdout.split('\n'))
     logger.debug(f'Found {len(parsed_output.children)} entries at root level')
 
@@ -88,7 +89,7 @@ async def _gather_monitor_data(ddcutil_id, monitor: Node) -> DdcciMonitor:
     # Retrieve capabilities and vcp feature values
     try:
         capabilities = await _parse_capabilities(bus_id)
-    except subprocess.CalledProcessError:
+    except CalledProcessError:
         local_logger.debug('Failed to parse monitor capabilities, skipping')
         raise
 
@@ -174,8 +175,8 @@ async def _get_vcp_value(bus_id: int, feature_code: int) -> int:
     Raises:
         subprocess.CalledProcessError: The underlying ddcutil command fails.
     """
-    result = await subprocess.async_subprocess_wrapper('ddcutil', 'getvcp', '--bus', str(bus_id), '--brief',
-                                                       hex(feature_code), logger=logger)
+    result = _strip_ddcutil_nvidia_warning(await subprocess.async_subprocess_wrapper(
+        'ddcutil', 'getvcp', '--bus', str(bus_id), '--brief', hex(feature_code), logger=logger))
     feature_value = result.stdout.split(' ')[3]
     # if the value is returned in hexadecimal format, it begins with 'x'.
     # `int` fails in this case, so we add a leading 0.
@@ -197,7 +198,9 @@ async def _parse_capabilities(bus_id: int) -> VcpFeatureList:
     """
     parsed_features: VcpFeatureList = {}
 
-    output = await subprocess.async_subprocess_wrapper('ddcutil', 'capabilities', '--bus', str(bus_id), '--brief', logger=logger)
+    output = _strip_ddcutil_nvidia_warning(
+        await subprocess.async_subprocess_wrapper('ddcutil', 'capabilities', '--bus', str(bus_id), '--brief',
+                                                  logger=logger))
     # This is what a sample capabilities string looks like:
     #  Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C E3 F3)vcp(02 04 05 08 10
     #  12 14(05 08 0B 0C) 16 18 1A 52 60(0F 11 12 ))mswhql(1)asset_eep(40)mccs_ver(2.1))
@@ -214,3 +217,19 @@ async def _parse_capabilities(bus_id: int) -> VcpFeatureList:
             parsed_features[int(code, 16)] = [int(value, 16) for value in re.findall(r'[\dA-F]+', values)]
 
     return parsed_features
+
+
+def _strip_ddcutil_nvidia_warning(command_output: CommandOutput) -> CommandOutput:
+    """
+    Return a new CommandOutput instance with NVIDIA-related warnings from ddcutil stdout output removed. Fix for #32.
+
+    Args:
+        command_output: CommandOutput to work with.
+
+    Returns:
+        New CommandOutput instance with warning messages removed
+    """
+    # `nvida`: typo is in ddcutil source
+    warning_content = '(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future io ' \
+                      'I2C_IO_STRATEGY_FILEIO. Retrying\n'
+    return dataclasses.replace(command_output, stdout=command_output.stdout.replace(warning_content, ''))

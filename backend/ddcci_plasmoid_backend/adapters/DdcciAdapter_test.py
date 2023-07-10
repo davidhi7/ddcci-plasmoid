@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import glob
 import json
 from pathlib import Path
 
@@ -11,7 +10,7 @@ from ddcci_plasmoid_backend.adapters.DdcciAdapter import DdcciAdapter
 from ddcci_plasmoid_backend.subprocess import CommandOutput
 
 
-@pytest.fixture(scope='module', params=glob.glob('fixtures/detect/*/'))
+@pytest.fixture(scope='module', params=Path('fixtures/detect/').glob('*/'))
 def ddcutil_mock(request):
     """
     Simple mocker for ddcutil CLI that reads given command output from the following files:
@@ -25,7 +24,7 @@ def ddcutil_mock(request):
     """
     # Data from json files is usually accessed in multiple calls, so let's cache it
     json_file_cache = {}
-    fixture_dir = Path(request.param)
+    fixture_dir = request.param
 
     def load_cached_json(path):
         if path not in json_file_cache:
