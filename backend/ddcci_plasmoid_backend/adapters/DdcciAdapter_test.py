@@ -49,7 +49,7 @@ def ddcutil_mock(request):
             if 'capabilities' in command:
                 return CommandOutput(stdout=load_cached_json(fixture_dir / 'vcp.json')[str(bus_id)]['capabilities'],
                                      stderr='', return_code=0)
-            elif 'getvcp' in command:
+            elif 'getvcp' in command:  # noqa: RET505
                 feature_code_index = command.index('getvcp') + 1
                 if command[feature_code_index] == '--bus':
                     feature_code_index += 2

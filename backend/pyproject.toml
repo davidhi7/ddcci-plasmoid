@@ -66,5 +66,7 @@ select = [
 ignore = [
 	# Line too long
 	"E501",
+	# Invalid module name:
+	"N999"
 ]
 

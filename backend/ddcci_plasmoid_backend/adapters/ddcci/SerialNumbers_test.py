@@ -1,32 +1,32 @@
 
-from ddcci_plasmoid_backend.adapters.ddcci.SerialNumbers import SerialNumbers as SN
+from ddcci_plasmoid_backend.adapters.ddcci.SerialNumbers import SerialNumbers
 
 
 def test_equal():
-    sn_1 = SN('123', 'abc')
-    sn_2 = SN('123', 'abc')
+    sn_1 = SerialNumbers('123', 'abc')
+    sn_2 = SerialNumbers('123', 'abc')
 
     assert sn_1 == sn_2
     assert sn_1 == sn_1
 
 
 def test_not_equal():
-    sn = SN('1', '2')
-    assert sn != SN('1', None)
-    assert sn != SN(None, '2')
-    assert sn != SN('3', '4')
+    sn = SerialNumbers('1', '2')
+    assert sn != SerialNumbers('1', None)
+    assert sn != SerialNumbers(None, '2')
+    assert sn != SerialNumbers('3', '4')
 
-    assert SN('', '') != SN('', '')
+    assert SerialNumbers('', '') != SerialNumbers('', '')
 
-    assert SN(None, None) != SN(None, None)
-    assert SN('1', None) != SN(None, None)
-    assert SN(None, '1') != SN(None, None)
+    assert SerialNumbers(None, None) != SerialNumbers(None, None)
+    assert SerialNumbers('1', None) != SerialNumbers(None, None)
+    assert SerialNumbers(None, '1') != SerialNumbers(None, None)
 
 
 def test_parse_binary_serial_number():
-    id = SN('12345', '12345 (0x67890Abc)')
+    id = SerialNumbers('12345', '12345 (0x67890Abc)')
     assert id.binary_serial_number == '12345'
 
 
 def test_parse_binary_serial_number_fail():
-    assert SN('12345', '12345 (67890)').binary_serial_number == '12345 (67890)'
+    assert SerialNumbers('12345', '12345 (67890)').binary_serial_number == '12345 (67890)'
