@@ -10,7 +10,7 @@
         "Icon": "brightness-high",
         "Id": "de.davidhi.ddcci-brightness",
         "Name": "Display Brightness",
-        "Version": "0.1.5",
+        "Version": "0.1.7",
         "Website": "https://github.com/davidhi7/ddcci-plasmoid",
 
         "Description[zh_CN]": "基于 DDC/CI-based 的外接显示器亮度控制工具",
