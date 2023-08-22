@@ -124,6 +124,10 @@ This is a bug in older ddcutil versions which it is fixed in ddcutil v1.4.1. In 
 
 ## History
 
+#### v0.1.7 2023-08-22
+
+* Fix backend command not updating after changing it in the configuration field (#17, thanks CatEricka)
+
 #### v0.1.6 2023-07-09
 
 * Fix backend errors with certain NVIDIA GPUs
