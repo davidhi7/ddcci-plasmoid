@@ -27,6 +27,9 @@ Item {
                 handleError(stdout, stderr);
             }
 			disconnectSource(cmd);
+
+            // Auto close the error notifications
+            commandSuccess(cmd);
         }
         function exec(cmd) {
             if (cmd) {
@@ -64,22 +67,30 @@ Item {
                 }
             }
 
+            commandSuccess(cmd);
         }
-        readonly property string command: `${plasmoid.configuration.executable} detect`
+        property string command: `${plasmoid.configuration.executable} detect`
         // add the meaningless variable `ONCE=1` in front so we can differentiate this one-off call from regular calls and disconnect it 
-        readonly property string oneoffCommand: `ONCE=1 ${command}`
+        property string oneoffCommand: `ONCE=1 ${command}`
         function start() {
             connectSource(command);
         }
         function runOnce() {
             connectSource(oneoffCommand);
         }
-        function stop() {
-            disconnectSource(command);
+        function stopAllCommands() {
+            connectedSources.forEach(cmd =>{
+                disconnectSource(cmd);
+            })
+        }
+        function updateCommand() {
+            command = `${plasmoid.configuration.executable} detect`;
+            oneoffCommand = `ONCE=1 ${command}`;
         }
     }
 
     signal error(string message)
+    signal commandSuccess(string cmd)
     function handleError(stdout, stderr) {
         try {
             const errorResponse = JSON.parse(stdout);
@@ -161,6 +172,12 @@ Item {
                     error.connect(function (message) {
                         error_text.text = message;
                         error_layout.visible = true;
+                    });
+                    commandSuccess.connect(function (_cmd) {
+                        if (error_layout.visible) {
+                            error_text.text = '';
+                            error_layout.visible = false;
+                        }
                     });
                 }
             }
@@ -274,6 +291,17 @@ Item {
 
     function action_refreshMonitors() {
         monitorDataSource.runOnce();
+    }
+
+    Connections {
+        target: plasmoid.configuration
+        function onValueChanged(key, value) {
+            if (key === 'executable') {
+                monitorDataSource.stopAllCommands();
+                monitorDataSource.updateCommand();
+                monitorDataSource.start();
+            }
+        }
     }
 
     Component.onCompleted: function() {

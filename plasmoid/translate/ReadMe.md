@@ -31,4 +31,4 @@ Note: Also need to add translation for [metadata.json](https://github.com/davidh
 |----------|---------|-------|
 | Template |       7 |       |
 | de       |     7/7 |  100% |
-| zh_CN    |     6/7 |   85% |
+| zh_CN    |     7/7 |  100% |
