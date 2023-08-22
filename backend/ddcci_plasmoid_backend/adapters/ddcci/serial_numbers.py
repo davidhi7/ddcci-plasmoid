@@ -16,7 +16,7 @@ class SerialNumbers:
     serial_number: Optional[str]
     binary_serial_number: Optional[str]
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         # From a string like '123456 (0x234567)' extract the '123456' part
         if not self.binary_serial_number:
             return
@@ -27,7 +27,7 @@ class SerialNumbers:
             try:
                 self.binary_serial_number = str(int(value[0]))
             except ValueError:
-                logger.debug(f'Failed to parse binary serial number `{self.binary_serial_number}`')
+                logger.warning(f'Failed to parse binary serial number `{self.binary_serial_number}`')
 
     def __eq__(self, other: 'SerialNumbers') -> bool:
         """

@@ -1,5 +1,4 @@
-
-from ddcci_plasmoid_backend.adapters.ddcci.SerialNumbers import SerialNumbers
+from ddcci_plasmoid_backend.adapters.ddcci.serial_numbers import SerialNumbers
 
 
 def test_equal():
@@ -7,7 +6,7 @@ def test_equal():
     sn_2 = SerialNumbers('123', 'abc')
 
     assert sn_1 == sn_2
-    assert sn_1 == sn_1
+    assert sn_1 == sn_1  # noqa: PLR0124 => We test the custom __eq__ function
 
 
 def test_not_equal():

@@ -12,7 +12,7 @@ class Node:
 
     child_by_key: dict[str, Node]
 
-    def __init__(self, parent: Node | None, indentation: int, key: str = '', value: str = ''):
+    def __init__(self, parent: Node | None, indentation: int, key: str = '', value: str = '') -> None:
         """
         Create a new node and set it as the child of the parent.
         """
@@ -25,7 +25,8 @@ class Node:
         self.child_by_key = {}
 
         if parent is not None:
-            self.parent._register_child(self)
+            self.parent._register_child(self)  # noqa: SLF001
+            # Access to private member of object that also belongs to this class
 
     def walk(self, *args: str) -> str:
         """
@@ -36,7 +37,8 @@ class Node:
             return self.child_by_key[args[0]].value
         if args[0] in self.child_by_key:
             return self.child_by_key[args[0]].walk(*args[1:])
-        raise ValueError(f'Key `{args[0]}` does not exist in the current node')
+        msg = f'Key `{args[0]}` does not exist in the current node'
+        raise ValueError(msg)
 
     def to_dict(self) -> dict[str | list[dict]]:
         """
@@ -72,7 +74,8 @@ class Node:
             # ddcutil output is indented by a multiple of 3 whitespaces
             indentation_characters = (len(line) - len(line.lstrip()))
             if indentation_characters % 3 != 0:
-                raise ValueError(f'Indentation whitespace count of line "{line.strip()}" is not a multiple of 3')
+                msg = f'Indentation whitespace count of line "{line.strip()}" is not a multiple of 3'
+                raise ValueError(msg)
 
             tokens = line.split(':')
             key = tokens[0].strip()

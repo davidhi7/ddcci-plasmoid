@@ -12,7 +12,7 @@ classifiers = [
     "Environment :: X11 Applications :: KDE",
     "Topic :: System :: Hardware"
 ]
-packages = [{include = "ddcci_plasmoid_backend"}]
+packages = [{ include = "ddcci_plasmoid_backend" }]
 
 [build-system]
 requires = ["poetry-core"]
@@ -30,6 +30,7 @@ pytest = "^7.3.0"
 pytest-asyncio = "^0.21.0"
 tox = "^4.6.4"
 ruff = "^0.0.277"
+pytest-cov = "^4.1.0"
 
 [tool.poetry.scripts]
 ddcci_plasmoid_backend = "ddcci_plasmoid_backend.__main__:main"
@@ -37,36 +38,60 @@ ddcci_plasmoid_backend = "ddcci_plasmoid_backend.__main__:main"
 [tool.pytest.ini_options]
 python_files = "*_test.py"
 python_functions = "test_*"
-addopts = "--pyargs ddcci_plasmoid_backend"
+addopts = "--pyargs ddcci_plasmoid_backend --cov"
 asyncio_mode = "auto"
 
 [tool.ruff]
 target-version = "py38"
-select = [
-	# pycodestyle
-	"E",
-	"W",
-	# pyflakes
-	"F",
-	# pyupgrade
-	# Use modern Python features for the best possible develop experience.
-	"UP",
-	# flake8-bugbear
-	# Find obvious bugs.
-	"B",
-	# flake8-pie
-	"PIE",
-	# flake8-return
-	"RET",
-	# pep8-naming
-	"N",
-	# flake8-simplify
-	"SIM",
-]
+line-length = 120
+select = ["ALL"]
 ignore = [
-	# Line too long
-	"E501",
-	# Invalid module name:
-	"N999"
+    # pydocstyle: I don't take docstrings too serious here
+    "D",
+    # Check for assert statements; we use asserts in pytest tests
+    "S101",
+    # Trailing commas in dicts; I don't like them
+    "COM812",
+    # Missing `self` annotation; Seems weird to annotate them
+    "ANN101",
+    # Long exception message passed to Exception constructor;
+    # Creating custom exceptions feels unneeded for this little project
+    "TRY003",
+    # Logging f-strings; I think f-strings are vastly better for readability
+    "G004",
+    # Check for method calls that initiate a subprocess with a shell.
+    # To perform a shell injection attack, an attacker would have to alter the widget configuration.
+    # At this point he could usually just execute shell commands directly.
+    "S602",
+    # Check for try/except within loops; Required for monitor detection
+    "PERF203",
 ]
 
+[tool.ruff.per-file-ignores]
+"{conftest,*_test}.py" = [
+    # Annotation related stuff
+    "ANN",
+    # Check for comparisons with magic values
+    "PLR2004",
+    # Unused arguments
+    "ARG",
+    # Private class member access; Needed for some tests
+    "SLF001",
+    # Use pathlib.Path.open instead of builtin open; Unneccessary for testing with hardcoded files
+    "PTH123",
+    # Checks for `pytest.raises` calls without match parameter; Irrelevant for this simple program
+    "PT011",
+]
+"__main__.py" = [
+    # Check for print statements; Tssential for communication with the widget
+    "T201"
+]
+
+[tool.ruff.flake8-quotes]
+inline-quotes = "single"
+
+[tool.ruff.flake8-pytest-style]
+fixture-parentheses = false
+
+[tool.ruff.flake8-builtins]
+builtins-ignorelist = ["id", "property"]

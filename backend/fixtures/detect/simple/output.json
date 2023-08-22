@@ -4,13 +4,13 @@
     "property_values": {
       "brightness": {
         "value": 50,
-        "min": 0,
-        "max": 100
+        "min_value": 0,
+        "max_value": 100
       },
       "contrast": {
         "value": 75,
-        "min": 0,
-        "max": 100
+        "min_value": 0,
+        "max_value": 100
       },
       "power_mode": {
         "value": 1,
@@ -122,13 +122,13 @@
     "property_values": {
       "brightness": {
         "value": 100,
-        "min": 0,
-        "max": 100
+        "min_value": 0,
+        "max_value": 100
       },
       "contrast": {
         "value": 100,
-        "min": 0,
-        "max": 100
+        "min_value": 0,
+        "max_value": 100
       },
       "power_mode": {
         "value": 4,

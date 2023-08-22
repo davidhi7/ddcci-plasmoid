@@ -1,6 +1,6 @@
 from typing import Tuple
 
-import pytest as pytest
+import pytest
 
 from ddcci_plasmoid_backend.tree import Node
 

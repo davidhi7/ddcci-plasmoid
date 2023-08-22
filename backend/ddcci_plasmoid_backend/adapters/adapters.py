@@ -2,40 +2,63 @@ from __future__ import annotations
 
 import asyncio
 from functools import reduce
+from typing import Dict
 
-from ddcci_plasmoid_backend import Property
-from ddcci_plasmoid_backend.adapters.MonitorAdapter import MonitorAdapter
-from ddcci_plasmoid_backend.adapters.TestAdapter import TestAdapter
-from ddcci_plasmoid_backend.adapters.DdcciAdapter import DdcciAdapter
+from ddcci_plasmoid_backend.adapters.ddcci_adapter import DdcciAdapter
+from ddcci_plasmoid_backend.adapters.monitor_adapter import Monitor, MonitorAdapter, Options, Property
+from ddcci_plasmoid_backend.default_options import DEFAULT_OPTIONS
 
-# Registration of all adapters included in this
-monitor_adapters = [
-    DdcciAdapter(),
-    TestAdapter()
-]
+AdapterIdentifier = str
+MonitorIdentifier = int
 
+DetectSummary = Dict[AdapterIdentifier, Dict[MonitorIdentifier, Monitor]]
 
-def adapter_by_label(label: str) -> MonitorAdapter:
-    for backend in monitor_adapters:
-        if label == backend.label:
-            return backend
-    raise ValueError(f'Invalid backend label `{label}`')
+# Registry of all adapters included in this
+monitor_adapter_classes: dict[AdapterIdentifier, type[MonitorAdapter]] = {
+    'ddcci': DdcciAdapter
+}
 
 
-async def detect(adapters: list[MonitorAdapter]) -> dict[str, dict]:
-    async def detect_call(adapter: MonitorAdapter):
+def _get_adapter_type(adapter: str) -> type[MonitorAdapter]:
+    if adapter not in monitor_adapter_classes.keys():
+        msg = f'`{adapter}` is not a valid monitor adapter type'
+        raise ValueError(msg)
+    return monitor_adapter_classes[adapter]
+
+
+def _merge_default_options(options: Options) -> Options:
+    return {**DEFAULT_OPTIONS, **options}
+
+
+async def detect(adapters: list[AdapterIdentifier], options: Options) -> DetectSummary:
+    """
+    Detect all monitors with the given adapters.
+
+    Args:
+        adapters: list of adapter identifiers, values must be equal to keys of `monitor_adapter_classes`.
+        options: Custom options to override default options with.
+
+    Returns:
+        All detected monitors, mapped by adapter identifier, then by monitor identifier.
+    """
+
+    async def detect_call(adapter: MonitorAdapter, label: str) -> DetectSummary:
         data = await adapter.detect()
         return {
-            adapter.label: {key: monitor.prepare_json_dump() for key, monitor in data.items()}
+            label: {key: monitor.prepare_json_dump() for key, monitor in data.items()}
         }
 
     tasks = []
+    options = _merge_default_options(options)
     for adapter in adapters:
-        tasks.append(asyncio.create_task(detect_call(adapter)))
-    #
+        instance = _get_adapter_type(adapter)(options)
+        tasks.append(asyncio.create_task(detect_call(instance, adapter)))
     result = await asyncio.gather(*tasks)
     return reduce(lambda x, y: {**x, **y}, result)
 
 
-def set_property(adapter: MonitorAdapter, property: Property, id: int, value: int):
-    return adapter.set(property, id, value)
+async def set_property(adapter: str, options: Options, property: str, id: int, value: int) -> None:
+    adapter_type = _get_adapter_type(adapter)
+    merged_options = _merge_default_options(options)
+    property = Property(property)
+    return await adapter_type(merged_options).set_property(property, id, value)

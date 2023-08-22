@@ -5,13 +5,13 @@
     "ddcutil_id": 1,
     "property_values": {
       "brightness": {
-        "max": 100,
-        "min": 0,
+        "max_value": 100,
+        "min_value": 0,
         "value": 50
       },
       "contrast": {
-        "max": 100,
-        "min": 0,
+        "max_value": 100,
+        "min_value": 0,
         "value": 75
       },
       "power_mode": {

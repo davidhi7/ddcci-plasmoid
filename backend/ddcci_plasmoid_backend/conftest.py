@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 
 from ddcci_plasmoid_backend.subprocess_wrappers import CommandOutput
@@ -17,12 +19,14 @@ def return_coroutine():
 
 @pytest.fixture
 def return_command_output():
-    def inner(stdout='', stderr='', return_code=0) -> CommandOutput:
+    def inner(stdout='', stderr='', return_code=0, *args, **kwargs) -> CommandOutput:
         return CommandOutput(return_code, stdout, stderr)
 
     return inner
 
 
 @pytest.fixture
-def return_callback_command_output():
-    ...
+def silent_logger():
+    logger = logging.getLogger('silent_logger')
+    logger.setLevel(logging.CRITICAL + 1)
+    return logger
