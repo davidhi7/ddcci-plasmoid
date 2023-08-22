@@ -1,0 +1,223 @@
+{
+    "command": "detect",
+    "response": {
+      "ddcci": {
+        "9": {
+          "name": "DELL S2721DGF",
+          "property_values": {
+            "brightness": {
+              "value": 60,
+              "min_value": 0,
+              "max_value": 100
+            },
+            "contrast": {
+              "value": 75,
+              "min_value": 0,
+              "max_value": 100
+            },
+            "power_mode": {
+              "value": 1,
+              "choices": [
+                1,
+                4,
+                5
+              ]
+            }
+          },
+          "ddcutil_id": 1,
+          "bus_id": 9,
+          "vcp_capabilities": {
+            "2": null,
+            "4": null,
+            "5": null,
+            "8": null,
+            "10": null,
+            "12": null,
+            "14": [
+              5,
+              8,
+              11,
+              12
+            ],
+            "16": null,
+            "18": null,
+            "52": null,
+            "60": [
+              15,
+              17,
+              18
+            ],
+            "62": null,
+            "1A": null,
+            "AC": null,
+            "AE": null,
+            "B2": null,
+            "B6": null,
+            "C6": null,
+            "C8": null,
+            "C9": null,
+            "CA": null,
+            "CC": [
+              2,
+              10,
+              3,
+              4,
+              8,
+              9,
+              13,
+              6
+            ],
+            "D6": [
+              1,
+              4,
+              5
+            ],
+            "DC": [
+              0,
+              5
+            ],
+            "DF": null,
+            "E0": null,
+            "E1": null,
+            "E2": [
+              0,
+              32,
+              33,
+              34,
+              47,
+              4,
+              30,
+              31,
+              29,
+              14,
+              18,
+              20,
+              39,
+              35,
+              36,
+              58
+            ],
+            "E3": null,
+            "EA": [
+              65024,
+              65025
+            ],
+            "F0": [
+              13,
+              14,
+              12,
+              15,
+              16,
+              17,
+              19,
+              49,
+              50,
+              52,
+              54
+            ],
+            "F1": null,
+            "F2": null,
+            "FD": null
+          }
+        },
+        "10": {
+          "name": "DELL U2417H",
+          "property_values": {
+            "brightness": {
+              "value": 30,
+              "min_value": 0,
+              "max_value": 100
+            },
+            "contrast": {
+              "value": 75,
+              "min_value": 0,
+              "max_value": 100
+            },
+            "power_mode": {
+              "value": 1,
+              "choices": [
+                1,
+                4,
+                5
+              ]
+            }
+          },
+          "ddcutil_id": 2,
+          "bus_id": 10,
+          "vcp_capabilities": {
+            "2": null,
+            "4": null,
+            "5": null,
+            "8": null,
+            "10": null,
+            "12": null,
+            "14": [
+              1,
+              4,
+              5,
+              6,
+              8,
+              9,
+              11,
+              12
+            ],
+            "16": null,
+            "18": null,
+            "60": [
+              16,
+              15,
+              17
+            ],
+            "1A": null,
+            "AA": [
+              1,
+              2,
+              3,
+              4
+            ],
+            "AC": null,
+            "AE": null,
+            "B6": null,
+            "C6": null,
+            "C8": null,
+            "C9": null,
+            "D6": [
+              1,
+              4,
+              5
+            ],
+            "DC": [
+              0,
+              2,
+              3,
+              5
+            ],
+            "DF": null,
+            "E0": null,
+            "E1": null,
+            "E2": [
+              0,
+              1,
+              2,
+              4,
+              11,
+              12,
+              13,
+              15,
+              16,
+              17,
+              19,
+              20,
+              25
+            ],
+            "F0": [
+              8
+            ],
+            "F1": null,
+            "F2": null,
+            "FD": null
+          }
+        }
+      }
+    }
+  }

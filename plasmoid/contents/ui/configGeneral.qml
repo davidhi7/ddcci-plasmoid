@@ -7,7 +7,10 @@ Kirigami.FormLayout {
 
     property alias cfg_stepSize: stepSize.text
     property alias cfg_executable: executable.text
-    property alias cfg_advancedMode: advancedMode.checked
+    property alias cfg_enableAdvancedMode: enableAdvancedMode.checked
+
+    property alias cfg_ddcciMonitorsEnabled: ddcciMonitorsEnabled.checked
+    property alias cfg_builtinMonitorsEnabled: builtinMonitorsEnabled.checked
 
     QQC2.TextField {
         id: stepSize
@@ -21,7 +24,17 @@ Kirigami.FormLayout {
     }
 
     QQC2.CheckBox {
-        id: advancedMode
+        id: enableAdvancedMode
         Kirigami.FormData.label: i18n("Show contrast sliders and power button:")
+    }
+
+    QQC2.CheckBox {
+        id: ddcciMonitorsEnabled
+        Kirigami.FormData.label: i18n("External monitors with DDC/CI support:")
+    }
+    
+    QQC2.CheckBox {
+        id: builtinMonitorsEnabled
+        Kirigami.FormData.label: i18n("Builtin laptop monitors:")
     }
 }

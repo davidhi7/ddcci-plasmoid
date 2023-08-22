@@ -3,13 +3,14 @@
     <kcfgfile name=""/>
 
     <group name="General">
+        <entry name="executable" type="String">
+            <!-- <default>python3 -m ddcci_plasmoid_backend</default> -->
+            <default>cat "./detect_mock.json"</default>
+        </entry>
         <entry name="stepSize" type="Int">
             <default>5</default>
         </entry>
-        <entry name="executable" type="String">
-            <default>python3 -m ddcci_plasmoid_backend</default>
-        </entry>
-        <entry name="advancedMode" type="Bool">
+        <entry name="enableAdvancedMode" type="Bool">
             <default>false</default>
         </entry>
     </group>
