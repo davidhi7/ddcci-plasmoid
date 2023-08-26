@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ddcci-plasmoid-backend"
-version = "0.1.7"
+version = "0.1.8"
 description = "Backend for ddcci-plasmoid"
 authors = ["David Himmelstoß <77309510+davidhi7@users.noreply.github.com>"]
 license = "MIT"
