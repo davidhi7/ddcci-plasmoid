@@ -114,15 +114,18 @@ Right-click the arrow of the system tray > open settings > go to *Entries* > scr
 
 Right-click your desktop > click *Add widgets* > search for *Display Brightness* and add the widget to your desktop or panels.
 
-
-
 ## Common issues
 
 #### The output of `ddcutil detect` starts with `Unable to open directory /sys/bus/i2c/devices/i2c--1: No such file or directory`
 
-This is a bug in older ddcutil versions which it is fixed in ddcutil v1.4.1. In some cases, it may cause the backend to fail.
+This is a bug in older ddcutil versions which it is fixed in ddcutil v1.4.1. In some cases, it may cause the backend to
+fail.
 
 ## History
+
+#### v0.1.8 2023-08-26
+
+* Ignore monitors if `VCP version` detection failed by ddcutil (#39)
 
 #### v0.1.7 2023-08-22
 
