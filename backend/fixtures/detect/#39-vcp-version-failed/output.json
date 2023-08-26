@@ -1,0 +1,9 @@
+{
+  "20": {
+    "name": "LG HDR 5K",
+    "bus_id": 20,
+    "ddcutil_id": 2,
+    "property_values": {},
+    "vcp_capabilities": {}
+  }
+}

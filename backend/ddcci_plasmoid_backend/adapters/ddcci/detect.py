@@ -40,6 +40,10 @@ async def ddcutil_detect_monitors(ddcutil_wrapper: DdcutilWrapper) -> list[ddcci
             logger.warning(f'Key `{monitor_node.key}` does not match pattern for a valid monitor, skip it')
             continue
 
+        if monitor_node.child_by_key['VCP version'].value == 'Detection failed':
+            logger.warning(f'{ddcutil_id=}: VCP version detection failed, skip it')
+            continue
+
         monitor_identification = _get_monitor_identification(monitor_node)
         if monitor_identification in identified_monitors:
             logger.warning(f'{ddcutil_id=}: Duplicate monitor found, skip it')
@@ -208,9 +212,12 @@ async def _parse_capabilities(ddcutil_wrapper: DdcutilWrapper, bus: int) -> ddcc
     #  12 14(05 08 0B 0C) 16 18 1A 52 60(0F 11 12 ))mswhql(1)asset_eep(40)mccs_ver(2.1))
     capabilities_string = output.stdout
     # Extract the `vcp(...) part from the capabilities string
-    vcp_features_enumeration = re.search(r'vcp\(([\dA-F\s]|(\([\dA-F\s]+\)))+\)', capabilities_string).group()
+    vcp_features_enumeration = re.search(r'vcp\(([\dA-F\s]|(\([\dA-F\s]+\)))+\)', capabilities_string)
+    # Prevent fail if the `vcp()` section is empty (primarily for debugging)
+    if not vcp_features_enumeration:
+        return {}
     # Extract the feature code and their values if not continuous
-    vcp_features = re.findall(r'([\dA-F]+)(\([\dA-F\s]+\))?', vcp_features_enumeration)
+    vcp_features = re.findall(r'([\dA-F]+)(\([\dA-F\s]+\))?', vcp_features_enumeration.group())
     for code, values in vcp_features:
         is_continuous_feature = values == ''
         if is_continuous_feature:

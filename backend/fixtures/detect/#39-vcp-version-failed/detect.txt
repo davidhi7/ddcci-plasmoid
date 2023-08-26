@@ -1,0 +1,23 @@
+Display 1
+   I2C bus:  /dev/i2c-19
+   DRM connector:           card0-DP-3
+   EDID synopsis:
+      Mfg id:               GSM - Goldstar Company Ltd (LG)
+      Model:                LG HDR 5K
+      Product code:         30497  (0x7721)
+      Serial number:        106NTWGDP049
+      Binary serial number: 465049 (0x00071899)
+      Manufacture year:     2021,  Week: 6
+   VCP version:         Detection failed
+
+Display 2
+   I2C bus:  /dev/i2c-20
+   DRM connector:           card0-DP-4
+   EDID synopsis:
+      Mfg id:               GSM - Goldstar Company Ltd (LG)
+      Model:                LG HDR 5K
+      Product code:         30497  (0x7721)
+      Serial number:        106NTWGDP049
+      Binary serial number: 465049 (0x00071899)
+      Manufacture year:     2021,  Week: 6
+   VCP version:         2.1
