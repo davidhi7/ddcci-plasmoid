@@ -77,6 +77,9 @@ async def detect():
                 f'Key {child.key.strip()} does not match pattern for valid display, so skip it')
             continue
         monitor_id = get_monitor_id(child)
+        if child.child_by_key['VCP version'].value == 'Detection failed':
+            logger.debug(f'Display ddcutil_id={monitor_id} VCP version detection failed, so skip it')
+            continue
         if 'EDID synopsis' in child.child_by_key:
             # monitors connected to DisplayPort may appear twice. This is apparently related to DisplayPort MST.
             # Since the EDID data of both entries is identical, we simply remove duplicate monitors based on their
