@@ -5,7 +5,12 @@ from functools import reduce
 from typing import Dict
 
 from ddcci_plasmoid_backend.adapters.ddcci_adapter import DdcciAdapter
-from ddcci_plasmoid_backend.adapters.monitor_adapter import Monitor, MonitorAdapter, Options, Property
+from ddcci_plasmoid_backend.adapters.monitor_adapter import (
+    Monitor,
+    MonitorAdapter,
+    Options,
+    Property,
+)
 from ddcci_plasmoid_backend.default_options import DEFAULT_OPTIONS
 
 AdapterIdentifier = str
@@ -15,13 +20,13 @@ DetectSummary = Dict[AdapterIdentifier, Dict[MonitorIdentifier, Monitor]]
 
 # Registry of all adapters included in this
 monitor_adapter_classes: dict[AdapterIdentifier, type[MonitorAdapter]] = {
-    'ddcci': DdcciAdapter
+    "ddcci": DdcciAdapter
 }
 
 
 def _get_adapter_type(adapter: str) -> type[MonitorAdapter]:
     if adapter not in monitor_adapter_classes.keys():
-        msg = f'`{adapter}` is not a valid monitor adapter type'
+        msg = f"`{adapter}` is not a valid monitor adapter type"
         raise ValueError(msg)
     return monitor_adapter_classes[adapter]
 
@@ -57,7 +62,9 @@ async def detect(adapters: list[AdapterIdentifier], options: Options) -> DetectS
     return reduce(lambda x, y: {**x, **y}, result)
 
 
-async def set_property(adapter: str, options: Options, property: str, id: int, value: int) -> None:
+async def set_property(
+        adapter: str, options: Options, property: str, id: int, value: int
+) -> None:
     adapter_type = _get_adapter_type(adapter)
     merged_options = _merge_default_options(options)
     property = Property(property)

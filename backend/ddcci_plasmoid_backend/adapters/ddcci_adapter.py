@@ -12,7 +12,12 @@ from ddcci_plasmoid_backend.adapters.ddcci import (
     ddcutil_wrapper,
     detect,
 )
-from ddcci_plasmoid_backend.adapters.monitor_adapter import Monitor, MonitorAdapter, Options, Property
+from ddcci_plasmoid_backend.adapters.monitor_adapter import (
+    Monitor,
+    MonitorAdapter,
+    Options,
+    Property,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +33,7 @@ class FeatureCode(Enum):
 feature_code_by_property = {
     Property.BRIGHTNESS: FeatureCode.BRIGHTNESS,
     Property.CONTRAST: FeatureCode.CONTRAST,
-    Property.POWER_MODE: FeatureCode.POWER_MODE
+    Property.POWER_MODE: FeatureCode.POWER_MODE,
 }
 
 
@@ -44,7 +49,7 @@ class DdcciAdapter(MonitorAdapter):
     def __init__(self, options: Options) -> None:
         super().__init__(options)
         self._ddcutil_wrapper = ddcutil_wrapper.DdcutilWrapper(options)
-        logger.info(f'ddcutil version: {self._ddcutil_wrapper.get_ddcutil_version()}')
+        logger.info(f"ddcutil version: {self._ddcutil_wrapper.get_ddcutil_version()}")
 
     async def detect(self) -> dict[MonitorIdentifier, DdcciMonitor]:
         monitors = await detect.ddcutil_detect_monitors(self._ddcutil_wrapper)
@@ -52,13 +57,15 @@ class DdcciAdapter(MonitorAdapter):
 
     async def set_property(self, property: Property, id: int, value: int) -> None:
         if property not in feature_code_by_property.keys():
-            msg = f'Unsupported property `{property.value}`'
+            msg = f"Unsupported property `{property.value}`"
             raise ValueError(msg)
         feature_code = feature_code_by_property[property]
         try:
-            await self._ddcutil_wrapper.run_async('setvcp', hex(feature_code.value), str(value), bus=id, logger=logger)
+            await self._ddcutil_wrapper.run_async(
+                "setvcp", hex(feature_code.value), str(value), bus=id, logger=logger
+            )
         except subprocess.CalledProcessError as err:
-            msg = f'Failed to set VCP feature {feature_code.value:X} to value {value}'
+            msg = f"Failed to set VCP feature {feature_code.value:X} to value {value}"
             raise OSError(msg) from err
 
 
@@ -71,5 +78,7 @@ class DdcciMonitor(Monitor):
     def prepare_json_dump(self) -> dict:
         dump = super().prepare_json_dump()
         # Replace decimal integers with hexadecimal strings
-        dump['vcp_capabilities'] = {f'{code:X}': value for code, value in dump['vcp_capabilities'].items()}
+        dump["vcp_capabilities"] = {
+            f"{code:X}": value for code, value in dump["vcp_capabilities"].items()
+        }
         return dump

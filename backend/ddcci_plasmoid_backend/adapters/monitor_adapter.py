@@ -32,15 +32,17 @@ class Monitor:
 
     def prepare_json_dump(self) -> dict:
         dict_representation = dataclasses.asdict(self)
-        dict_representation['property_values'] = \
-            {property.value: value for property, value in dict_representation['property_values'].items()}
+        dict_representation["property_values"] = {
+            property.value: value
+            for property, value in dict_representation["property_values"].items()
+        }
         return dict_representation
 
 
 class Property(Enum):
-    BRIGHTNESS = 'brightness'
-    CONTRAST = 'contrast'
-    POWER_MODE = 'power_mode'
+    BRIGHTNESS = "brightness"
+    CONTRAST = "contrast"
+    POWER_MODE = "power_mode"
 
 
 @dataclass

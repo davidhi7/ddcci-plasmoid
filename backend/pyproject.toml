@@ -21,6 +21,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 python = "^3.8"
 fasteners = "^0.18"
+black = "^23.7.0"
 
 [tool.poetry.group.dev]
 optional = true
@@ -43,7 +44,7 @@ asyncio_mode = "auto"
 
 [tool.ruff]
 target-version = "py38"
-line-length = 120
+line-length = 100
 select = ["ALL"]
 ignore = [
     # pydocstyle: I don't take docstrings too serious here
@@ -88,10 +89,14 @@ ignore = [
 ]
 
 [tool.ruff.flake8-quotes]
-inline-quotes = "single"
+inline-quotes = "double"
 
 [tool.ruff.flake8-pytest-style]
 fixture-parentheses = false
 
 [tool.ruff.flake8-builtins]
 builtins-ignorelist = ["id", "property"]
+
+[tool.black]
+target-versions = ["py38", "py39", "py310", "py311"]
+max-line-length = 100

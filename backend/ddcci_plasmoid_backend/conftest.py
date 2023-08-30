@@ -19,7 +19,7 @@ def return_coroutine():
 
 @pytest.fixture
 def return_command_output():
-    def inner(stdout='', stderr='', return_code=0, *args, **kwargs) -> CommandOutput:
+    def inner(stdout="", stderr="", return_code=0, *args, **kwargs) -> CommandOutput:
         return CommandOutput(return_code, stdout, stderr)
 
     return inner
@@ -27,6 +27,6 @@ def return_command_output():
 
 @pytest.fixture
 def silent_logger():
-    logger = logging.getLogger('silent_logger')
+    logger = logging.getLogger("silent_logger")
     logger.setLevel(logging.CRITICAL + 1)
     return logger
