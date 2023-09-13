@@ -90,7 +90,7 @@ Install the backend from PyPI using the following command:
 
 `$ pip install --user ddcci-plasmoid-backend`
 
-or use `pipx` to install backend into a virtual environment where in the user home:
+or use [`pipx`](https://pypa.github.io/pipx/) to install backend instead of `pip` due to the [PEP-668](https://peps.python.org/pep-0668/) change:
 
 `$ pipx install ddcci-plasmoid-backend`
 
