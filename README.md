@@ -133,6 +133,10 @@ Right-click your desktop > click *Add widgets* > search for *Display Brightness*
 
 ## Common issues
 
+#### Installing the backend with `pip` fails, printing `This environment is externally managed`
+
+Some distributions, most notably Arch Linux, disable the installation of PyPI packages globally using `pip`. In [Step 3](#3-install-the-backend), use the `pipx` alternative instead. 
+
 #### The output of `ddcutil detect` starts with `Unable to open directory /sys/bus/i2c/devices/i2c--1: No such file or directory`
 
 This is a bug in older ddcutil versions which it is fixed in ddcutil v1.4.1. In some cases, it may cause the backend to
