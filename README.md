@@ -88,7 +88,21 @@ Display 2
 
 Install the backend from PyPI using the following command:
 
-`$ pip install --user ddcci-plasmoid-backend `
+`$ pip install --user ddcci-plasmoid-backend`
+
+or use `pipx` to install backend into a virtual environment where in the user home:
+
+`$ pipx install ddcci-plasmoid-backend`
+
+About [pipx](https://pypa.github.io/pipx/):
+
+> #### Overview: What is pipx?
+> pipx is a tool to help you install and run end-user applications written in Python. It's roughly similar to macOS's brew, JavaScript's npx, and Linux's apt.
+>
+>It's closely related to pip. In fact, it uses pip, but is focused on installing and managing Python packages that can be run from the command line directly as applications.
+> #### How is it Different from pip?
+>
+>pip is a general-purpose package installer for both libraries and apps with no environment isolation. pipx is made specifically for application installation, as it adds isolation yet still makes the apps available in your shell: pipx creates an isolated environment for each application and its associated packages.
 
 ### 4. Install the widget itself ###
 
@@ -101,6 +115,8 @@ $ kpackagetool5 --install plasmoid
 # or upgrade the plasmoid:
 $ kpackagetool5 --upgrade plasmoid
 ````
+
+**Note**: If you use **pipx** to install the backend, the widget setting `Backend executable command` should be `~/.local/bin/ddcci_plasmoid_backend` (which is the default installation path of pipx)
 
 ### 5. Display the widget
 
