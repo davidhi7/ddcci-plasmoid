@@ -90,7 +90,8 @@ Install the backend from PyPI using the following command:
 
 `$ pip install --user ddcci-plasmoid-backend`
 
-or use [`pipx`](https://pypa.github.io/pipx/) to install backend instead of `pip` due to the [PEP-668](https://peps.python.org/pep-0668/) change:
+You can also use [`pipx`](https://pypa.github.io/pipx/) to install the backend.
+This is the recommended option if your distribution doesn't allow `pip` for global packages, see [PEP-668](https://peps.python.org/pep-0668/).
 
 `$ pipx install ddcci-plasmoid-backend`
 
@@ -116,7 +117,7 @@ $ kpackagetool5 --install plasmoid
 $ kpackagetool5 --upgrade plasmoid
 ````
 
-**Note**: If you use **pipx** to install the backend, the widget setting `Backend executable command` should be `~/.local/bin/ddcci_plasmoid_backend` (which is the default installation path of pipx)
+**Note**: If you used `pipx` to install the backend in the previous step, the widget setting `Backend executable command` should be `~/.local/bin/ddcci_plasmoid_backend` (which is the default installation path of pipx).
 
 ### 5. Display the widget
 
