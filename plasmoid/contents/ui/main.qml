@@ -96,12 +96,7 @@ Item {
             }
         }
         // Command to query monitor data
-        property string pollingCommand: {
-            const newCommand = `${backendCommand} detect ddcci`;
-            // By adding this side effect, the regular polling also uses the new command. Otherwise it would continue using the old command.
-            restart(newCommand);
-            return newCommand;
-        }
+        property string pollingCommand: `${backendCommand} detect ddcci`
         // Add the meaningless variable `ONCE=1` in front so we can differentiate this one-off call from regular calls and disconnect it 
         property string oneoffCommand: `ONCE=1 ${pollingCommand}`
         function start() {
@@ -112,10 +107,13 @@ Item {
             log(`Run backend detect once with command '${oneoffCommand}'`);
             connectSource(oneoffCommand);
         }
-        function restart(newCommand) {
+        function restart() {
             connectedSources = []
-            log(`Restart backup detect polling with command '${newCommand}'`);
-            connectSource(newCommand);
+            log(`Restart backup detect polling with command '${pollingCommand}'`);
+            connectSource(pollingCommand);
+        }
+        onPollingCommandChanged: {
+            restart();
         }
     }
 
