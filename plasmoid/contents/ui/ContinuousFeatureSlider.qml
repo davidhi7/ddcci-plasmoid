@@ -10,10 +10,12 @@ RowLayout {
     required property int propertyStepSize
 
     property alias value: slider.value
-    property alias intValue: slider.intValue
 
     Layout.alignment: Qt.AlignRight
     spacing: PlasmaCore.Units.gridUnit
+
+    signal locked()
+    signal released(int value)
     
     PlasmaComponents.Label {
         text: propertyName
@@ -32,8 +34,6 @@ RowLayout {
         to: 100
         stepSize: Math.max(propertyStepSize, 1)
 
-        property int intValue: Math.round(value)
-
         Timer {
             id: mouseWheelScrollingDebounceTimer
 
@@ -46,19 +46,15 @@ RowLayout {
             triggeredOnStart: false
 
             onTriggered: {
-                valuesLock = false;
-                // TODO set command stuff
-                console.log(`value updated to ${slider.value}`);
+                released(slider.value);
             }
         }
 
         onMoved: {
-            // Should also be locked during mouse wheel scrolling.
-            valuesLock = true;
-            // TODO ?
-            // brightness = value;
+            // Lock if the slider was moved by mouse buttons or scrolling
+            locked();
 
-            // Handle mouse wheel debounce only when the slider is not pressed.
+            // Handle mouse wheel debounce only when the slider is not pressed but moved by scrolling
             if (!pressed) {
                 mouseWheelScrollingDebounceTimer.restart();
             }
@@ -66,12 +62,11 @@ RowLayout {
 
         onPressedChanged: function() {
             if (pressed) {
-                valuesLock = true;
+                // Slider is pressed
+                locked();
             } else {
                 // Slider is released
-                valuesLock = false;
-                // TODO set command stuff
-                console.log(`value updated to ${slider.value}`);
+                released(slider.value);
             }
         }
     }
@@ -79,7 +74,7 @@ RowLayout {
     PlasmaComponents.Label {
         horizontalAlignment: Qt.AlignRight
         Layout.minimumWidth: percentageMetrics.advanceWidth
-        text: slider.intValue + '%'
+        text: slider.value + '%'
 
         TextMetrics {
             id: percentageMetrics

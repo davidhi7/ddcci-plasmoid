@@ -4,8 +4,8 @@
 
     <group name="General">
         <entry name="executable" type="String">
-            <!-- <default>python3 -m ddcci_plasmoid_backend</default> -->
-            <default>cat "./detect_mock.json"</default>
+            <!-- <default>cat detect_mock.json #</default> -->
+            <default>ddcci_plasmoid_backend</default>
         </entry>
         <entry name="stepSize" type="Int">
             <default>5</default>

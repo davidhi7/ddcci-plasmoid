@@ -6,54 +6,72 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents
 import org.kde.plasma.extras 2.0 as PlasmaExtras
 
+import "code/backend_interface.js" as Backend
+
 Item {
     id: root
+    // --- Global variables ---
+    // Enable or disable debug logging
+    readonly property bool enableLogging: true
+    // Command to invoke the backend program
+    property string backendCommand: plasmoid.configuration.executable
+    // Interface to call the backend to set new properties
+    property var backendInstance: new Backend.BackendInterface(executable, backendCommand)
+
+
     // Do never apply new values if one slider is not released yet
     property bool valuesLock: false
     property bool outsideSysTray: !(plasmoid.containmentDisplayHints & PlasmaCore.Types.ContainmentDrawsPlasmoidHeading)
 
-    Connections {
-        target: valuesLock
-        onChanged: () => {
-            console.log(valuesLock)
-        } 
+    function log(message) {
+        if (enableLogging) {
+            console.log(`LOGGING: ${message}`);
+        }
     }
 
-    // https://github.com/Zren/plasma-applet-commandoutput/blob/master/package/contents/ui/main.qml
-    // PlasmaCore.DataSource {
-    //     id: executable
-    //     engine: "executable"
-    //     connectedSources: []
-    //     onNewData: function (cmd, data) {
-    //         const exitCode = data["exit code"];
-	// 		const exitStatus = data["exit status"];
-	// 		const stdout = data.stdout;
-	// 		const stderr = data.stderr;
+    function removeTrailingNewlines(arg) {
+        return arg.replace(/\n$/, '');
+    }
 
-    //         if (exitCode > 0) {
-    //             handleError(stdout, stderr);
-    //         }
-	// 		disconnectSource(cmd);
-    //     }
-    //     function exec(cmd) {
-    //         if (cmd) {
-    //             connectSource(cmd);
-    //         }
-    //     }
-    // }
+    // Executable dataSource for all commands but regular backend polling
+    PlasmaCore.DataSource {
+        id: executable
+        engine: "executable"
+        connectedSources: []
+        function exec(command, callback) {
+            log(`Execute command: ${command}`);
+            const wrappedCallback = (calledCommand, data) => {
+                if (calledCommand === command) {
+                    const exitCode = data["exit code"];
+                    const stdout = data.stdout;
+                    const stderr = data.stderr;
+                    log(`exitCode: ${command}: ${exitCode}`);
+                    log(`stdout:   ${command}: ${removeTrailingNewlines(stdout)}`);
+                    log(`stderr:   ${command}: ${removeTrailingNewlines(stderr)}`);
+                    callback(exitCode, stdout, stderr);
+                    disconnectSource(command);
+                    onNewData.disconnect(wrappedCallback);
+                }
+            };
+            onNewData.connect(wrappedCallback);
+            connectSource(command);
+        }
+    }
 
+    // DataSource for regular backend polling
+    // TODO error handling
     PlasmaCore.DataSource {
         id: monitorDataSource
         engine: "executable"
         connectedSources: []
         interval: 60 * 1000
-        onNewData: function (cmd, data) {
+        onNewData: function (command, data) {
             const exitCode = data["exit code"];
 			const exitStatus = data["exit status"];
 			const stdout = data.stdout;
 			const stderr = data.stderr;
 
-            if (cmd === oneoffCommand) {
+            if (command === oneoffCommand) {
                 disconnectSource(oneoffCommand);
             }
 
@@ -63,30 +81,41 @@ Item {
             }
 
             // if the lock is held, simply do nothing and wait for the next refresh
-            // if (!valuesLock) {
-            if (true) {
+            // TODO also look if latest ddcutil setvcp call is newer happened before current detect call
+            if (!valuesLock) {
                 monitorModel.clear();
-			    const response = JSON.parse(stdout);
-                for (let adapter in response.response) {
-                    // TODO do take adapters into account
-                    for (let key in response.response[adapter]) {
-                        monitorModel.append(response.response[adapter][key]);
+			    const output = JSON.parse(stdout);
+                for (let adapter in output.response) {
+                    for (let id in output.response[adapter]) {
+                        let monitor = output.response[adapter][id];
+                        monitor.id = id;
+                        monitor.adapter = adapter;
+                        monitorModel.append(monitor);
                     }
                 }
             }
         }
-        // readonly property string command: `${plasmoid.configuration.executable} detect`
-        readonly property string command: `${plasmoid.configuration.executable}`
-        // add the meaningless variable `ONCE=1` in front so we can differentiate this one-off call from regular calls and disconnect it 
-        readonly property string oneoffCommand: `ONCE=1 ${command}`
+        // Command to query monitor data
+        property string pollingCommand: {
+            const newCommand = `${backendCommand} detect ddcci`;
+            // By adding this side effect, the regular polling also uses the new command. Otherwise it would continue using the old command.
+            restart(newCommand);
+            return newCommand;
+        }
+        // Add the meaningless variable `ONCE=1` in front so we can differentiate this one-off call from regular calls and disconnect it 
+        property string oneoffCommand: `ONCE=1 ${pollingCommand}`
         function start() {
-            connectSource(command);
+            log(`Start backend detect polling with command '${pollingCommand}'`);
+            connectSource(pollingCommand);
         }
         function runOnce() {
+            log(`Run backend detect once with command '${oneoffCommand}'`);
             connectSource(oneoffCommand);
         }
-        function stop() {
-            disconnectSource(command);
+        function restart(newCommand) {
+            connectedSources = []
+            log(`Restart backup detect polling with command '${newCommand}'`);
+            connectSource(newCommand);
         }
     }
 
@@ -103,8 +132,8 @@ Item {
             error(i18n("Error:") + stdout + stderr);
         }
     }
+
     ListModel {
-    
         id: monitorModel
     }
 
@@ -186,10 +215,10 @@ Item {
 
             ColumnLayout {
                 Repeater {
-                    // visible: plasmoid.configuration.enableAdvancedMode
                     model: monitorModel
                     delegate: AdvancedMonitorItem {
                         visible: plasmoid.configuration.enableAdvancedMode
+                        backendWrapper: backendInstance 
                     }
                 }
 
@@ -197,6 +226,7 @@ Item {
                     model: monitorModel
                     delegate: SimpleMonitorItem {
                         visible: !plasmoid.configuration.enableAdvancedMode
+                        backendWrapper: backendInstance 
                     }
                 }
 
@@ -209,163 +239,8 @@ Item {
                 Item {
                     height: 0
                     Layout.fillWidth: true
-                    // Layout.fillHeight: true
                 }
             }
-
-            // Main content
-            // GridLayout {
-            //     visible: monitorModel.count > 0
-
-            //     Layout.alignment: Qt.AlignHCenter
-            //     columns: 2
-            //     rows: monitorModel.count
-            //     flow: GridLayout.TopToBottom
-            //     columnSpacing: PlasmaCore.Units.gridUnit / 2
-            //     rowSpacing: PlasmaCore.Units.gridUnit
-
-            //     Repeater {
-            //         model: monitorModel
-            //         delegate: ColumnLayout {
-            //             spacing: 0
-            //             PlasmaComponents.Label {
-            //                 Layout.alignment: Qt.AlignRight
-            //                 Layout.rightMargin: 4
-                            
-            //                 // level: 5
-            //                 text: name
-            //             }
-            //             PlasmaComponents.ToolButton {         
-            //                 visible:  plasmoid.configuration.advancedMode                   
-            //                 Layout.alignment: Qt.AlignRight
-            //                 icon.name: 'system-shutdown-symbolic'
-            //                 PlasmaComponents.ToolTip {
-            //                     text: 'Shut monitors down'
-            //                 }
-            //                 icon {
-            //                     width: 16
-            //                     height: 16
-            //                 }
-            //             }
-            //             Item {
-            //                 Layout.fillWidth: true
-            //             }
-            //         }
-            //     }
-
-            //     Repeater {
-            //         model: monitorModel
-            //         delegate: ColumnLayout {
-            //             RowLayout {
-            //                 Layout.alignment: Qt.AlignRight
-            //                 PlasmaComponents.Label {
-            //                     visible:  plasmoid.configuration.advancedMode
-            //                     Layout.alignment: Qt.AlignRight
-            //                     Layout.rightMargin: 4
-            //                     text: 'Brightness:'
-            //                 }
-
-            //                 PlasmaComponents.Slider {
-            //                     id: brightnessSlider
-            //                     Layout.fillWidth: !root.outsideSysTray
-            //                     from: 0
-            //                     to: 100
-            //                     value: brightness
-            //                 }
-
-            //                 PlasmaComponents.Label {
-            //                     id: percentageLabel
-            //                     horizontalAlignment: Qt.AlignRight
-
-            //                     text: brightness + '%'
-            //                     Layout.minimumWidth: percentageMetrics.advanceWidth
-            //                 }
-            //             }
-
-            //             RowLayout {
-            //                 visible:  plasmoid.configuration.advancedMode
-            //                 Layout.alignment: Qt.AlignRight
-            //                 PlasmaComponents.Label {
-            //                     Layout.alignment: Qt.AlignRight
-            //                     Layout.rightMargin: 4
-            //                     text: 'Contrast:'
-            //                 }
-
-            //                 PlasmaComponents.Slider {
-            //                     id: contrastSlider
-            //                     Layout.fillWidth: !root.outsideSysTray
-            //                     from: 0
-            //                     to: 100
-            //                     value: brightness
-            //                 }
-
-            //                 PlasmaComponents.Label {
-            //                     horizontalAlignment: Qt.AlignRight
-
-            //                     text: brightness + '%'
-            //                     Layout.minimumWidth: percentageMetrics.advanceWidth
-            //                 }
-            //             }
-            //         }
-            //     }
-
-            //         // delegate: PlasmaComponents.Slider {
-            //         //     id: slider
-            //         //     // outside the systray, this causes layouting issues
-            //         //     Layout.fillWidth: !root.outsideSysTray
-            //         //     from: 0
-            //         //     to: 100
-            //         //     value: brightness
-            //         //     stepSize: plasmoid.configuration.stepSize || 1
-
-            //         //     Timer {
-            //         //         id: mouseWheelScrollingDebounceTimer
-
-            //         //         // How long does it take to trigger when the mouse wheel stops scrolling
-            //         //         interval: 400
-
-            //         //         // will only be triggered once after restart() called
-            //         //         repeat: false
-            //         //         running: false
-            //         //         triggeredOnStart: false
-
-            //         //         onTriggered: {
-            //         //             valuesLock = false
-            //         //             executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
-            //         //         }
-            //         //     }
-
-            //         //     onMoved: () => {
-            //         //         // Should also be locked during mouse wheel scrolling.
-            //         //         valuesLock = true
-            //         //         brightness = value
-
-            //         //         // Handle mouse wheel debounce only when the slider is not pressed.
-            //         //         if (!pressed) {
-            //         //             mouseWheelScrollingDebounceTimer.restart()
-            //         //         }
-            //         //     }
-
-            //         //     onPressedChanged: function() {
-            //         //         if (pressed) {
-            //         //             valuesLock = true
-            //         //         } else {
-            //         //             // Slider is released
-            //         //             valuesLock = false
-            //         //             executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
-            //         //         }
-            //         //     }
-            //         // }
-            // }
-
-            // Item to fill entire width and the remaining height, this way all other childs of the layout can be centered horizontally
-            
-
-            // TextMetrics {
-            //     id: percentageMetrics
-            //     font: percentageLabel.font
-            //     text: '100%'
-            // }
 
         }
     }
@@ -375,6 +250,9 @@ Item {
     }
 
     Component.onCompleted: function() {
+        executable.exec(`${backendCommand} version`, (exitCode, stdout, stderr) => {
+            log(`Backend version: ${removeTrailingNewlines(stdout)}`);
+        });
         monitorDataSource.start();
         // code to add new action: Plasmoid.setAction("actionId", i18_n("text"), "iconName") (i18_n without underscore)
         Plasmoid.setAction('refreshMonitors', i18n("Refresh monitors"), 'view-refresh-symbolic');
