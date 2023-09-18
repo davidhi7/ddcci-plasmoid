@@ -4,8 +4,8 @@ from unittest.mock import MagicMock, call
 import pytest
 from pytest_asyncio import fixture
 
+from ddcci_plasmoid_backend import config
 from ddcci_plasmoid_backend.adapters.ddcci.ddcutil_wrapper import DdcutilWrapper
-from ddcci_plasmoid_backend.default_options import DEFAULT_OPTIONS
 from ddcci_plasmoid_backend.subprocess_wrappers import CalledProcessError, CommandOutput
 
 
@@ -42,11 +42,11 @@ async def test_basic_functionality(
     )
 
 
+@pytest.mark.usefixtures("mock_subprocess_wrapper")
 async def test_detect_bus_error(
         silent_logger,
         default_ddcutil_wrapper,
         ddcutil_verbs,
-        mock_subprocess_wrapper: MagicMock,
 ):
     if ddcutil_verbs != "detect":
         with pytest.raises(ValueError):
@@ -56,9 +56,9 @@ async def test_detect_bus_error(
 async def test_sleep_multiplier(
         silent_logger, ddcutil_verbs, mock_subprocess_wrapper: MagicMock
 ):
-    custom_options = dict(DEFAULT_OPTIONS)
-    custom_options["ddcutil_sleep_multiplier"] = 1.5
-    ddcutil_wrapper = DdcutilWrapper(custom_options)
+    custom_config = config.init(None)["ddcci"]
+    custom_config["ddcutil_sleep_multiplier"] = "1.5"
+    ddcutil_wrapper = DdcutilWrapper(custom_config)
     await ddcutil_wrapper.run_async(ddcutil_verbs, "arg1", bus=0, logger=silent_logger)
     mock_subprocess_wrapper.assert_called_once_with(
         f'ddcutil {"--bus 0 " if ddcutil_verbs != "detect" else ""}--sleep-multiplier 1.5 {ddcutil_verbs} arg1',
@@ -67,9 +67,9 @@ async def test_sleep_multiplier(
 
 
 async def test_no_verify(silent_logger, mock_subprocess_wrapper: MagicMock):
-    custom_options = dict(DEFAULT_OPTIONS)
-    custom_options["ddcutil_no_verify"] = True
-    ddcutil_wrapper = DdcutilWrapper(custom_options)
+    custom_config = config.init(None)["ddcci"]
+    custom_config["ddcutil_no_verify"] = "True"
+    ddcutil_wrapper = DdcutilWrapper(custom_config)
     await ddcutil_wrapper.run_async("setvcp", "arg1", bus=0, logger=silent_logger)
     mock_subprocess_wrapper.assert_called_once_with(
         "ddcutil --bus 0 setvcp --noverify arg1", silent_logger
@@ -99,9 +99,9 @@ async def test_brute_force_attempts(
                 return erroneous_command_output
             return default_command_output
 
-    custom_options = dict(DEFAULT_OPTIONS)
-    custom_options["brute_force_attempts"] = 5
-    ddcutil_wrapper = DdcutilWrapper(custom_options)
+    custom_config = config.init(None)["ddcci"]
+    custom_config["brute_force_attempts"] = "5"
+    ddcutil_wrapper = DdcutilWrapper(custom_config)
 
     erroneous_attempt_provider = ErroneousAttemptProvider(erroneous_attempts)
     with mock.patch(
@@ -124,7 +124,7 @@ async def test_brute_force_attempts(
             * mocked_fn.call_count
     )
 
-    if erroneous_attempts < custom_options["brute_force_attempts"] + 1:
+    if erroneous_attempts < custom_config.getint("brute_force_attempts") + 1:
         assert output == default_command_output
     else:
         assert output == erroneous_command_output

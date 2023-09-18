@@ -7,9 +7,9 @@ from unittest import mock
 
 import pytest
 
+from ddcci_plasmoid_backend import config
 from ddcci_plasmoid_backend.adapters import ddcci_adapter
 from ddcci_plasmoid_backend.adapters.monitor_adapter import Property
-from ddcci_plasmoid_backend.default_options import DEFAULT_OPTIONS
 from ddcci_plasmoid_backend.subprocess_wrappers import CommandOutput
 
 if TYPE_CHECKING:
@@ -101,7 +101,7 @@ async def test_detect(monkeypatch, ddcutil_mock):
         "ddcci_plasmoid_backend.subprocess_wrappers.async_subprocess_wrapper",
         async_ddcutil_mock,
     )
-    adapter = ddcci_adapter.DdcciAdapter(DEFAULT_OPTIONS)
+    adapter = ddcci_adapter.DdcciAdapter(config.init(None)["ddcci"])
     detected_monitors = await adapter.detect()
     # turn output into only dicts
     dictified_output = {
@@ -114,7 +114,7 @@ async def test_detect(monkeypatch, ddcutil_mock):
 
 
 async def test_set_basic():
-    adapter = ddcci_adapter.DdcciAdapter(DEFAULT_OPTIONS)
+    adapter = ddcci_adapter.DdcciAdapter(config.init(None)["ddcci"])
     with mock.patch.object(adapter._ddcutil_wrapper, "run_async") as mocked_fn:
         await adapter.set_property(property=Property.BRIGHTNESS, id=0, value=100)
         mocked_fn.assert_called_once_with(

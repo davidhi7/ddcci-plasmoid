@@ -4,17 +4,17 @@ import dataclasses
 from abc import abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, Union
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ddcci_plasmoid_backend.adapters.adapters import MonitorIdentifier
+    from configparser import SectionProxy
 
-Options = Dict[str, Union[str, int, float, bool]]
+    from ddcci_plasmoid_backend.adapters.adapters import MonitorIdentifier
 
 
 class MonitorAdapter:
-    def __init__(self, options: Options) -> None:
-        self.options = options
+    def __init__(self, config_section: SectionProxy) -> None:
+        self.config_section = config_section
 
     @abstractmethod
     async def detect(self) -> dict[MonitorIdentifier, Monitor]:

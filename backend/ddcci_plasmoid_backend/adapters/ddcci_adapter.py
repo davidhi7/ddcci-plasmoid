@@ -7,6 +7,8 @@ from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Optional
 
 if TYPE_CHECKING:
+    from configparser import SectionProxy
+
     from ddcci_plasmoid_backend.adapters.adapters import MonitorIdentifier
 from ddcci_plasmoid_backend.adapters.ddcci import (
     ddcutil_wrapper,
@@ -15,7 +17,6 @@ from ddcci_plasmoid_backend.adapters.ddcci import (
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
     Monitor,
     MonitorAdapter,
-    Options,
     Property,
 )
 
@@ -46,9 +47,9 @@ class PowerModeValues(Enum):
 
 
 class DdcciAdapter(MonitorAdapter):
-    def __init__(self, options: Options) -> None:
-        super().__init__(options)
-        self._ddcutil_wrapper = ddcutil_wrapper.DdcutilWrapper(options)
+    def __init__(self, config_section: SectionProxy) -> None:
+        super().__init__(config_section)
+        self._ddcutil_wrapper = ddcutil_wrapper.DdcutilWrapper(config_section)
         logger.info(f"ddcutil version: {self._ddcutil_wrapper.get_ddcutil_version()}")
 
     async def detect(self) -> dict[MonitorIdentifier, DdcciMonitor]:

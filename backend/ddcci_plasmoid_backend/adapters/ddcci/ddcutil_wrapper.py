@@ -9,7 +9,9 @@ from ddcci_plasmoid_backend import subprocess_wrappers
 from ddcci_plasmoid_backend.subprocess_wrappers import CalledProcessError
 
 if TYPE_CHECKING:
-    from ddcci_plasmoid_backend.adapters.monitor_adapter import Options
+    from configparser import SectionProxy
+
+    pass
 
 logger = logging.getLogger(__name__)
 ddcutil_failure_pattern = re.compile("(DDC communication failed)")
@@ -17,11 +19,11 @@ DDCUTIL_DEFAULT_SLEEP_MULTIPLIER = 1.0
 
 
 class DdcutilWrapper:
-    def __init__(self, options: Options) -> None:
-        self.ddcutil_executable: str = options["ddcutil_executable"]
-        self.sleep_multiplier: float = options["ddcutil_sleep_multiplier"]
-        self.no_verify: bool = options["ddcutil_no_verify"]
-        self.brute_force_attempts: int = options["brute_force_attempts"]
+    def __init__(self, config_section: SectionProxy) -> None:
+        self.ddcutil_executable = config_section.get("ddcutil_executable")
+        self.sleep_multiplier = config_section.getfloat("ddcutil_sleep_multiplier")
+        self.no_verify = config_section.getboolean("ddcutil_no_verify")
+        self.brute_force_attempts = config_section.getint("brute_force_attempts")
 
     async def run_async(
             self, verb: str, *arguments: str, bus: int | None = None, logger: logging.Logger
@@ -52,7 +54,8 @@ class DdcutilWrapper:
             attempt += 1
             output = await subprocess_wrappers.async_subprocess_wrapper(command, logger)
         else:
-            # while ... else is only executed if the queue has not been exited with break but with a false loop condition
+            # while ... else is only executed if the queue has not been exited with break but with a false loop
+            # condition
             if attempt > 0:
                 logger.info(f"Required {attempt} attempts for command `{command}`")
         return self._strip_ddcutil_nvidia_warning(output)
@@ -87,7 +90,8 @@ class DdcutilWrapper:
             command_output: subprocess_wrappers.CommandOutput,
     ) -> subprocess_wrappers.CommandOutput:
         """
-        Return a new CommandOutput instance with NVIDIA-related warnings from ddcutil stdout output removed. Fix for #32.
+        Return a new CommandOutput instance with NVIDIA-related warnings from ddcutil stdout output removed.
+        Fix for #32.
 
         Args:
             command_output: CommandOutput to work with

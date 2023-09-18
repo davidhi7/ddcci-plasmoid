@@ -15,6 +15,7 @@ from typing import TYPE_CHECKING, Callable, NoReturn
 
 import fasteners
 
+from ddcci_plasmoid_backend import config
 from ddcci_plasmoid_backend.adapters import adapters
 from ddcci_plasmoid_backend.adapters.adapters import monitor_adapter_classes
 from ddcci_plasmoid_backend.adapters.monitor_adapter import Property
@@ -38,15 +39,6 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         metavar="LOG_FILE",
         help="Write debug messages to LOG_FILE",
     )
-    argument_parser.add_argument(
-        "-o",
-        "--options",
-        action="store",
-        type=json.loads,
-        metavar="JSON",
-        help="Adapter-specific options encoded as JSON key value pairs",
-        default={},
-    )
     sub_parsers = argument_parser.add_subparsers(
         title="commands", dest="command", required=True
     )
@@ -66,6 +58,20 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     )
     set_parser.add_argument("property", choices=properties, help="Monitor property")
     set_parser.add_argument("value", type=int, help="New value")
+
+    # Simple conversion function to split configuration identifiers formatted as `section.key` into separate variables,
+    # raising a ValueError if the argument is wrongly formatted
+    def composed_config_key(argument: str) -> tuple[str, str]:
+        section, key = argument.split(".")
+        return section, key
+
+    config_parser = sub_parsers.add_parser(
+        "config", help="Get or set a configuration value"
+    )
+    config_parser.add_argument(
+        "key", type=composed_config_key, help="Configuration key"
+    )
+    config_parser.add_argument("value", help="New configuration value", nargs="?")
 
     return argument_parser
 
@@ -132,9 +138,29 @@ def main() -> NoReturn:
     logger.info("backend version: %s", version("ddcci-plasmoid-backend"))
     logger.info("argv: %s", " ".join(sys.argv))
     sys.excepthook = get_custom_except_hook(arguments["command"], logger)
+    config.config = config.init(config.DEFAULT_CONFIG_PATH)
 
     if arguments["command"] == "version":
         print(version("ddcci-plasmoid-backend"))
+        sys.exit(0)
+    elif arguments["command"] == "config":
+        section, key = arguments["key"]
+        if arguments["value"]:
+            value = arguments["value"]
+            config.set_config_value(
+                config.config,
+                section,
+                key,
+                value,
+                save_file_path=config.DEFAULT_CONFIG_PATH,
+            )
+            print(json.dumps({"command": "config"}))
+        else:
+            print(
+                json.dumps(
+                    {"command": "config", "response": config.config[section].get(key)}
+                )
+            )
         sys.exit(0)
 
     # Include the username in the lock file. Otherwise, if user A creates a lock, user B may not have the permissions
@@ -148,9 +174,7 @@ def main() -> NoReturn:
                 json.dumps(
                     {
                         "command": "detect",
-                        "response": asyncio.run(
-                            adapters.detect(arguments["adapter"], arguments["options"])
-                        ),
+                        "response": asyncio.run(adapters.detect(arguments["adapter"])),
                     }
                 )
             )
@@ -162,7 +186,6 @@ def main() -> NoReturn:
                         "response": asyncio.run(
                             adapters.set_property(
                                 arguments["adapter"],
-                                arguments["options"],
                                 arguments["property"],
                                 arguments["id"],
                                 arguments["value"],

@@ -4,14 +4,13 @@ import asyncio
 from functools import reduce
 from typing import Dict
 
+from ddcci_plasmoid_backend import config
 from ddcci_plasmoid_backend.adapters.ddcci_adapter import DdcciAdapter
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
     Monitor,
     MonitorAdapter,
-    Options,
     Property,
 )
-from ddcci_plasmoid_backend.default_options import DEFAULT_OPTIONS
 
 AdapterIdentifier = str
 MonitorIdentifier = int
@@ -31,17 +30,12 @@ def _get_adapter_type(adapter: str) -> type[MonitorAdapter]:
     return monitor_adapter_classes[adapter]
 
 
-def _merge_default_options(options: Options) -> Options:
-    return {**DEFAULT_OPTIONS, **options}
-
-
-async def detect(adapters: list[AdapterIdentifier], options: Options) -> DetectSummary:
+async def detect(adapters: list[AdapterIdentifier]) -> DetectSummary:
     """
     Detect all monitors with the given adapters.
 
     Args:
         adapters: list of adapter identifiers, values must be equal to keys of `monitor_adapter_classes`.
-        options: Custom options to override default options with.
 
     Returns:
         All detected monitors, mapped by adapter identifier, then by monitor identifier.
@@ -54,18 +48,16 @@ async def detect(adapters: list[AdapterIdentifier], options: Options) -> DetectS
         }
 
     tasks = []
-    options = _merge_default_options(options)
     for adapter in adapters:
-        instance = _get_adapter_type(adapter)(options)
+        config_section = config.config[adapter]
+        instance = _get_adapter_type(adapter)(config_section)
         tasks.append(asyncio.create_task(detect_call(instance, adapter)))
     result = await asyncio.gather(*tasks)
     return reduce(lambda x, y: {**x, **y}, result)
 
 
-async def set_property(
-        adapter: str, options: Options, property: str, id: int, value: int
-) -> None:
+async def set_property(adapter: str, property: str, id: int, value: int) -> None:
     adapter_type = _get_adapter_type(adapter)
-    merged_options = _merge_default_options(options)
+    config_section = config.config[adapter]
     property = Property(property)
-    return await adapter_type(merged_options).set_property(property, id, value)
+    return await adapter_type(config_section).set_property(property, id, value)
