@@ -25,12 +25,12 @@ config = ConfigParser()
 
 
 def init(config_path: Path | None = None) -> ConfigParser:
-    """Create a new configuration instance. If config_path is not None, read the given configuration file.
-    If configuration keys and sections are missing, they are created to match CONFIG_SCHEME.
+    """Create a new configuration instance. If config_path is not None, read the given configuration
+    file. If configuration keys and sections are missing, they are created to match CONFIG_SCHEME.
 
     Args:
-        config_path: Path to the configuration file. If None, create a new configuration file from scratch. If the file
-        does not exist, it is not created.
+        config_path: Path to the configuration file. If None, create a new configuration file from
+        scratch. If the file does not exist, it is not created.
 
     Returns:
 
@@ -80,8 +80,8 @@ def set_config_value(
     if key not in CONFIG_SCHEME[section].keys():
         msg = f"Key `{section}` does not exist within section `{section}`"
         raise ConfigurationError(msg)
-    # Try to parse the value and then convert it back into a string, to test whether the value is acceptable and to
-    # normalize it
+    # Try to parse the value and then convert it back into a string, to test whether the value is
+    # acceptable and to normalize it
     normalized_value: str
     try:
         normalized_value = str(CONFIG_SCHEME[section][key]["type"](value))

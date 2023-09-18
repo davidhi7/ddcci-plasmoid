@@ -59,8 +59,8 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     set_parser.add_argument("property", choices=properties, help="Monitor property")
     set_parser.add_argument("value", type=int, help="New value")
 
-    # Simple conversion function to split configuration identifiers formatted as `section.key` into separate variables,
-    # raising a ValueError if the argument is wrongly formatted
+    # Simple conversion function to split configuration identifiers formatted as `section.key` into
+    # separate variables, raising a ValueError if the argument is wrongly formatted
     def composed_config_key(argument: str) -> tuple[str, str]:
         section, key = argument.split(".")
         return section, key
@@ -163,9 +163,9 @@ def main() -> NoReturn:
             )
         sys.exit(0)
 
-    # Include the username in the lock file. Otherwise, if user A creates a lock, user B may not have the permissions
-    # to access the lock file and this program will fail until the lock file is deleted.
-    # Using `os.getlogin()` may fail on some configurations (#19)
+    # Include the username in the lock file. Otherwise, if user A creates a lock, user B may not
+    # have the permissions to access the lock file and this program will fail until the lock file
+    # is deleted. Using `os.getlogin()` may fail on some configurations (#19)
     with fasteners.InterProcessLock(
             Path(tempfile.gettempdir()) / f"ddcci_plasmoid_backend-{getpass.getuser()}.lock"
     ):

@@ -38,8 +38,8 @@ async def ddcutil_detect_monitors(
     identified_monitors: list[SerialNumbers] = []
     monitor_tasks = []
     for monitor_node in parsed_output.children:
-        # Try to get the ddcutil monitor id. If this fails, the node is likely not representing a functional DDC/CI
-        # monitor.
+        # Try to get the ddcutil monitor id. If this fails, the node is likely not representing a
+        # functional DDC/CI monitor.
         try:
             ddcutil_id = _get_ddcutil_monitor_id(monitor_node)
         except ValueError:
@@ -156,7 +156,8 @@ def _get_monitor_identification(monitor: Node) -> SerialNumbers:
         monitor: Node representing one monitor reported by `ddcutil detect`
 
     Returns:
-        `SerialNumbers` object containing the serial number and the binary serial number if available.
+        `SerialNumbers` object containing the serial number and the binary serial number if
+        available.
     """
     local_logger = logging.getLogger(
         __name__ + f" ddcutil_id={_get_ddcutil_monitor_id(monitor)}"
@@ -188,8 +189,8 @@ def _get_ddcutil_monitor_id(monitor: Node) -> int:
         Integer value
 
     Raises:
-        ValueError: The node does not represent a valid monitor: Its top level key is not `Display %i` where %i is the
-        display id
+        ValueError: The node does not represent a valid monitor: Its top level key is not
+        `Display %i` where %i is the display id
     """
     key = monitor.key.strip()
     if not re.fullmatch(r"Display \d+", key):
@@ -237,7 +238,8 @@ async def _parse_capabilities(
         bus: i2c bus id
 
     Returns:
-        Dict of supported feature codes and accepted values for non-continuous features or None for continuous features.
+        Dict of supported feature codes and accepted values for non-continuous features or None for
+         continuous features.
 
     Raises:
         subprocess_wrappers.CalledProcessError: The underlying ddcutil command fails.
@@ -247,8 +249,9 @@ async def _parse_capabilities(
         "capabilities", "--brief", bus=bus, logger=logger
     )
     # This is what a sample capabilities string looks like:
-    #  Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C E3 F3)vcp(02 04 05 08 10
-    #  12 14(05 08 0B 0C) 16 18 1A 52 60(0F 11 12 ))mswhql(1)asset_eep(40)mccs_ver(2.1))
+    #  Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C E3
+    #  F3)vcp(02 04 05 08 10 12 14(05 08 0B 0C) 16 18 1A 52 60(0F 11 12 ))mswhql(1)asset_eep(40)
+    #  mccs_ver(2.1))
     capabilities_string = output.stdout
     # Extract the `vcp(...) part from the capabilities string
     vcp_features_enumeration = re.search(

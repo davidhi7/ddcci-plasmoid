@@ -35,7 +35,8 @@ async def detect(adapters: list[AdapterIdentifier]) -> DetectSummary:
     Detect all monitors with the given adapters.
 
     Args:
-        adapters: list of adapter identifiers, values must be equal to keys of `monitor_adapter_classes`.
+        adapters: list of adapter identifiers, values must be equal to keys of
+        `monitor_adapter_classes`.
 
     Returns:
         All detected monitors, mapped by adapter identifier, then by monitor identifier.

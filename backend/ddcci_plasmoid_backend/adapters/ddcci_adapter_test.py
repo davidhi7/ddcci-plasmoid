@@ -25,8 +25,8 @@ def ddcutil_mock(request, default_command_output):  # noqa: C901
     * output.json: expected output
 
     Returns:
-        Function with arguments program, *argv, logger to mock (async_)subprocess_wrapper and the parsed output.json
-        content
+        Function with arguments program, *argv, logger to mock (async_)subprocess_wrapper and the
+        parsed output.json content
     """
     # Data from json files is usually accessed in multiple calls, so let's cache it
     json_file_cache: dict[Path, dict] = {}
@@ -42,7 +42,8 @@ def ddcutil_mock(request, default_command_output):  # noqa: C901
     # sync function that provides sample output for different ddcutil calls
     def mock(command_string: str, logger):
         command = command_string.split(" ")
-        # `detect` is the only ddcutil verb that does not require or support specific monitor identifications
+        # `detect` is the only ddcutil verb that does not require or support specific monitor
+        # identifications
         if "detect" in command:
             with (fixture_dir / "detect.txt").open() as file:
                 return CommandOutput(stdout=file.read(), stderr="", return_code=0)
@@ -107,8 +108,8 @@ async def test_detect(monkeypatch, ddcutil_mock):
     dictified_output = {
         key: value.prepare_json_dump() for key, value in detected_monitors.items()
     }
-    # JSON does not support integer keys, so dump and parse again to make sure we have valid json to compare to the
-    # expected output
+    # JSON does not support integer keys, so dump and parse again to make sure we have valid json
+    # to compare to the expected output
     json_output = json.loads(json.dumps(dictified_output))
     assert json_output == expected_output
 

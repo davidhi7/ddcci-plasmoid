@@ -32,8 +32,8 @@ class Node:
 
     def walk(self, *args: str) -> str:
         """
-        Walk recursively into children by key and return the value of the last child of the last given key.
-        Raise a ValueError if a key in the parameters is invalid.
+        Walk recursively into children by key and return the value of the last child of the last
+        given key. Raise a ValueError if a key in the parameters is invalid.
         """
         if len(args) == 1 and args[0] in self.child_by_key:
             return self.child_by_key[args[0]].value
@@ -44,8 +44,8 @@ class Node:
 
     def to_dict(self) -> dict[str | list[dict]]:
         """
-        Return a representation of this node as a recursive dictionary, removing the `parent` attribute in the process.
-        This dict can be used for serialization or testing.
+        Return a representation of this node as a recursive dictionary, removing the `parent`
+        attribute in the process. This dict can be used for serialization or testing.
         """
         return {
             "key": self.key,
@@ -76,7 +76,7 @@ class Node:
             # ddcutil output is indented by a multiple of 3 whitespaces
             indentation_characters = len(line) - len(line.lstrip())
             if indentation_characters % 3 != 0:
-                msg = f'Indentation whitespace count of line "{line.strip()}" is not a multiple of 3'
+                msg = f"Indentation whitespace count of line {line.strip()} is not a multiple of 3"
                 raise ValueError(msg)
 
             tokens = line.split(":")

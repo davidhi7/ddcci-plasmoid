@@ -54,8 +54,8 @@ class DdcutilWrapper:
             attempt += 1
             output = await subprocess_wrappers.async_subprocess_wrapper(command, logger)
         else:
-            # while ... else is only executed if the queue has not been exited with break but with a false loop
-            # condition
+            # while ... else is only executed if the queue has not been exited with break but with
+            # a false loop condition
             if attempt > 0:
                 logger.info(f"Required {attempt} attempts for command `{command}`")
         return self._strip_ddcutil_nvidia_warning(output)
@@ -90,8 +90,8 @@ class DdcutilWrapper:
             command_output: subprocess_wrappers.CommandOutput,
     ) -> subprocess_wrappers.CommandOutput:
         """
-        Return a new CommandOutput instance with NVIDIA-related warnings from ddcutil stdout output removed.
-        Fix for #32.
+        Return a new CommandOutput instance with NVIDIA-related warnings from ddcutil stdout output
+        removed. Fix for #32.
 
         Args:
             command_output: CommandOutput to work with
@@ -120,8 +120,8 @@ class DdcutilWrapper:
             output = subprocess_wrappers.subprocess_wrapper(
                 f"{self.ddcutil_executable} --version", logger=silent_logger
             )
-            # First line of ddcutil output contains the version with a value like 'ddcutil 2.0.0-rc1'
-            # Then remove 'ddcutil' and the trailing whitespace
+            # First line of ddcutil output contains the version with a value like
+            # 'ddcutil 2.0.0-rc1'.Then remove 'ddcutil' and the trailing whitespace
             return output.stdout.split("\n")[0].replace("ddcutil", "").strip()
         except CalledProcessError as error:
             msg = "Failed to invoke ddcutil"
