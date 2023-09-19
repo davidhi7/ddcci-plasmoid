@@ -109,6 +109,22 @@ def configure_root_logger(*, debug_mode: bool, debug_log: Path | None) -> None:
     logging.getLogger("asyncio").setLevel(logging.WARNING)
 
 
+def print_output_json(command: str, **kwargs: str | dict | list) -> None:
+    """Print kwargs to stdout formatted as json.
+
+    Args:
+        command: `command` property of the output
+        **kwargs: Content of the output
+
+    Returns:
+        None
+    """
+    # By doing this, `command` is always the first key
+    data = {"command": command}
+    data.update(kwargs)
+    print(json.dumps(data))
+
+
 def get_custom_except_hook(command: str, logger: logging.Logger) -> Callable:
     def except_hook(
             exc_type: type[BaseException],
@@ -118,19 +134,13 @@ def get_custom_except_hook(command: str, logger: logging.Logger) -> Callable:
         logger.exception(
             "Uncaught exception occurred", exc_info=(exc_type, exc_value, exc_traceback)
         )
-        print(
-            json.dumps(
-                {
-                    "command": command,
-                    "error": {
-                        "type": exc_type.__name__,
-                        "value": str(exc_value),
-                        "traceback": format_exception(
-                            exc_type, exc_value, exc_traceback
-                        ),
-                    },
-                }
-            )
+        print_output_json(
+            command,
+            error={
+                "type": exc_type.__name__,
+                "value": str(exc_value),
+                "traceback": format_exception(exc_type, exc_value, exc_traceback),
+            },
         )
         sys.exit(1)
 
@@ -153,6 +163,7 @@ def main() -> NoReturn:
         sys.exit(0)
     elif arguments["command"] == "config":
         section, key = arguments["key"]
+        # If a value argument is provided, the config value is set, otherwise it is only read
         if arguments["value"]:
             value = arguments["value"]
             config.set_config_value(
@@ -162,13 +173,7 @@ def main() -> NoReturn:
                 value,
                 save_file_path=config.DEFAULT_CONFIG_PATH,
             )
-            print(json.dumps({"command": "config"}))
-        else:
-            print(
-                json.dumps(
-                    {"command": "config", "response": config.config[section].get(key)}
-                )
-            )
+        print_output_json("config", response=config.config[section].get(key))
         sys.exit(0)
 
     # Include the username in the lock file. Otherwise, if user A creates a lock, user B may not
@@ -178,32 +183,23 @@ def main() -> NoReturn:
             Path(tempfile.gettempdir()) / f"ddcci_plasmoid_backend-{getpass.getuser()}.lock"
     ):
         if arguments["command"] == "detect":
-            print(
-                json.dumps(
-                    {
-                        "command": "detect",
-                        "response": asyncio.run(adapters.detect(arguments["adapter"])),
-                    }
-                )
+            print_output_json(
+                "command", response=asyncio.run(adapters.detect(arguments["adapter"]))
             )
         elif arguments["command"] == "set":
-            print(
-                json.dumps(
-                    {
-                        "command": "set",
-                        "response": asyncio.run(
-                            adapters.set_property(
-                                arguments["adapter"],
-                                arguments["property"],
-                                arguments["id"],
-                                arguments["value"],
-                            )
-                        ),
-                    }
-                )
-            )
+            asyncio.run(
+                adapters.set_property(
+                    arguments["adapter"],
+                    arguments["property"],
+                    arguments["id"],
+                    arguments["value"],
+                ))
+            print_output_json("set")
         elif arguments["command"] == "set-all":
-            asyncio.run(adapters.set_all_monitors(arguments["property"], arguments["value"]))
+            asyncio.run(
+                adapters.set_all_monitors(arguments["property"], arguments["value"])
+            )
+            print_output_json("set-all")
 
     sys.exit(0)
 
