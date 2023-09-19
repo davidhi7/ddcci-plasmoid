@@ -59,6 +59,14 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     set_parser.add_argument("property", choices=properties, help="Monitor property")
     set_parser.add_argument("value", type=int, help="New value")
 
+    set_all_parser = sub_parsers.add_parser(
+        "set-all",
+        help="Write a value to all monitors detected in the last `detect` call",
+    )
+
+    set_all_parser.add_argument("property", choices=properties, help="Monitor property")
+    set_all_parser.add_argument("value", type=int, help="New value")
+
     # Simple conversion function to split configuration identifiers formatted as `section.key` into
     # separate variables, raising a ValueError if the argument is wrongly formatted
     def composed_config_key(argument: str) -> tuple[str, str]:
@@ -194,6 +202,8 @@ def main() -> NoReturn:
                     }
                 )
             )
+        elif arguments["command"] == "set-all":
+            asyncio.run(adapters.set_all_monitors(arguments["property"], arguments["value"]))
 
     sys.exit(0)
 

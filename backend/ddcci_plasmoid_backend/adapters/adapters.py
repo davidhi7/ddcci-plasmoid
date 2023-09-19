@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import asyncio
+import json
+import logging
 from functools import reduce
 from typing import Dict
 
@@ -11,6 +13,9 @@ from ddcci_plasmoid_backend.adapters.monitor_adapter import (
     MonitorAdapter,
     Property,
 )
+from ddcci_plasmoid_backend.cache import CacheFiles
+
+logger = logging.getLogger(__name__)
 
 AdapterIdentifier = str
 MonitorIdentifier = int
@@ -53,8 +58,13 @@ async def detect(adapters: list[AdapterIdentifier]) -> DetectSummary:
         config_section = config.config[adapter]
         instance = _get_adapter_type(adapter)(config_section)
         tasks.append(asyncio.create_task(detect_call(instance, adapter)))
-    result = await asyncio.gather(*tasks)
-    return reduce(lambda x, y: {**x, **y}, result)
+    result = reduce(lambda x, y: {**x, **y}, await asyncio.gather(*tasks))
+    # Cache the latest detect result
+    CacheFiles.DETECT.value.parent.mkdir(exist_ok=True)
+    logger.info(f"Write `detect` output to cache file `{CacheFiles.DETECT.value}`")
+    with CacheFiles.DETECT.value.open("w") as file:
+        json.dump(result, file)
+    return result
 
 
 async def set_property(adapter: str, property: str, id: int, value: int) -> None:
@@ -62,3 +72,20 @@ async def set_property(adapter: str, property: str, id: int, value: int) -> None
     config_section = config.config[adapter]
     property = Property(property)
     return await adapter_type(config_section).set_property(property, id, value)
+
+
+async def set_all_monitors(property: str, value: int) -> None:
+    if not CacheFiles.DETECT.value.is_file():
+        msg = f"Cache file `{CacheFiles.DETECT.value}` is not a file"
+        raise FileNotFoundError(msg)
+    property = Property(property)
+    cache: DetectSummary
+    with CacheFiles.DETECT.value.open() as file:
+        cache = json.load(file)
+    tasks = []
+    for adapter, monitors in cache.items():
+        for id in monitors:
+            tasks.append(asyncio.create_task(
+                _get_adapter_type(adapter)(config.config[adapter]).set_property(property, id,
+                                                                                value)))
+    await asyncio.gather(*tasks)
