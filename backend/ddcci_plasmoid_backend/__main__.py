@@ -78,7 +78,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "config", help="Get or set a configuration value"
     )
     config_parser.add_argument(
-        "key", type=composed_config_key, help="Configuration key"
+        "composed-key", type=composed_config_key, help="Configuration section and key"
     )
     config_parser.add_argument("value", help="New configuration value", nargs="?")
 
@@ -198,7 +198,8 @@ def main() -> NoReturn:
                     arguments["property"],
                     arguments["id"],
                     arguments["value"],
-                ))
+                )
+            )
             print_output_json("set")
         elif arguments["command"] == "set-all":
             asyncio.run(

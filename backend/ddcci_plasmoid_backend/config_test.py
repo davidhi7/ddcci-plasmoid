@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from ddcci_plasmoid_backend import config
+from ddcci_plasmoid_backend.errors import ConfigurationError
 
 
 @pytest.fixture
@@ -54,3 +55,14 @@ def test_set_config_value():
     assert config_object._sections == config.init(Path(file.name))._sections
 
     Path(file.name).unlink()
+
+
+@pytest.mark.usefixtures("_mock_config_scheme")
+def test_set_config_value_errors():
+    config_object = config.init(None)
+    with pytest.raises(ConfigurationError, match="Section"):
+        config.set_config_value(config_object, "wrong-section", "key1", "value")
+    with pytest.raises(ConfigurationError, match="Key"):
+        config.set_config_value(config_object, "section1", "wrong-key", "value")
+    with pytest.raises(ConfigurationError, match="Value"):
+        config.set_config_value(config_object, "section1", "key2", "not-an-int")

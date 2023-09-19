@@ -94,8 +94,8 @@ def set_config_value(
     except ValueError as err:
         msg = f"Value `{value}` is invalid for the key `{section}.{key}`"
         raise ConfigurationError(msg) from err
-    if section not in config_instance.sections():
-        config_instance.add_section(section)
+    # Here we do not create a new section to the ConfigParser if it is missing because all sections
+    # in a template-compliant ConfigParser are already there
     config_instance[section][key] = normalized_value
     if save_file_path:
         with save_file_path.open("w") as file:
