@@ -29,5 +29,5 @@ def test_parse_binary_serial_number():
 
 def test_parse_binary_serial_number_fail():
     assert (
-            SerialNumbers("12345", "12345 (67890)").binary_serial_number == "12345 (67890)"
+        SerialNumbers("12345", "12345 (67890)").binary_serial_number == "12345 (67890)"
     )

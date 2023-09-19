@@ -49,6 +49,6 @@ class SerialNumbers:
         if not self.serial_number and not self.binary_serial_number:
             return False
         return (
-                self.serial_number == other.serial_number
-                and self.binary_serial_number == other.binary_serial_number
+            self.serial_number == other.serial_number
+            and self.binary_serial_number == other.binary_serial_number
         )

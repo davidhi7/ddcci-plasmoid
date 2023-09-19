@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 async def ddcutil_detect_monitors(
-        ddcutil_wrapper: DdcutilWrapper,
+    ddcutil_wrapper: DdcutilWrapper,
 ) -> list[ddcci_adapter.DdcciMonitor]:
     """
     Detect all connected monitors supporting DDC/CI including their capabilities and feature values.
@@ -81,7 +81,7 @@ async def ddcutil_detect_monitors(
 
 
 async def _gather_monitor_data(
-        ddcutil_wrapper: DdcutilWrapper, ddcutil_id: int, monitor: Node
+    ddcutil_wrapper: DdcutilWrapper, ddcutil_id: int, monitor: Node
 ) -> ddcci_adapter.DdcciMonitor:
     """
     Gather monitor EDID data, parse monitor capabilities and fetch current feature values.
@@ -200,7 +200,7 @@ def _get_ddcutil_monitor_id(monitor: Node) -> int:
 
 
 async def _get_vcp_value(
-        ddcutil_wrapper: DdcutilWrapper, bus: int, feature_code: int
+    ddcutil_wrapper: DdcutilWrapper, bus: int, feature_code: int
 ) -> int:
     """
     Query the value of a continuous or non-continuous vcp feature.
@@ -229,7 +229,7 @@ async def _get_vcp_value(
 
 
 async def _parse_capabilities(
-        ddcutil_wrapper: DdcutilWrapper, bus: int
+    ddcutil_wrapper: DdcutilWrapper, bus: int
 ) -> ddcci_adapter.VcpFeatureList:
     """
     Parse the capabilities string of a monitor.

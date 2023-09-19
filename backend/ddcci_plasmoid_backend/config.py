@@ -54,12 +54,12 @@ def init(config_path: Path | None = None) -> ConfigParser:
 
 
 def set_config_value(
-        config_instance: ConfigParser,
-        section: str,
-        key: str,
-        value: str,
-        *,
-        save_file_path: Path | None = None,
+    config_instance: ConfigParser,
+    section: str,
+    key: str,
+    value: str,
+    *,
+    save_file_path: Path | None = None,
 ) -> None:
     """Write a value to the given configuration instance, then optionally save it.
     The value is validated using CONFIG_SCHEME.

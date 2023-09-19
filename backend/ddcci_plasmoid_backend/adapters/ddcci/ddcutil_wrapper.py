@@ -26,7 +26,7 @@ class DdcutilWrapper:
         self.brute_force_attempts = config_section.getint("brute_force_attempts")
 
     async def run_async(
-            self, verb: str, *arguments: str, bus: int | None = None, logger: logging.Logger
+        self, verb: str, *arguments: str, bus: int | None = None, logger: logging.Logger
     ) -> subprocess_wrappers.CommandOutput:
         """
         Run a ddcutil command asynchronously.
@@ -72,8 +72,8 @@ class DdcutilWrapper:
             msg = f"i2c bus missing for `{verb}` verb"
             raise ValueError(msg)
         if (
-                self.sleep_multiplier
-                and self.sleep_multiplier != DDCUTIL_DEFAULT_SLEEP_MULTIPLIER
+            self.sleep_multiplier
+            and self.sleep_multiplier != DDCUTIL_DEFAULT_SLEEP_MULTIPLIER
         ):
             command.append("--sleep-multiplier")
             command.append(str(self.sleep_multiplier))
@@ -87,7 +87,7 @@ class DdcutilWrapper:
 
     @staticmethod
     def _strip_ddcutil_nvidia_warning(
-            command_output: subprocess_wrappers.CommandOutput,
+        command_output: subprocess_wrappers.CommandOutput,
     ) -> subprocess_wrappers.CommandOutput:
         """
         Return a new CommandOutput instance with NVIDIA-related warnings from ddcutil stdout output

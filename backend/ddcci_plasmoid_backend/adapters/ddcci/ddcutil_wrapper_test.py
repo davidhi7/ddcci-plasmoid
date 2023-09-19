@@ -12,8 +12,8 @@ from ddcci_plasmoid_backend.subprocess_wrappers import CalledProcessError, Comma
 @fixture(scope="function")
 def mock_subprocess_wrapper(default_command_output):
     with mock.patch(
-            "ddcci_plasmoid_backend.subprocess_wrappers.async_subprocess_wrapper",
-            return_value=default_command_output,
+        "ddcci_plasmoid_backend.subprocess_wrappers.async_subprocess_wrapper",
+        return_value=default_command_output,
     ) as mocked_function:
         yield mocked_function
 
@@ -24,17 +24,17 @@ def ddcutil_verbs(request):
 
 
 async def test_basic_functionality(
-        silent_logger,
-        default_ddcutil_wrapper,
-        ddcutil_verbs,
-        mock_subprocess_wrapper: MagicMock,
-        default_command_output,
+    silent_logger,
+    default_ddcutil_wrapper,
+    ddcutil_verbs,
+    mock_subprocess_wrapper: MagicMock,
+    default_command_output,
 ):
     assert (
-            await default_ddcutil_wrapper.run_async(
-                ddcutil_verbs, "arg1", "arg2", bus=0, logger=silent_logger
-            )
-            == default_command_output
+        await default_ddcutil_wrapper.run_async(
+            ddcutil_verbs, "arg1", "arg2", bus=0, logger=silent_logger
+        )
+        == default_command_output
     )
     mock_subprocess_wrapper.assert_called_once_with(
         f'ddcutil {"--bus 0 " if ddcutil_verbs != "detect" else ""}{ddcutil_verbs} arg1 arg2',
@@ -44,9 +44,9 @@ async def test_basic_functionality(
 
 @pytest.mark.usefixtures("mock_subprocess_wrapper")
 async def test_detect_bus_error(
-        silent_logger,
-        default_ddcutil_wrapper,
-        ddcutil_verbs,
+    silent_logger,
+    default_ddcutil_wrapper,
+    ddcutil_verbs,
 ):
     if ddcutil_verbs != "detect":
         with pytest.raises(ValueError):
@@ -54,7 +54,7 @@ async def test_detect_bus_error(
 
 
 async def test_sleep_multiplier(
-        silent_logger, ddcutil_verbs, mock_subprocess_wrapper: MagicMock
+    silent_logger, ddcutil_verbs, mock_subprocess_wrapper: MagicMock
 ):
     custom_config = config.init(None)["ddcci"]
     custom_config["ddcutil_sleep_multiplier"] = "1.5"
@@ -79,7 +79,7 @@ async def test_no_verify(silent_logger, mock_subprocess_wrapper: MagicMock):
 
 @pytest.mark.parametrize("erroneous_attempts", [6, 3])
 async def test_brute_force_attempts(
-        silent_logger, ddcutil_verbs, default_command_output, erroneous_attempts
+    silent_logger, ddcutil_verbs, default_command_output, erroneous_attempts
 ):
     erroneous_command_output = CommandOutput(
         stdout="DDC communication failed", stderr="", return_code=0
@@ -106,8 +106,8 @@ async def test_brute_force_attempts(
 
     erroneous_attempt_provider = ErroneousAttemptProvider(erroneous_attempts)
     with mock.patch(
-            "ddcci_plasmoid_backend.subprocess_wrappers.async_subprocess_wrapper",
-            side_effect=erroneous_attempt_provider.call,
+        "ddcci_plasmoid_backend.subprocess_wrappers.async_subprocess_wrapper",
+        side_effect=erroneous_attempt_provider.call,
     ) as mocked_fn:
         output = await ddcutil_wrapper.run_async(
             ddcutil_verbs, bus=0, logger=silent_logger
@@ -115,14 +115,14 @@ async def test_brute_force_attempts(
     # 6 attempts equals first regular attempt followed by five more attempts.
     assert mocked_fn.call_count == min(erroneous_attempts + 1, 6)
     assert (
-            mocked_fn.call_args_list
-            == [
-                call(
-                    f'ddcutil {"--bus 0 " if ddcutil_verbs != "detect" else ""}{ddcutil_verbs}',
-                    silent_logger,
-                ),
-            ]
-            * mocked_fn.call_count
+        mocked_fn.call_args_list
+        == [
+            call(
+                f'ddcutil {"--bus 0 " if ddcutil_verbs != "detect" else ""}{ddcutil_verbs}',
+                silent_logger,
+            ),
+        ]
+        * mocked_fn.call_count
     )
 
     if erroneous_attempts < custom_config.getint("brute_force_attempts") + 1:
@@ -142,8 +142,8 @@ async def test_strip_nvidia_warning(silent_logger, default_ddcutil_wrapper):
         stdout=regular_output + error_message, stderr="", return_code=0
     )
     with mock.patch(
-            "ddcci_plasmoid_backend.subprocess_wrappers.async_subprocess_wrapper",
-            return_value=mocked_output,
+        "ddcci_plasmoid_backend.subprocess_wrappers.async_subprocess_wrapper",
+        return_value=mocked_output,
     ):
         assert await default_ddcutil_wrapper.run_async(
             "getvcp", "10", bus=0, logger=silent_logger
@@ -159,17 +159,17 @@ def test_get_ddcutil_version(default_ddcutil_wrapper):
         "redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n"
     )
     with mock.patch(
-            "ddcci_plasmoid_backend.subprocess_wrappers.subprocess_wrapper",
-            return_value=CommandOutput(
-                stdout=sample_ddcutil_version_output, stderr="", return_code=0
-            ),
+        "ddcci_plasmoid_backend.subprocess_wrappers.subprocess_wrapper",
+        return_value=CommandOutput(
+            stdout=sample_ddcutil_version_output, stderr="", return_code=0
+        ),
     ):
         assert default_ddcutil_wrapper.get_ddcutil_version() == "2.0.0-rc1"
 
 
 def test_get_ddcutil_version_error(default_ddcutil_wrapper):
     with mock.patch(
-            "ddcci_plasmoid_backend.subprocess_wrappers.subprocess_wrapper",
-            side_effect=CalledProcessError(1, "ddcutil --version"),
+        "ddcci_plasmoid_backend.subprocess_wrappers.subprocess_wrapper",
+        side_effect=CalledProcessError(1, "ddcutil --version"),
     ), pytest.raises(OSError):
         default_ddcutil_wrapper.get_ddcutil_version()

@@ -48,7 +48,7 @@ def subprocess_wrapper(command: str, logger: logging.Logger) -> CommandOutput:
 
 
 async def async_subprocess_wrapper(
-        command: str, logger: logging.Logger
+    command: str, logger: logging.Logger
 ) -> CommandOutput:
     """
     Wrapper for asynchronous subprocess calls to simplify logging and testing
@@ -82,7 +82,7 @@ async def async_subprocess_wrapper(
 
 
 def _log_subprocess_output(
-        cmd: str, output: CommandOutput, logger: logging.Logger
+    cmd: str, output: CommandOutput, logger: logging.Logger
 ) -> None:
     # remove trailing newlines for better readability
     stripped_stdout = re.sub(r"\n$", "", output.stdout)

@@ -45,7 +45,7 @@ def test_dict(sample_nodes_1):
 def test_walk(sample_nodes_2):
     assert sample_nodes_2.walk("Root 1", "Level 1a") == "value 1a"
     assert (
-            sample_nodes_2.walk("Root 1", "Level 1a", "Level 2a", "Level 3b") == "value 3b"
+        sample_nodes_2.walk("Root 1", "Level 1a", "Level 2a", "Level 3b") == "value 3b"
     )
 
 

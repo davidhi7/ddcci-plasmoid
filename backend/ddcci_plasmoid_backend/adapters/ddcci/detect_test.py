@@ -41,7 +41,7 @@ def test_get_ddcutil_monitor_id_exception():
 
 
 async def test_get_vcp_value_continuous(
-        monkeypatch, return_coroutine, return_command_output, default_ddcutil_wrapper
+    monkeypatch, return_coroutine, return_command_output, default_ddcutil_wrapper
 ):
     monkeypatch.setattr(
         subprocess_wrappers,
@@ -54,7 +54,7 @@ async def test_get_vcp_value_continuous(
 
 
 async def test_get_vcp_value_noncontinuous(
-        monkeypatch, return_coroutine, return_command_output, default_ddcutil_wrapper
+    monkeypatch, return_coroutine, return_command_output, default_ddcutil_wrapper
 ):
     monkeypatch.setattr(
         subprocess_wrappers,
@@ -67,7 +67,7 @@ async def test_get_vcp_value_noncontinuous(
 
 
 async def test_parse_capabilities(
-        monkeypatch, return_coroutine, return_command_output, default_ddcutil_wrapper
+    monkeypatch, return_coroutine, return_command_output, default_ddcutil_wrapper
 ):
     vcp_feature_string = (
         "Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C "

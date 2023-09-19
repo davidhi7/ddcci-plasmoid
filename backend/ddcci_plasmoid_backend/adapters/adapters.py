@@ -85,7 +85,11 @@ async def set_all_monitors(property: str, value: int) -> None:
     tasks = []
     for adapter, monitors in cache.items():
         for id in monitors:
-            tasks.append(asyncio.create_task(
-                _get_adapter_type(adapter)(config.config[adapter]).set_property(property, id,
-                                                                                value)))
+            tasks.append(
+                asyncio.create_task(
+                    _get_adapter_type(adapter)(config.config[adapter]).set_property(
+                        property, id, value
+                    )
+                )
+            )
     await asyncio.gather(*tasks)

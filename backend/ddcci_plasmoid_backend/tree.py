@@ -13,7 +13,7 @@ class Node:
     child_by_key: dict[str, Node]
 
     def __init__(
-            self, parent: Node | None, indentation: int, key: str = "", value: str = ""
+        self, parent: Node | None, indentation: int, key: str = "", value: str = ""
     ) -> None:
         """
         Create a new node and set it as the child of the parent.
