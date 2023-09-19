@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from configparser import ConfigParser
 from pathlib import Path
 
@@ -8,7 +9,12 @@ from ddcci_plasmoid_backend.errors import ConfigurationError
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_CONFIG_PATH = Path("~/.config/ddcci_plasmoid/config.ini").expanduser()
+CONFIG_DIR = (
+    Path(os.path.expandvars("$XDG_CONFIG_HOME"))
+    if "XDG_CONFIG_HOME" in os.environ
+    else Path("~/.config").expanduser()
+)
+DEFAULT_CONFIG_PATH = CONFIG_DIR / "ddcci_plasmoid/config.ini"
 
 # Template that provides types and default values to all expected configuration values
 CONFIG_SCHEME = {

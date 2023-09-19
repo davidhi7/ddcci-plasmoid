@@ -5,6 +5,7 @@ import asyncio
 import getpass
 import json
 import logging
+import os
 import pathlib
 import sys
 import tempfile
@@ -179,9 +180,13 @@ def main() -> NoReturn:
     # Include the username in the lock file. Otherwise, if user A creates a lock, user B may not
     # have the permissions to access the lock file and this program will fail until the lock file
     # is deleted. Using `os.getlogin()` may fail on some configurations (#19)
-    with fasteners.InterProcessLock(
-            Path(tempfile.gettempdir()) / f"ddcci_plasmoid_backend-{getpass.getuser()}.lock"
-    ):
+    lock_file = (
+        Path(os.path.expandvars("$XDG_RUNTIME_DIR/ddcci_plasmoid_backend.lock"))
+        if "XDG_RUNTIME_DIR" in os.environ
+        else Path(tempfile.gettempdir())
+             / f"ddcci_plasmoid_backend-{getpass.getuser()}.lock"
+    )
+    with fasteners.InterProcessLock(lock_file):
         if arguments["command"] == "detect":
             print_output_json(
                 "command", response=asyncio.run(adapters.detect(arguments["adapter"]))
