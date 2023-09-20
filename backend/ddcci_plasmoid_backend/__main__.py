@@ -78,7 +78,10 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "config", help="Get or set a configuration value"
     )
     config_parser.add_argument(
-        "composed-key", type=composed_config_key, help="Configuration section and key"
+        "section.key",
+        dest="key",
+        type=composed_config_key,
+        help="Configuration section and key",
     )
     config_parser.add_argument("value", help="New configuration value", nargs="?")
 
@@ -128,9 +131,9 @@ def print_output_json(command: str, **kwargs: str | dict | list) -> None:
 
 def get_custom_except_hook(command: str, logger: logging.Logger) -> Callable:
     def except_hook(
-            exc_type: type[BaseException],
-            exc_value: BaseException,
-            exc_traceback: TracebackType | None,
+        exc_type: type[BaseException],
+        exc_value: BaseException,
+        exc_traceback: TracebackType | None,
     ) -> NoReturn:
         logger.exception(
             "Uncaught exception occurred", exc_info=(exc_type, exc_value, exc_traceback)
@@ -184,7 +187,7 @@ def main() -> NoReturn:
         Path(os.path.expandvars("$XDG_RUNTIME_DIR/ddcci_plasmoid_backend.lock"))
         if "XDG_RUNTIME_DIR" in os.environ
         else Path(tempfile.gettempdir())
-             / f"ddcci_plasmoid_backend-{getpass.getuser()}.lock"
+        / f"ddcci_plasmoid_backend-{getpass.getuser()}.lock"
     )
     with fasteners.InterProcessLock(lock_file):
         if arguments["command"] == "detect":

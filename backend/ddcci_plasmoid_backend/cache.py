@@ -10,4 +10,4 @@ CACHE_DIR = (
 
 
 class CacheFiles(Enum):
-    DETECT = CACHE_DIR / "/ddcci_plasmoid/detect.json"
+    DETECT = CACHE_DIR / "ddcci_plasmoid/detect.json"
