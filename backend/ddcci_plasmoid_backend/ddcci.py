@@ -56,7 +56,8 @@ async def detect():
         result = await async_subprocess_wrapper(
             f'ddcutil getvcp --bus {bus_id} --brief {brightness_feature_code:x}')
 
-        _, _, _, display_brightness_raw, _ = result['stdout'].split(' ')
+        # In case of an partial error, first few lines of stdout are the error message, and the last non-empty line is the actual result
+        _, _, _, display_brightness_raw, _ = result['stdout'].split("\n")[-2].split(' ')
 
         return {
             'id': display_id,
