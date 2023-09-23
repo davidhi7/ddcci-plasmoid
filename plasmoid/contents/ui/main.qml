@@ -289,6 +289,7 @@ Item {
                       }
                       onClicked: {
                           executable.exec(plasmoid.configuration.executable + ` toggle-power ${bus_id}`)
+                          is_on = !is_on
                       }
                   }
                 }
