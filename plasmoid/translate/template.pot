@@ -44,3 +44,15 @@ msgstr ""
 #: ../contents/ui/main.qml
 msgid "Refresh monitors"
 msgstr ""
+
+#: ../contents/ui/main.qml
+msgid "Toggle monitor power"
+msgstr ""
+
+#: ../contents/ui/main.qml
+msgid "On"
+msgstr ""
+
+#: ../contents/ui/main.qml
+msgid "Off"
+msgstr ""

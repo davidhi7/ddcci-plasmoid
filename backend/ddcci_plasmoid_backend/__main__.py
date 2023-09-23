@@ -121,6 +121,21 @@ def main():
             except subprocess.CalledProcessError as err:
                 logger.debug(err)
                 handle_error(err)
+        elif arguments['command'] == 'toggle-power':
+            bus_id = arguments['bus']
+            try:
+                ddcci.toggle_power(bus_id)
+                print(json.dumps({
+                    'command': 'toggle-power',
+                    'value': {
+                        'bus_id': bus_id,
+                    }
+                }))
+            except subprocess.CalledProcessError as err:
+                logger.debug(err)
+                handle_error(err)
+
+
 
     sys.exit(0)
 

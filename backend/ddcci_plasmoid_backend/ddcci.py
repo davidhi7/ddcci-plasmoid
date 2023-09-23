@@ -21,6 +21,7 @@ class MonitorData(TypedDict):
     name: str
     bus_id: int
     brightness: int
+    is_on: bool
 
 
 # Record for identifying a monitor by its `Serial number` as well as `Binary serial number` EDID value reported by
@@ -63,7 +64,8 @@ async def detect():
             'id': display_id,
             'name': display_name,
             'bus_id': bus_id,
-            'brightness': int(display_brightness_raw)
+            'brightness': int(display_brightness_raw),
+            'is_on': is_on(bus_id)
         }
 
     output = subprocess_wrapper('ddcutil detect')
@@ -107,6 +109,18 @@ async def detect():
 def set_brightness(bus_id: int, brightness: int) -> None:
     subprocess_wrapper(f'ddcutil setvcp --bus {bus_id} {brightness_feature_code:x} {brightness}')
 
+def is_on(bus_id: int) -> bool:
+    result = subprocess_wrapper(f'ddcutil getvcp --bus {bus_id} --brief D6')
+    return result['stdout'].split("\n")[-2].split(' ')[-1] == 'x01'
+
+def turn_off(bus_id: int) -> None:
+    subprocess_wrapper(f'ddcutil setvcp --bus {bus_id} D6 04')
+
+def turn_on(bus_id: int) -> None:
+    subprocess_wrapper(f'ddcutil setvcp --bus {bus_id} D6 01')
+
+def toggle_power(bus_id: int) -> None:
+    turn_off(bus_id) if is_on(bus_id) else turn_on(bus_id)
 
 def get_EDID_value(node: Node, value: str) -> Optional[str]:
     node = node.child_by_key['EDID synopsis'].child_by_key.get(value)

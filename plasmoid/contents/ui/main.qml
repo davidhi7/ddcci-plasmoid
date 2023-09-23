@@ -70,7 +70,7 @@ Item {
             commandSuccess(cmd);
         }
         property string command: `${plasmoid.configuration.executable} detect`
-        // add the meaningless variable `ONCE=1` in front so we can differentiate this one-off call from regular calls and disconnect it 
+        // add the meaningless variable `ONCE=1` in front so we can differentiate this one-off call from regular calls and disconnect it
         property string oneoffCommand: `ONCE=1 ${command}`
         function start() {
             connectSource(command);
@@ -195,7 +195,7 @@ Item {
                 visible: monitorModel.count > 0
 
                 Layout.alignment: Qt.AlignHCenter
-                columns: 3
+                columns: 4
                 rows: monitorModel.count
                 flow: GridLayout.TopToBottom
                 columnSpacing: PlasmaCore.Units.gridUnit
@@ -267,7 +267,7 @@ Item {
                         id: percentageLabel
                         horizontalAlignment: Qt.AlignRight
 
-                        text: brightness + '%'
+                        text: brightness + '% (' + (is_on ? i18n('On') : i18n('Off')) +')'
 
                         Layout.minimumWidth: percentageMetrics.advanceWidth
                         TextMetrics {
@@ -276,6 +276,21 @@ Item {
                             text: '100%'
                         }
                     }
+                }
+
+                Repeater {
+                    model: monitorModel
+                    delegate: PlasmaComponents.ToolButton {
+                      Layout.alignment: Qt.AlignRight
+
+                      icon.name: 'system-shutdown-symbolic'
+                      PlasmaComponents.ToolTip {
+                          text: i18n("Toggle monitor power")
+                      }
+                      onClicked: {
+                          executable.exec(plasmoid.configuration.executable + ` toggle-power ${bus_id}`)
+                      }
+                  }
                 }
             }
 
