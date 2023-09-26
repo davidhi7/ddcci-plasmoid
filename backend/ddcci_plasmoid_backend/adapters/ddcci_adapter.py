@@ -2,18 +2,18 @@ from __future__ import annotations
 
 import logging
 import subprocess
-from dataclasses import dataclass
 from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Optional
+
+from ddcci_plasmoid_backend.adapters.ddcci import (
+    ddcutil_wrapper,
+    detect,
+)
 
 if TYPE_CHECKING:
     from configparser import SectionProxy
 
     from ddcci_plasmoid_backend.adapters.adapters import MonitorIdentifier
-from ddcci_plasmoid_backend.adapters.ddcci import (
-    ddcutil_wrapper,
-    detect,
-)
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
     Monitor,
     MonitorAdapter,
@@ -38,7 +38,7 @@ feature_code_by_property = {
 }
 
 
-class PowerModeValues(Enum):
+class PowerModeValue(Enum):
     POWER_ON = 0x01
     DPMS_STANDBY = 0x02
     DPMS_SUSPEND = 0x03
@@ -54,9 +54,9 @@ class DdcciAdapter(MonitorAdapter):
 
     async def detect(self) -> dict[MonitorIdentifier, DdcciMonitor]:
         monitors = await detect.ddcutil_detect_monitors(self._ddcutil_wrapper)
-        return {monitor.bus_id: monitor for monitor in monitors}
+        return {monitor["id"]: monitor for monitor in monitors}
 
-    async def set_property(self, property: Property, id: int, value: int) -> None:
+    async def set_property(self, id: int, property: Property, value: int) -> None:
         if property not in feature_code_by_property.keys():
             msg = f"Unsupported property `{property.value}`"
             raise ValueError(msg)
@@ -70,16 +70,7 @@ class DdcciAdapter(MonitorAdapter):
             raise OSError(msg) from err
 
 
-@dataclass
 class DdcciMonitor(Monitor):
     ddcutil_id: int
     bus_id: int
     vcp_capabilities: VcpFeatureList
-
-    def prepare_json_dump(self) -> dict:
-        dump = super().prepare_json_dump()
-        # Replace decimal integers with hexadecimal strings
-        dump["vcp_capabilities"] = {
-            f"{code:X}": value for code, value in dump["vcp_capabilities"].items()
-        }
-        return dump

@@ -19,15 +19,25 @@ import fasteners
 from ddcci_plasmoid_backend import config
 from ddcci_plasmoid_backend.adapters import adapters
 from ddcci_plasmoid_backend.adapters.adapters import monitor_adapter_classes
-from ddcci_plasmoid_backend.adapters.monitor_adapter import Property
+from ddcci_plasmoid_backend.adapters.monitor_adapter import (
+    Property,
+    CONTINUOUS_PROPERTIES,
+)
 
 if TYPE_CHECKING:
     from types import TracebackType
 
 
 def configure_argument_parser() -> argparse.ArgumentParser:
+    """Set up the argument parser
+
+    Returns:
+        ArgumentParser instance
+    """
     interfaces = monitor_adapter_classes.keys()
+    # noinspection PyUnresolvedReferences
     properties = [property.value for property in Property]
+    continuous_properties = [property.value for property in CONTINUOUS_PROPERTIES]
 
     argument_parser = argparse.ArgumentParser(prog="ddcci-plasmoid-backend")
     argument_parser.add_argument(
@@ -68,6 +78,38 @@ def configure_argument_parser() -> argparse.ArgumentParser:
     set_all_parser.add_argument("property", choices=properties, help="Monitor property")
     set_all_parser.add_argument("value", type=int, help="New value")
 
+    increment_parser = sub_parsers.add_parser(
+        "increment", help="Increment or decrement a continuous property of a monitor"
+    )
+    increment_parser.add_argument(
+        "adapter", choices=interfaces, help="Target monitor adapter"
+    )
+    increment_parser.add_argument(
+        "id", type=int, help="Monitor identification (`detect` key)"
+    )
+    increment_parser.add_argument(
+        "property", choices=continuous_properties, help="Monitor property"
+    )
+    increment_parser.add_argument(
+        "increase",
+        type=int,
+        help="Positive or negative integer to add to current value",
+    )
+
+    increment_all_parser = sub_parsers.add_parser(
+        "increment-all",
+        help="Increment or decrement a continuous property of all monitors detected in the latest"
+        " `detect` call",
+    )
+    increment_all_parser.add_argument(
+        "property", choices=continuous_properties, help="Monitor property"
+    )
+    increment_all_parser.add_argument(
+        "increase",
+        type=int,
+        help="Positive or negative integer to add to current value",
+    )
+
     # Simple conversion function to split configuration identifiers formatted as `section.key` into
     # separate variables, raising a ValueError if the argument is wrongly formatted
     def composed_config_key(argument: str) -> tuple[str, str]:
@@ -78,8 +120,8 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "config", help="Get or set a configuration value"
     )
     config_parser.add_argument(
-        "section.key",
-        dest="key",
+        "key",
+        metavar="section.key",
         type=composed_config_key,
         help="Configuration section and key",
     )
@@ -89,6 +131,15 @@ def configure_argument_parser() -> argparse.ArgumentParser:
 
 
 def configure_root_logger(*, debug_mode: bool, debug_log: Path | None) -> None:
+    """configure the root logger
+
+    Args:
+        debug_mode: If false, hide all output by setting loglevel to CRITICAL + 1
+        debug_log: File to write logged messages to. If None, do not log to a file.
+
+    Returns:
+        None
+    """
     logging_formatter = logging.Formatter("%(levelname)s %(name)s: %(message)s")
     logging_level = logging.NOTSET if debug_mode else logging.CRITICAL + 1
 
@@ -130,6 +181,16 @@ def print_output_json(command: str, **kwargs: str | dict | list) -> None:
 
 
 def get_custom_except_hook(command: str, logger: logging.Logger) -> Callable:
+    """Create a custom exception hook function
+
+    Args:
+        command: `command` argument value passed in the CLI
+        logger: Logger instance
+
+    Returns:
+        Exception handler function compatible to default `sys.excepthook` handler
+    """
+
     def except_hook(
         exc_type: type[BaseException],
         exc_value: BaseException,
@@ -151,8 +212,8 @@ def get_custom_except_hook(command: str, logger: logging.Logger) -> Callable:
     return except_hook
 
 
-def main() -> NoReturn:
-    arguments = vars(configure_argument_parser().parse_args())
+def handle_arguments(argv: list[str]) -> int:
+    arguments = vars(configure_argument_parser().parse_args(argv))
     configure_root_logger(
         debug_mode=arguments["debug"], debug_log=arguments["debug_log"]
     )
@@ -160,12 +221,11 @@ def main() -> NoReturn:
     logger.info("backend version: %s", version("ddcci-plasmoid-backend"))
     logger.info("argv: %s", " ".join(sys.argv))
     sys.excepthook = get_custom_except_hook(arguments["command"], logger)
-    config.config = config.init(config.DEFAULT_CONFIG_PATH)
 
     if arguments["command"] == "version":
         print(version("ddcci-plasmoid-backend"))
-        sys.exit(0)
-    elif arguments["command"] == "config":
+        return 0
+    if arguments["command"] == "config":
         section, key = arguments["key"]
         # If a value argument is provided, the config value is set, otherwise it is only read
         if arguments["value"]:
@@ -178,11 +238,12 @@ def main() -> NoReturn:
                 save_file_path=config.DEFAULT_CONFIG_PATH,
             )
         print_output_json("config", response=config.config[section].get(key))
-        sys.exit(0)
+        return 0
 
-    # Include the username in the lock file. Otherwise, if user A creates a lock, user B may not
-    # have the permissions to access the lock file and this program will fail until the lock file
-    # is deleted. Using `os.getlogin()` may fail on some configurations (#19)
+    # Include the username in the lock file if using a generic directory. Otherwise, if user A
+    # creates a lock, user B may not have the permissions to access the lock file and this program
+    # will fail until the lock file is deleted. Using `os.getlogin()` may fail on some
+    # configurations (#19)
     lock_file = (
         Path(os.path.expandvars("$XDG_RUNTIME_DIR/ddcci_plasmoid_backend.lock"))
         if "XDG_RUNTIME_DIR" in os.environ
@@ -196,10 +257,10 @@ def main() -> NoReturn:
             )
         elif arguments["command"] == "set":
             asyncio.run(
-                adapters.set_property(
+                adapters.set_monitor_property(
                     arguments["adapter"],
-                    arguments["property"],
                     arguments["id"],
+                    arguments["property"],
                     arguments["value"],
                 )
             )
@@ -209,8 +270,30 @@ def main() -> NoReturn:
                 adapters.set_all_monitors(arguments["property"], arguments["value"])
             )
             print_output_json("set-all")
+        elif arguments["command"] == "increment":
+            asyncio.run(
+                adapters.set_monitor_property(
+                    arguments["adapter"],
+                    arguments["id"],
+                    arguments["property"],
+                    arguments["increase"],
+                    increase_by_value=True,
+                )
+            )
+        elif arguments["command"] == "increment-all":
+            asyncio.run(
+                adapters.set_all_monitors(
+                    arguments["property"],
+                    arguments["increase"],
+                    increase_by_value=True,
+                )
+            )
 
-    sys.exit(0)
+    return 0
+
+
+def main() -> NoReturn:
+    sys.exit(handle_arguments(sys.argv[1:]))
 
 
 if __name__ == "__main__":

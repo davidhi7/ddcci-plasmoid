@@ -44,7 +44,8 @@ async def ddcutil_detect_monitors(
             ddcutil_id = _get_ddcutil_monitor_id(monitor_node)
         except ValueError:
             logger.warning(
-                f"Key `{monitor_node.key}` does not match pattern for a valid monitor, skip it"
+                f"Key `{monitor_node.key}` does not match pattern for a valid monitor,"
+                " skip it"
             )
             continue
 
@@ -64,7 +65,9 @@ async def ddcutil_detect_monitors(
             )
         )
 
-    monitors = await asyncio.gather(*monitor_tasks, return_exceptions=True)
+    monitors: list[ddcci_adapter.DdcciMonitor | BaseException] = list(
+        await asyncio.gather(*monitor_tasks, return_exceptions=True)
+    )
     count_all = len(monitors)
     # Filter exception objects that indicate that monitor detection failed
     for entry in list(monitors):
@@ -74,8 +77,10 @@ async def ddcutil_detect_monitors(
     count_filtered = len(monitors)
     count_remaining = count_all - count_filtered
     logger.info(
-        f'Detected {count_filtered} working monitor {"bus" if count_filtered == 1 else "busses"}, '
-        f'{count_remaining} malfunctioning {"bus" if count_remaining == 1 else "busses"}.'
+        f"Detected {count_filtered} working monitor"
+        f" {'bus' if count_filtered == 1 else 'busses'},"
+        f" {count_remaining} malfunctioning"
+        f" {'bus' if count_remaining == 1 else 'busses'}."
     )
     return monitors
 
@@ -115,6 +120,7 @@ async def _gather_monitor_data(
 
     vcp_values: dict[Property, ContinuousValue | NonContinuousValue] = {}
     # Concurrent ddcutil calls on the same i2c bus would fail
+    # TODO optimize by calling a single command
     if ddcci_adapter.FeatureCode.BRIGHTNESS.value in capabilities:
         vcp_values[Property.BRIGHTNESS] = ContinuousValue(
             value=await _get_vcp_value(
@@ -140,11 +146,13 @@ async def _gather_monitor_data(
         )
 
     return ddcci_adapter.DdcciMonitor(
-        ddcutil_id=ddcutil_id,
         name=monitor_name,
+        adapter="ddcci",
+        id=bus_id,
+        property_values=vcp_values,
+        ddcutil_id=ddcutil_id,
         bus_id=bus_id,
         vcp_capabilities=capabilities,
-        property_values=vcp_values,
     )
 
 

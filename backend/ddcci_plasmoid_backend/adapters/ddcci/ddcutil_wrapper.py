@@ -101,8 +101,8 @@ class DdcutilWrapper:
         """
         # `nvida`: typo is in ddcutil source
         warning_content = (
-            "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future io "
-            "I2C_IO_STRATEGY_FILEIO. Retrying\n"
+            "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing"
+            " future io I2C_IO_STRATEGY_FILEIO. Retrying\n"
         )
         return dataclasses.replace(
             command_output, stdout=command_output.stdout.replace(warning_content, "")

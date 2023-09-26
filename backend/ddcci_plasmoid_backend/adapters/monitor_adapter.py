@@ -1,15 +1,16 @@
 from __future__ import annotations
 
-import dataclasses
 from abc import abstractmethod
-from dataclasses import dataclass
 from enum import Enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, TypedDict
 
 if TYPE_CHECKING:
     from configparser import SectionProxy
 
-    from ddcci_plasmoid_backend.adapters.adapters import MonitorIdentifier
+    from ddcci_plasmoid_backend.adapters.adapters import (
+        MonitorIdentifier,
+        AdapterIdentifier,
+    )
 
 
 class MonitorAdapter:
@@ -21,38 +22,37 @@ class MonitorAdapter:
         pass
 
     @abstractmethod
-    async def set_property(self, property: Property, id: int, value: int) -> None:
+    async def set_property(self, id: int, property: Property, value: int) -> None:
         pass
 
 
-@dataclass
-class Monitor:
+class Monitor(TypedDict):
     name: str
+    adapter: AdapterIdentifier
+    id: MonitorIdentifier
     property_values: dict[Property, ContinuousValue | NonContinuousValue]
 
-    def prepare_json_dump(self) -> dict:
-        dict_representation = dataclasses.asdict(self)
-        dict_representation["property_values"] = {
-            property.value: value
-            for property, value in dict_representation["property_values"].items()
-        }
-        return dict_representation
 
-
-class Property(Enum):
+# By also inheriting from str, we can have StrEnum behaviour in earlier versions than Python 3.11
+class Property(str, Enum):
     BRIGHTNESS = "brightness"
     CONTRAST = "contrast"
     POWER_MODE = "power_mode"
 
+    # https://docs.astral.sh/ruff/rules/#flake8-slots-slot
+    __slots__ = ()
 
-@dataclass
-class ContinuousValue:
+
+CONTINUOUS_PROPERTIES = [Property.BRIGHTNESS, Property.CONTRAST]
+NON_CONTINUOUS_PROPERTIES = [Property.POWER_MODE]
+
+
+class ContinuousValue(TypedDict):
     value: int
     min_value: int
     max_value: int
 
 
-@dataclass
-class NonContinuousValue:
+class NonContinuousValue(TypedDict):
     value: int
     choices: list[int]

@@ -15,7 +15,8 @@ from ddcci_plasmoid_backend.subprocess_wrappers import CalledProcessError
 )
 async def test_subprocess_wrapper_success(silent_logger, subprocess_method):
     return_value = subprocess_method(
-        "python -c \"import os; os.write(1, b'test-stdout'); os.write(2, b'test-stderr')\"",
+        "python -c \"import os; os.write(1, b'test-stdout'); os.write(2,"
+        " b'test-stderr')\"",
         logger=silent_logger,
     )
     output = await return_value if inspect.isawaitable(return_value) else return_value

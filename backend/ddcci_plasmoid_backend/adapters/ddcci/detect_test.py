@@ -70,9 +70,9 @@ async def test_parse_capabilities(
     monkeypatch, return_coroutine, return_command_output, default_ddcutil_wrapper
 ):
     vcp_feature_string = (
-        "Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C "
-        "E3 F3)vcp(02 04 05 08 10 12 14(05 08 0B 0C) 16 18 1A 52 60(0F 11 12 ))mswhql(1)"
-        "asset_eep(40)mccs_ver(2.1))"
+        "Unparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01"
+        " 02 03 07 0C E3 F3)vcp(02 04 05 08 10 12 14(05 08 0B 0C) 16 18 1A 52 60(0F 11"
+        " 12 ))mswhql(1)asset_eep(40)mccs_ver(2.1))"
     )
     monkeypatch.setattr(
         subprocess_wrappers,

@@ -4,17 +4,18 @@ import logging
 import os
 from configparser import ConfigParser
 from pathlib import Path
+from typing import Final
 
 from ddcci_plasmoid_backend.errors import ConfigurationError
 
 logger = logging.getLogger(__name__)
 
-CONFIG_DIR = (
+CONFIG_DIR: Final[Path] = (
     Path(os.path.expandvars("$XDG_CONFIG_HOME"))
     if "XDG_CONFIG_HOME" in os.environ
     else Path("~/.config").expanduser()
 )
-DEFAULT_CONFIG_PATH = CONFIG_DIR / "ddcci_plasmoid/config.ini"
+DEFAULT_CONFIG_PATH: Final[Path] = CONFIG_DIR / "ddcci_plasmoid/config.ini"
 
 # Template that provides types and default values to all expected configuration values
 CONFIG_SCHEME = {
@@ -25,9 +26,6 @@ CONFIG_SCHEME = {
         "brute_force_attempts": {"type": int, "default": 0},
     }
 }
-
-# Placeholder for global configuration object
-config = ConfigParser()
 
 
 def init(config_path: Path | None = None) -> ConfigParser:
@@ -101,3 +99,7 @@ def set_config_value(
         with save_file_path.open("w") as file:
             config_instance.write(file)
             logger.info(f"Saved config file `{save_file_path}`")
+
+
+# Main config instance
+config: Final[ConfigParser] = init(DEFAULT_CONFIG_PATH)

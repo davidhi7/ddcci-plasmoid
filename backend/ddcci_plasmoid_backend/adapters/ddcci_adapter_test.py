@@ -117,7 +117,7 @@ async def test_detect(monkeypatch, ddcutil_mock):
 async def test_set_basic():
     adapter = ddcci_adapter.DdcciAdapter(config.init(None)["ddcci"])
     with mock.patch.object(adapter._ddcutil_wrapper, "run_async") as mocked_fn:
-        await adapter.set_property(property=Property.BRIGHTNESS, id=0, value=100)
+        await adapter.set_property(id=0, property=Property.BRIGHTNESS, value=100)
         mocked_fn.assert_called_once_with(
             "setvcp",
             hex(ddcci_adapter.FeatureCode.BRIGHTNESS.value),

@@ -30,7 +30,8 @@ class SerialNumbers:
                 self.binary_serial_number = str(int(value[0]))
             except ValueError:
                 logger.warning(
-                    f"Failed to parse binary serial number `{self.binary_serial_number}`"
+                    "Failed to parse binary serial number"
+                    f" `{self.binary_serial_number}`"
                 )
 
     def __eq__(self, other: "SerialNumbers") -> bool:

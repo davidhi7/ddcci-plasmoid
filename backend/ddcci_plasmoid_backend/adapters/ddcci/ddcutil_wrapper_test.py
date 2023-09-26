@@ -37,7 +37,8 @@ async def test_basic_functionality(
         == default_command_output
     )
     mock_subprocess_wrapper.assert_called_once_with(
-        f'ddcutil {"--bus 0 " if ddcutil_verbs != "detect" else ""}{ddcutil_verbs} arg1 arg2',
+        f'ddcutil {"--bus 0 " if ddcutil_verbs != "detect" else ""}{ddcutil_verbs} arg1'
+        " arg2",
         silent_logger,
     )
 
@@ -94,6 +95,7 @@ async def test_brute_force_attempts(
         def __init__(self, erroneous_attempts: int):
             self.remaining_erroneous_attempts = erroneous_attempts
 
+        # noinspection PyUnusedLocal
         def call(self, *args, **kwargs) -> CommandOutput:
             if self.remaining_erroneous_attempts > 0:
                 self.remaining_erroneous_attempts -= 1
@@ -118,7 +120,8 @@ async def test_brute_force_attempts(
         mocked_fn.call_args_list
         == [
             call(
-                f'ddcutil {"--bus 0 " if ddcutil_verbs != "detect" else ""}{ddcutil_verbs}',
+                "ddcutil"
+                f" {'--bus 0 ' if ddcutil_verbs != 'detect' else ''}{ddcutil_verbs}",
                 silent_logger,
             ),
         ]
@@ -135,8 +138,8 @@ async def test_brute_force_attempts(
 async def test_strip_nvidia_warning(silent_logger, default_ddcutil_wrapper):
     regular_output = "VCP 10 C 50 100\n"
     error_message = (
-        "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future io "
-        "I2C_IO_STRATEGY_FILEIO. Retrying\n"
+        "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future"
+        " io I2C_IO_STRATEGY_FILEIO. Retrying\n"
     )
     mocked_output = CommandOutput(
         stdout=regular_output + error_message, stderr="", return_code=0
@@ -152,11 +155,12 @@ async def test_strip_nvidia_warning(silent_logger, default_ddcutil_wrapper):
 
 def test_get_ddcutil_version(default_ddcutil_wrapper):
     sample_ddcutil_version_output = (
-        "ddcutil 2.0.0-rc1\nBuilt with support for USB connected displays.\nBuilt without function "
-        "failure simulation.\nBuilt with libdrm services.\n\nCopyright (C) 2015-2023 "
-        "Sanford Rockowitz\nLicense GPLv2: GNU GPL version 2 or later "
-        "<http://gnu.org/licenses/gpl.html>\nThis is free software: you are free to change and "
-        "redistribute it.\nThere is NO WARRANTY, to the extent permitted by law.\n"
+        "ddcutil 2.0.0-rc1\nBuilt with support for USB connected displays.\nBuilt"
+        " without function failure simulation.\nBuilt with libdrm"
+        " services.\n\nCopyright (C) 2015-2023 Sanford Rockowitz\nLicense GPLv2: GNU"
+        " GPL version 2 or later <http://gnu.org/licenses/gpl.html>\nThis is free"
+        " software: you are free to change and redistribute it.\nThere is NO WARRANTY,"
+        " to the extent permitted by law.\n"
     )
     with mock.patch(
         "ddcci_plasmoid_backend.subprocess_wrappers.subprocess_wrapper",

@@ -76,7 +76,10 @@ class Node:
             # ddcutil output is indented by a multiple of 3 whitespaces
             indentation_characters = len(line) - len(line.lstrip())
             if indentation_characters % 3 != 0:
-                msg = f"Indentation whitespace count of line {line.strip()} is not a multiple of 3"
+                msg = (
+                    f"Indentation whitespace count of line {line.strip()} is not a"
+                    " multiple of 3"
+                )
                 raise ValueError(msg)
 
             tokens = line.split(":")

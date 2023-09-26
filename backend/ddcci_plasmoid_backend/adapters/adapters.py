@@ -9,11 +9,17 @@ from typing import Dict
 from ddcci_plasmoid_backend import config
 from ddcci_plasmoid_backend.adapters.ddcci_adapter import DdcciAdapter
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
+    ContinuousValue,
     Monitor,
     MonitorAdapter,
+    NonContinuousValue,
     Property,
 )
-from ddcci_plasmoid_backend.cache import CacheFiles
+from ddcci_plasmoid_backend.cache import CacheFiles, cached_data
+from ddcci_plasmoid_backend.errors import (
+    MissingCacheError,
+    UnsupportedPropertyValueError,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +41,56 @@ def _get_adapter_type(adapter: str) -> type[MonitorAdapter]:
     return monitor_adapter_classes[adapter]
 
 
+def _validate_new_property_value(
+    monitor: Monitor,
+    property: Property,
+    value: int,
+    *,
+    increase_by_value: bool = False,
+    constraint_to_limits,
+) -> int:
+    """
+
+    Args:
+        monitor:
+        property:
+        value:
+        increase_by_value:
+
+    Returns:
+
+    """
+    adapter = monitor["adapter"]
+    id = monitor["id"]
+    if property not in monitor["property_values"]:
+        msg = f"Monitor `{adapter}.{id}` does not support property `{property}`"
+        raise UnsupportedPropertyValueError(msg)
+    if "choices" in monitor["property_values"][property]:
+        property_instance: NonContinuousValue = monitor["property_values"][property]
+        if increase_by_value:
+            msg = f"Argument `{increase_by_value=}` is not allowed for non-continuous properties"
+            raise ValueError(msg)
+        if value not in property_instance["choices"]:
+            msg = (
+                f"Monitor `{adapter}.{id}` does not support value `{value}` for"
+                f" non-continuous property `{property}`"
+            )
+            raise UnsupportedPropertyValueError(msg)
+    else:
+        property_instance: ContinuousValue = monitor["property_values"][property]
+        if increase_by_value:
+            value += property_instance["value"]
+        if (
+            value < property_instance["min_value"]
+            or value > property_instance["max_value"]
+        ):
+            msg = (
+                f"Monitor `{adapter}.{id}` does not support value `{value}` for"
+                f" continuous property `{property}`"
+            )
+            raise UnsupportedPropertyValueError(msg)
+
+
 async def detect(adapters: list[AdapterIdentifier]) -> DetectSummary:
     """
     Detect all monitors with the given adapters.
@@ -47,11 +103,11 @@ async def detect(adapters: list[AdapterIdentifier]) -> DetectSummary:
         All detected monitors, mapped by adapter identifier, then by monitor identifier.
     """
 
-    async def detect_call(adapter: MonitorAdapter, label: str) -> DetectSummary:
+    async def detect_call(
+        adapter: MonitorAdapter, adapter_name: AdapterIdentifier
+    ) -> DetectSummary:
         data = await adapter.detect()
-        return {
-            label: {key: monitor.prepare_json_dump() for key, monitor in data.items()}
-        }
+        return {adapter_name: dict(data.items())}
 
     tasks = []
     for adapter in adapters:
@@ -67,29 +123,75 @@ async def detect(adapters: list[AdapterIdentifier]) -> DetectSummary:
     return result
 
 
-async def set_property(adapter: str, property: str, id: int, value: int) -> None:
+async def set_monitor_property(
+    adapter: AdapterIdentifier,
+    id: MonitorIdentifier,
+    property_name: str,
+    value: int,
+    *,
+    increase_by_value: bool = False,
+) -> None:
+    property = Property(property_name)
+    monitor: Monitor
+    try:
+        monitor: Monitor = cached_data[CacheFiles.DETECT][adapter][str(id)]
+        _validate_new_property_value(
+            monitor, property, value, increase_by_value=increase_by_value
+        )
+        if increase_by_value:
+            value += monitor["property_values"][property]["value"]
+        logger.info("Property value validation succeeded")
+    except KeyError as exc:
+        msg = (
+            f"Monitor `{adapter}.{id}` is not present in `detect` cache, cannot"
+            " validate support for accessed property and assigned value"
+        )
+        if increase_by_value:
+            # If we rely on the cache to look up the current value, do not dismiss the exception
+            raise MissingCacheError(msg) from exc
+        logger.warning(
+            f"Monitor `{adapter}.{id}` is not present in `detect` cache, cannot"
+            " validate support for accessed property and assigned value"
+        )
+    except UnsupportedPropertyValueError:
+        msg = (
+            f"Unsupported property or value found for monitor `{adapter}.{id}`,"
+            f" attempt to set it anyways"
+        )
+        if increase_by_value:
+            raise
+        logger.exception(msg)
+
     adapter_type = _get_adapter_type(adapter)
     config_section = config.config[adapter]
     property = Property(property)
-    return await adapter_type(config_section).set_property(property, id, value)
+    await adapter_type(config_section).set_property(id, property, value)
+    cached_data[CacheFiles.DETECT][adapter][str(id)]["property_values"][property][
+        "value"
+    ] = value
+    with CacheFiles.DETECT.value.open("w") as file:
+        json.dump(cached_data[CacheFiles.DETECT], file)
 
 
-async def set_all_monitors(property: str, value: int) -> None:
-    if not CacheFiles.DETECT.value.is_file():
-        msg = f"Cache file `{CacheFiles.DETECT.value}` is not a file"
-        raise FileNotFoundError(msg)
-    property = Property(property)
-    cache: DetectSummary
-    with CacheFiles.DETECT.value.open() as file:
-        cache = json.load(file)
+async def set_all_monitors(
+    property_name: str, value: int, *, increase_by_value: bool = False
+) -> None:
+    property = Property(property_name)
+    cached_detect_output: DetectSummary = cached_data[CacheFiles.DETECT]
     tasks = []
-    for adapter, monitors in cache.items():
-        for id in monitors:
-            tasks.append(
+    for adapter, monitors in cached_detect_output.items():
+        tasks.extend(
+            [
                 asyncio.create_task(
-                    _get_adapter_type(adapter)(config.config[adapter]).set_property(
-                        property, id, value
+                    set_monitor_property(
+                        adapter,
+                        id,
+                        property,
+                        value,
+                        increase_by_value=increase_by_value,
                     )
                 )
-            )
+                for id in monitors
+            ]
+        )
     await asyncio.gather(*tasks)
