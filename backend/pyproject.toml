@@ -21,6 +21,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.dependencies]
 python = "^3.8"
 fasteners = "^0.18"
+pydantic = "^2.4.1"
 
 [tool.poetry.group.dev]
 optional = true

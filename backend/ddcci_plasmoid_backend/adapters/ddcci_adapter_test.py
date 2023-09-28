@@ -106,7 +106,7 @@ async def test_detect(monkeypatch, ddcutil_mock):
     detected_monitors = await adapter.detect()
     # turn output into only dicts
     dictified_output = {
-        key: value.prepare_json_dump() for key, value in detected_monitors.items()
+        key: value.model_dump() for key, value in detected_monitors.items()
     }
     # JSON does not support integer keys, so dump and parse again to make sure we have valid json
     # to compare to the expected output

@@ -9,16 +9,15 @@ from ddcci_plasmoid_backend.adapters.ddcci import (
     ddcutil_wrapper,
     detect,
 )
-
-if TYPE_CHECKING:
-    from configparser import SectionProxy
-
-    from ddcci_plasmoid_backend.adapters.adapters import MonitorIdentifier
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
     Monitor,
     MonitorAdapter,
     Property,
+    MonitorIdentifier,
 )
+
+if TYPE_CHECKING:
+    from configparser import SectionProxy
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +53,7 @@ class DdcciAdapter(MonitorAdapter):
 
     async def detect(self) -> dict[MonitorIdentifier, DdcciMonitor]:
         monitors = await detect.ddcutil_detect_monitors(self._ddcutil_wrapper)
-        return {monitor["id"]: monitor for monitor in monitors}
+        return {monitor.id: monitor for monitor in monitors}
 
     async def set_property(self, id: int, property: Property, value: int) -> None:
         if property not in feature_code_by_property.keys():

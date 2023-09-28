@@ -20,8 +20,8 @@ from ddcci_plasmoid_backend import config
 from ddcci_plasmoid_backend.adapters import adapters
 from ddcci_plasmoid_backend.adapters.adapters import monitor_adapter_classes
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
-    Property,
     CONTINUOUS_PROPERTIES,
+    Property,
 )
 
 if TYPE_CHECKING:

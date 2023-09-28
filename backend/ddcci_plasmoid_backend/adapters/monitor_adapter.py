@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, List, Dict, Union
+
+from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from configparser import SectionProxy
 
-    from ddcci_plasmoid_backend.adapters.adapters import (
-        MonitorIdentifier,
-        AdapterIdentifier,
-    )
+AdapterIdentifier = str
+MonitorIdentifier = int
 
 
 class MonitorAdapter:
@@ -24,13 +24,6 @@ class MonitorAdapter:
     @abstractmethod
     async def set_property(self, id: int, property: Property, value: int) -> None:
         pass
-
-
-class Monitor(TypedDict):
-    name: str
-    adapter: AdapterIdentifier
-    id: MonitorIdentifier
-    property_values: dict[Property, ContinuousValue | NonContinuousValue]
 
 
 # By also inheriting from str, we can have StrEnum behaviour in earlier versions than Python 3.11
@@ -47,12 +40,24 @@ CONTINUOUS_PROPERTIES = [Property.BRIGHTNESS, Property.CONTRAST]
 NON_CONTINUOUS_PROPERTIES = [Property.POWER_MODE]
 
 
-class ContinuousValue(TypedDict):
+class Monitor(BaseModel):
+    name: str
+    adapter: AdapterIdentifier
+    id: MonitorIdentifier
+    property_values: Dict[Property, Union[ContinuousValue, NonContinuousValue]]
+
+
+class ContinuousValue(BaseModel):
     value: int
     min_value: int
     max_value: int
 
 
-class NonContinuousValue(TypedDict):
+class NonContinuousValue(BaseModel):
     value: int
-    choices: list[int]
+    choices: List[int]
+
+
+ContinuousValue.model_rebuild()
+NonContinuousValue.model_rebuild()
+Monitor.model_rebuild()
