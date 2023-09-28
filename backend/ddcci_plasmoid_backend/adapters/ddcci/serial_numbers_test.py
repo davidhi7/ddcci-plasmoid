@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ddcci_plasmoid_backend.adapters.ddcci.serial_numbers import SerialNumbers
 
 

@@ -7,15 +7,12 @@ from typing import TYPE_CHECKING, Dict, List, Optional
 
 from pydantic import field_serializer
 
-from ddcci_plasmoid_backend.adapters.ddcci import (
-    ddcutil_wrapper,
-    detect,
-)
+from ddcci_plasmoid_backend.adapters.ddcci import ddcutil_wrapper, detect
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
     Monitor,
     MonitorAdapter,
-    Property,
     MonitorIdentifier,
+    Property,
 )
 
 if TYPE_CHECKING:

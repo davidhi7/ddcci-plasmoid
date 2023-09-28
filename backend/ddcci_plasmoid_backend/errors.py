@@ -3,9 +3,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
-    Property,
     AdapterIdentifier,
     MonitorIdentifier,
+    Property,
 )
 
 if TYPE_CHECKING:

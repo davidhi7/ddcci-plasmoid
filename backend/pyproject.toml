@@ -33,6 +33,7 @@ tox = "^4.6.4"
 ruff = "^0.0.277"
 pytest-cov = "^4.1.0"
 black = "^23.9.1"
+isort = "^5.12.0"
 
 [tool.poetry.scripts]
 ddcci_plasmoid_backend = "ddcci_plasmoid_backend.__main__:main"
@@ -85,7 +86,7 @@ ignore = [
     "PT011",
 ]
 "__main__.py" = [
-    # Check for print statements; Tssential for communication with the widget
+    # Check for print statements; Essential for communication with the widget
     "T201"
 ]
 
@@ -101,3 +102,9 @@ builtins-ignorelist = ["id", "property"]
 [tool.black]
 target-versions = ["py38", "py39", "py310", "py311"]
 max-line-length = 100
+
+[tool.isort]
+profile = "black"
+py_version = 38
+line_length = 100
+add_imports = ["from __future__ import annotations"]

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from ddcci_plasmoid_backend import subprocess_wrappers

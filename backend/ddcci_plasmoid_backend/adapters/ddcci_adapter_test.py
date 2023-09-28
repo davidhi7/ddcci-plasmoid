@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
-from unittest import mock
 from pathlib import Path
 from typing import TYPE_CHECKING, Union
+from unittest import mock
 
 import pytest
 
