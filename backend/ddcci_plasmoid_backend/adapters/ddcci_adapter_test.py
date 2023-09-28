@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import json
+from unittest import mock
 from pathlib import Path
 from typing import TYPE_CHECKING, Union
-from unittest import mock
 
 import pytest
 
@@ -116,7 +116,9 @@ async def test_detect(monkeypatch, ddcutil_mock):
 
 async def test_set_basic():
     adapter = ddcci_adapter.DdcciAdapter(config.init(None)["ddcci"])
-    with mock.patch.object(adapter._ddcutil_wrapper, "run_async") as mocked_fn:
+    with mock.patch.object(
+        adapter._ddcutil_wrapper, "run_async", return_value=None
+    ) as mocked_fn:
         await adapter.set_property(id=0, property=Property.BRIGHTNESS, value=100)
         mocked_fn.assert_called_once_with(
             "setvcp",
