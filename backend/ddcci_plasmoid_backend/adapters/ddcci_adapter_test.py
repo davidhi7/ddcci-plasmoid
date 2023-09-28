@@ -102,7 +102,9 @@ async def test_detect(monkeypatch, ddcutil_mock):
         "ddcci_plasmoid_backend.subprocess_wrappers.async_subprocess_wrapper",
         async_ddcutil_mock,
     )
-    adapter = ddcci_adapter.DdcciAdapter(config.init(None)["ddcci"])
+    adapter = ddcci_adapter.DdcciAdapter(
+        config.init(None)["ddcci"], log_ddcutil_version=False
+    )
     detected_monitors = await adapter.detect()
     # turn output into only dicts
     dictified_output = {
@@ -115,7 +117,9 @@ async def test_detect(monkeypatch, ddcutil_mock):
 
 
 async def test_set_basic():
-    adapter = ddcci_adapter.DdcciAdapter(config.init(None)["ddcci"])
+    adapter = ddcci_adapter.DdcciAdapter(
+        config.init(None)["ddcci"], log_ddcutil_version=False
+    )
     with mock.patch.object(
         adapter._ddcutil_wrapper, "run_async", return_value=None
     ) as mocked_fn:

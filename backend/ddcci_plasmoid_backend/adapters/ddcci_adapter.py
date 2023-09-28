@@ -48,10 +48,15 @@ class PowerModeValue(Enum):
 
 
 class DdcciAdapter(MonitorAdapter):
-    def __init__(self, config_section: SectionProxy) -> None:
+    def __init__(
+        self, config_section: SectionProxy, *, log_ddcutil_version: bool = True
+    ) -> None:
         super().__init__(config_section)
         self._ddcutil_wrapper = ddcutil_wrapper.DdcutilWrapper(config_section)
-        logger.info(f"ddcutil version: {self._ddcutil_wrapper.get_ddcutil_version()}")
+        if log_ddcutil_version:
+            logger.info(
+                f"ddcutil version: {self._ddcutil_wrapper.get_ddcutil_version()}"
+            )
 
     async def detect(self) -> dict[MonitorIdentifier, DdcciMonitor]:
         monitors = await detect.ddcutil_detect_monitors(self._ddcutil_wrapper)
