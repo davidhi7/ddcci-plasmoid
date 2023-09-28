@@ -1,5 +1,7 @@
 {
   "9": {
+    "adapter": "ddcci",
+    "id": 9,
     "name": "DELL S2721DGF",
     "property_values": {
       "brightness": {
@@ -118,6 +120,8 @@
     }
   },
   "10": {
+    "adapter": "ddcci",
+    "id": 10,
     "name": "DELL U2417H",
     "property_values": {
       "brightness": {

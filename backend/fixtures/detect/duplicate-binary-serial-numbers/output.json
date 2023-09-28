@@ -1,5 +1,7 @@
 {
   "10": {
+    "adapter": "ddcci",
+    "id": 10,
     "name": "DELL U2417H",
     "bus_id": 10,
     "ddcutil_id": 2,

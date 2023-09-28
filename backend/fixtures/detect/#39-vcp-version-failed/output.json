@@ -1,5 +1,7 @@
 {
   "20": {
+    "adapter": "ddcci",
+    "id": 20,
     "name": "LG HDR 5K",
     "bus_id": 20,
     "ddcutil_id": 2,

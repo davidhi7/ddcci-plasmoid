@@ -1,5 +1,7 @@
 {
   "2": {
+    "adapter": "ddcci",
+    "id": 2,
     "name": "SMBX2035",
     "bus_id": 2,
     "ddcutil_id": 1,

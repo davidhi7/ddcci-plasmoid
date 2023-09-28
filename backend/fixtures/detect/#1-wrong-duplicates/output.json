@@ -1,5 +1,7 @@
 {
   "4": {
+    "adapter": "ddcci",
+    "id": 4,
     "name": "E2442",
     "bus_id": 4,
     "ddcutil_id": 1,
@@ -9,6 +11,8 @@
     }
   },
   "6": {
+    "adapter": "ddcci",
+    "id": 6,
     "name": "E2342",
     "bus_id": 6,
     "ddcutil_id": 2,
@@ -18,6 +22,8 @@
     }
   },
   "8": {
+    "adapter": "ddcci",
+    "id": 8,
     "name": "PHL 243V7",
     "bus_id": 8,
     "ddcutil_id": 3,

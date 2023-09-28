@@ -5,6 +5,8 @@ import subprocess
 from enum import Enum
 from typing import TYPE_CHECKING, Dict, List, Optional
 
+from pydantic import field_serializer
+
 from ddcci_plasmoid_backend.adapters.ddcci import (
     ddcutil_wrapper,
     detect,
@@ -73,3 +75,7 @@ class DdcciMonitor(Monitor):
     ddcutil_id: int
     bus_id: int
     vcp_capabilities: VcpFeatureList
+
+    @field_serializer("vcp_capabilities")
+    def serialize_vcp_capabilities(self, vcp_capabilities: VcpFeatureList):
+        return {f"{code:X}": value for code, value in vcp_capabilities.items()}

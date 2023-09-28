@@ -1,5 +1,7 @@
 {
   "4": {
+    "adapter": "ddcci",
+    "id": 4,
     "name": "24MB56",
     "bus_id": 4,
     "ddcutil_id": 1,
@@ -9,6 +11,8 @@
     }
   },
   "7": {
+    "adapter": "ddcci",
+    "id": 7,
     "name": "ZOWIE XL LCD",
     "bus_id": 7,
     "ddcutil_id": 2,
