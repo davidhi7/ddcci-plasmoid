@@ -48,3 +48,7 @@ class IllegalPropertyValueError(Exception):
             f" {'continuous' if is_continuous else 'non-continuous'} property `{property}`"
         )
         super().__init__(msg)
+
+
+class IllegalArgumentError(ValueError):
+    """An illegal value for an argument was provided"""
