@@ -213,6 +213,14 @@ def get_custom_except_hook(command: str, logger: logging.Logger) -> Callable:
 
 
 def handle_arguments(argv: list[str]) -> int:
+    """Parse and handle arguments
+
+    Args:
+        argv: List of arguments excluding the source code file, i.e. `sys.argv[1:]`
+
+    Returns:
+        Exit code
+    """
     arguments = vars(configure_argument_parser().parse_args(argv))
     configure_root_logger(
         debug_mode=arguments["debug"], debug_log=arguments["debug_log"]
@@ -293,6 +301,11 @@ def handle_arguments(argv: list[str]) -> int:
 
 
 def main() -> NoReturn:
+    """Entry point into the program
+
+    Returns:
+        `NoReturn`: This function exits the interpreter.
+    """
     sys.exit(handle_arguments(sys.argv[1:]))
 
 
