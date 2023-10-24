@@ -136,15 +136,29 @@ async def test_brute_force_attempts(
         assert output == erroneous_command_output
 
 
+@pytest.mark.parametrize(
+    "error_message",
+    [
+        (
+            "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future"
+            " io I2C_IO_STRATEGY_FILEIO. Retrying\n"
+        ),
+        (
+            "Unable to open directory /sys/bus/i2c/devices/i2c--1: No such file or directory\n"
+            "Device /dev/i2c-255 does not exist. Error = ENOENT(2): No such file or directory\n"
+            "/sys/bus/i2c buses without /dev/i2c-N devices: /sys/bus/i2c/devices/i2c-255\n"
+            "Driver i2c_dev must be loaded or builtin\n"
+            "See https://www.ddcutil.com/kernel_module\n"
+        ),
+    ],
+)
 # noinspection SpellCheckingInspection
-async def test_strip_nvidia_warning(silent_logger, default_ddcutil_wrapper):
+async def test_strip_ddcutil_warnings(
+    silent_logger, default_ddcutil_wrapper, error_message
+):
     regular_output = "VCP 10 C 50 100\n"
-    error_message = (
-        "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing future"
-        " io I2C_IO_STRATEGY_FILEIO. Retrying\n"
-    )
     mocked_output = CommandOutput(
-        stdout=regular_output + error_message, stderr="", return_code=0
+        stdout=error_message + regular_output, stderr="", return_code=0
     )
     with mock.patch(
         "ddcci_plasmoid_backend.subprocess_wrappers.async_subprocess_wrapper",

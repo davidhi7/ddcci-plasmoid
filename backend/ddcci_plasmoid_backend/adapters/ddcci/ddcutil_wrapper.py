@@ -58,7 +58,7 @@ class DdcutilWrapper:
             # a false loop condition
             if attempt > 0:
                 logger.info(f"Required {attempt} attempts for command `{command}`")
-        return self._strip_ddcutil_nvidia_warning(output)
+        return self._strip_irrelevant_error_messages(output)
 
     def _build_command(self, verb: str, *arguments: str, bus: int | None) -> str:
         command = [self.ddcutil_executable]
@@ -86,12 +86,11 @@ class DdcutilWrapper:
         return " ".join(command)
 
     @staticmethod
-    def _strip_ddcutil_nvidia_warning(
+    def _strip_irrelevant_error_messages(
         command_output: subprocess_wrappers.CommandOutput,
     ) -> subprocess_wrappers.CommandOutput:
-        """
-        Return a new CommandOutput instance with NVIDIA-related warnings from ddcutil stdout output
-        removed. Fix for #32.
+        """Return a new CommandOutput instance with multiple ddcutil warnings/errors in stdout
+        output removed. Fix for #32 and multiple other bugs.
 
         Args:
             command_output: CommandOutput to work with
@@ -99,14 +98,24 @@ class DdcutilWrapper:
         Returns:
             New CommandOutput instance with warning messages removed
         """
-        # `nvida`: typo is in ddcutil source
-        warning_content = (
-            "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing"
-            " future io I2C_IO_STRATEGY_FILEIO. Retrying\n"
-        )
-        return dataclasses.replace(
-            command_output, stdout=command_output.stdout.replace(warning_content, "")
-        )
+        error_messages = [
+            # #32, `nvida`: typo is in ddcutil source
+            (
+                "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing"
+                " future io I2C_IO_STRATEGY_FILEIO. Retrying\n"
+            ),
+            # Common error with ddcutil versions prior to 1.4.1
+            "Unable to open directory /sys/bus/i2c/devices/i2c--1: No such file or directory\n",
+            "Device /dev/i2c-255 does not exist. Error = ENOENT(2): No such file or directory\n",
+            "/sys/bus/i2c buses without /dev/i2c-N devices: /sys/bus/i2c/devices/i2c-255\n",
+            "Driver i2c_dev must be loaded or builtin\n",
+            "See https://www.ddcutil.com/kernel_module\n",
+        ]
+        fixed_stdout = command_output.stdout
+        for entry in error_messages:
+            fixed_stdout = fixed_stdout.replace(entry, "")
+
+        return dataclasses.replace(command_output, stdout=fixed_stdout)
 
     def get_ddcutil_version(self) -> str:
         """
