@@ -68,6 +68,12 @@ ignore = [
     "S602",
     # Check for try/except within loops; Required for monitor detection
     "PERF203",
+    # Check for imports that are only used for type annotations; Required for pydantic models
+    "TCH001",
+    # Do not use legacy type annotations like Dict or List imported from typing; Builtin `list`
+    # `dict` etc do not seem to work with pydantic - Check when setting minimum python version
+    # to 3.9
+    "UP006",
 ]
 
 [tool.ruff.per-file-ignores]

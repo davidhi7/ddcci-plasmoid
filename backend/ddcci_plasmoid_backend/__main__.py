@@ -22,6 +22,7 @@ from ddcci_plasmoid_backend.adapters.adapters import monitor_adapter_classes
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
     CONTINUOUS_PROPERTIES,
     Property,
+    Monitor,
 )
 
 if TYPE_CHECKING:
@@ -279,21 +280,40 @@ def handle_arguments(argv: list[str]) -> int:
             )
             print_output_json("set-all")
         elif arguments["command"] == "increment":
+
+            def get_incremented_monitor_property(
+                monitor: Monitor, property: Property
+            ) -> int:
+                return monitor.property_values[property].value + arguments["increase"]
+
             asyncio.run(
                 adapters.set_monitor_property(
                     arguments["adapter"],
                     arguments["id"],
                     arguments["property"],
-                    arguments["increase"],
-                    increase_by_value=True,
+                    get_incremented_monitor_property,
                 )
             )
         elif arguments["command"] == "increment-all":
+
+            def get_incremented_monitor_property(
+                monitors: list[Monitor], property: Property
+            ) -> int:
+                current_value = round(
+                    sum(
+                        [
+                            monitor.property_values[property].value
+                            for monitor in monitors
+                        ]
+                    )
+                    / len(monitors)
+                )
+                return current_value + arguments["increase"]
+
             asyncio.run(
                 adapters.set_all_monitors(
                     arguments["property"],
-                    arguments["increase"],
-                    increase_by_value=True,
+                    value=get_incremented_monitor_property,
                 )
             )
 

@@ -6,6 +6,7 @@ import re
 from typing import TYPE_CHECKING
 
 from ddcci_plasmoid_backend import subprocess_wrappers
+from ddcci_plasmoid_backend.errors import DdcutilError
 from ddcci_plasmoid_backend.subprocess_wrappers import CalledProcessError
 
 if TYPE_CHECKING:
@@ -41,24 +42,30 @@ class DdcutilWrapper:
             CommandOutput
         """
         command = self._build_command(verb, *arguments, bus=bus)
-        output = await subprocess_wrappers.async_subprocess_wrapper(command, logger)
-        attempt = 0
-        while re.findall(ddcutil_failure_pattern, output.stdout):
-            if attempt == self.brute_force_attempts:
-                # Do not show info message if failure pattern was found on first and only attempt
-                if attempt > 0:
-                    logger.warning(
-                        f"Command `{command}` failed {attempt + 1} times in a row"
-                    )
-                break
-            attempt += 1
+        try:
             output = await subprocess_wrappers.async_subprocess_wrapper(command, logger)
-        else:
-            # while ... else is only executed if the queue has not been exited with break but with
-            # a false loop condition
-            if attempt > 0:
-                logger.info(f"Required {attempt} attempts for command `{command}`")
-        return self._strip_irrelevant_error_messages(output)
+            attempt = 0
+            while re.findall(ddcutil_failure_pattern, output.stdout):
+                if attempt == self.brute_force_attempts:
+                    # Do not show info message if failure pattern was found on first and only attempt
+                    if attempt > 0:
+                        logger.warning(
+                            f"Command `{command}` failed {attempt + 1} times in a row"
+                        )
+                    break
+                attempt += 1
+                output = await subprocess_wrappers.async_subprocess_wrapper(
+                    command, logger
+                )
+            else:
+                # while ... else is only executed if the queue has not been exited with break but with
+                # a false loop condition
+                if attempt > 0:
+                    logger.info(f"Required {attempt} attempts for command `{command}`")
+            return self._strip_irrelevant_error_messages(output)
+        except CalledProcessError as exc:
+            msg = f"Running ddcutil command `{command}` failed"
+            raise DdcutilError(msg) from exc
 
     def _build_command(self, verb: str, *arguments: str, bus: int | None) -> str:
         command = [self.ddcutil_executable]
@@ -134,4 +141,4 @@ class DdcutilWrapper:
             return output.stdout.split("\n")[0].replace("ddcutil", "").strip()
         except CalledProcessError as error:
             msg = "Failed to invoke ddcutil"
-            raise OSError(msg) from error
+            raise DdcutilError(msg) from error

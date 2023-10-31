@@ -1,15 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from ddcci_plasmoid_backend.adapters.monitor_adapter import (
+    CONTINUOUS_PROPERTIES,
     AdapterIdentifier,
     MonitorIdentifier,
     Property,
 )
-
-if TYPE_CHECKING:
-    pass
+from ddcci_plasmoid_backend.cache import CacheFile
 
 
 class ConfigurationError(Exception):
@@ -18,6 +15,14 @@ class ConfigurationError(Exception):
 
 class MissingCacheError(Exception):
     """Errors related to missing cache data"""
+
+    def __init__(self, description: CacheFile | str) -> None:
+        if isinstance(description, CacheFile):
+            cache_file: CacheFile = description
+            msg = f"Cache `{cache_file}` unavailable (path: {cache_file.value.path})"
+        else:
+            msg = description
+        super().__init__(msg)
 
 
 class UnsupportedPropertyError(Exception):
@@ -40,9 +45,8 @@ class IllegalPropertyValueError(Exception):
         id: MonitorIdentifier,
         property: Property,
         value: int,
-        *,
-        is_continuous: bool,
-    ):
+    ) -> None:
+        is_continuous = property in CONTINUOUS_PROPERTIES
         msg = (
             f"Monitor `{adapter}.{id}` does not support the value `{value}` for "
             f" {'continuous' if is_continuous else 'non-continuous'} property `{property}`"
@@ -52,3 +56,7 @@ class IllegalPropertyValueError(Exception):
 
 class IllegalArgumentError(ValueError):
     """An illegal value for an argument was provided"""
+
+
+class DdcutilError(OSError):
+    """A ddcutil command failed"""

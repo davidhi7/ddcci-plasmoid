@@ -48,12 +48,22 @@ class Monitor(BaseModel):
 
 
 class ContinuousValue(BaseModel):
+    """
+    Model for a continuous property that accepts all integers between the min and max
+    value.
+    """
+
     value: int
     min_value: int
     max_value: int
 
 
 class NonContinuousValue(BaseModel):
+    """
+    Model for a non-continuous property that only accepts integer values from a defined set of
+    choices.
+    """
+
     value: int
     choices: List[int]
 
