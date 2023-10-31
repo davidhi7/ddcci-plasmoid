@@ -1,0 +1,14 @@
+busno=6, Feature 0x41 should not exist but ddc_get_nontable_vcp_value() succeeds, returning mh=0x00 ml=0x64 sh=0x00 sl=0x64
+busno=6, Feature 0xdd should not exist but ddc_get_nontable_vcp_value() succeeds, returning mh=0x00 ml=0x64 sh=0x00 sl=0x64
+busno=6, Feature 0x00 should not exist but ddc_get_nontable_vcp_value() succeeds, returning mh=0x00 ml=0x64 sh=0x00 sl=0x64
+Display 1
+   I2C bus:  /dev/i2c-6
+   DRM connector:           card1-DP-1
+   EDID synopsis:
+      Mfg id:               DEL - Dell Inc.
+      Model:                DELL P2418D
+      Product code:         53441  (0xd0c1)
+      Serial number:        
+      Binary serial number: 
+      Manufacture year:     2019,  Week: 4
+   VCP version:         2.1

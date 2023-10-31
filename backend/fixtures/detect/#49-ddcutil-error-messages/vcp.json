@@ -1,0 +1,8 @@
+{
+  "6": {
+    "capabilities": "busno=6, Feature 0xdd should not exist but ddc_get_nontable_vcp_value() succeeds, returning mh=0x00 ml=0x64 sh=0x00 sl=0x64\nUnparsed capabilities string: (prot(monitor)type(LCD)model(S2721DGFA)cmds(01 02 03 07 0C E3 F3)vcp(10 12 D6(01 04 05) )mswhql(1)asset_eep(40)mccs_ver(2.1))\n",
+    "10": "busno=6, Feature 0xdd should not exist but ddc_get_nontable_vcp_value() succeeds, returning mh=0x00 ml=0x64 sh=0x00 sl=0x64\nVCP 10 C 50 100\n",
+    "12": "busno=6, Feature 0xdd should not exist but ddc_get_nontable_vcp_value() succeeds, returning mh=0x00 ml=0x64 sh=0x00 sl=0x64\nVCP 12 C 75 100\n",
+    "D6": "busno=6, Feature 0xdd should not exist but ddc_get_nontable_vcp_value() succeeds, returning mh=0x00 ml=0x64 sh=0x00 sl=0x64\nVCP D6 SNC x01\n"
+  }
+}

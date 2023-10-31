@@ -150,6 +150,10 @@ async def test_brute_force_attempts(
             "Driver i2c_dev must be loaded or builtin\n"
             "See https://www.ddcutil.com/kernel_module\n"
         ),
+        (
+            "busno=6, Feature 0xdd should not exist but ddc_get_nontable_vcp_value() succeeds, "
+            "returning mh=0x00 ml=0x64 sh=0x00 sl=0x64\n"
+        ),
     ],
 )
 # noinspection SpellCheckingInspection

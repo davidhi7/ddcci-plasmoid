@@ -96,8 +96,8 @@ class DdcutilWrapper:
     def _strip_irrelevant_error_messages(
         command_output: subprocess_wrappers.CommandOutput,
     ) -> subprocess_wrappers.CommandOutput:
-        """Return a new CommandOutput instance with multiple ddcutil warnings/errors in stdout
-        output removed. Fix for #32 and multiple other bugs.
+        """Return a new CommandOutput instance with certain ddcutil warnings/errors removed from
+        the stdout parameter. Fix for #32, #49 and multiple other bugs.
 
         Args:
             command_output: CommandOutput to work with
@@ -108,19 +108,24 @@ class DdcutilWrapper:
         error_messages = [
             # #32, `nvida`: typo is in ddcutil source
             (
-                "(is_nvidia_einval_bug          ) nvida/i2c-dev bug encountered. Forcing"
-                " future io I2C_IO_STRATEGY_FILEIO. Retrying\n"
+                r"\(is_nvidia_einval_bug\s+\) nvida/i2c-dev bug encountered\. "
+                r"Forcing future io I2C_IO_STRATEGY_FILEIO\. Retrying\n"
             ),
             # Common error with ddcutil versions prior to 1.4.1
-            "Unable to open directory /sys/bus/i2c/devices/i2c--1: No such file or directory\n",
-            "Device /dev/i2c-255 does not exist. Error = ENOENT(2): No such file or directory\n",
-            "/sys/bus/i2c buses without /dev/i2c-N devices: /sys/bus/i2c/devices/i2c-255\n",
-            "Driver i2c_dev must be loaded or builtin\n",
-            "See https://www.ddcutil.com/kernel_module\n",
+            r"Unable to open directory /sys/bus/i2c/devices/i2c--1: No such file or directory\n",
+            r"Device /dev/i2c-255 does not exist\. Error = ENOENT\(2\): No such file or directory\n",
+            r"/sys/bus/i2c buses without /dev/i2c-N devices: /sys/bus/i2c/devices/i2c-255\n",
+            r"Driver i2c_dev must be loaded or builtin\n",
+            r"See https://www\.ddcutil\.com/kernel_module\n",
+            # #49
+            (
+                r"busno=\d+, Feature 0x.+ should not exist but ddc_get_nontable_vcp_value\(\) succeeds"
+                r", returning mh=0x.+ ml=0x.+ sh=0x.+ sl=0x.+\n"
+            ),
         ]
         fixed_stdout = command_output.stdout
         for entry in error_messages:
-            fixed_stdout = fixed_stdout.replace(entry, "")
+            fixed_stdout = re.sub(entry, "", fixed_stdout)
 
         return dataclasses.replace(command_output, stdout=fixed_stdout)
 
