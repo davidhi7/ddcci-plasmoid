@@ -14,23 +14,7 @@
 
 ## Setup
 
-### 1. Load the `i2c-dev` kernel module
-
-DDC/CI communication relies on i²C busses. The i2c-dev kernel module exposes this functionality to the userspace. Most kernel builds should include this module already, so it only needs to be loaded.
-
-Check if it is already loaded:
-
-`$ lsmod | grep i2c_dev`
-
-If it isn't, load it automatically on every boot:
-
-`$ echo i2c-dev | sudo tee /etc/modules-load.d/i2c-dev.conf`
-
-or load it once:
-
-`$ sudo modprobe i2c-dev`
-
-### 2. Install and configure **ddcutil**
+### 1. Install and configure **ddcutil**
 
 ddcutil is a command line utility to control external monitors.
 We use ddcutil to detect supported monitors and adjust their brightness.
@@ -39,7 +23,7 @@ Note that additional steps may be required if you are using a NVIDIA GPU, see [S
 
 Install the `ddcutil` from your distribution's repositories. ([Arch Linux](https://archlinux.org/packages/extra/x86_64/ddcutil/))
 
-By default, ddcutil can only be used the the root user.
+By default, ddcutil can only be used the root user.
 Little configuration is required to allow non-root users to use it:
 
 `$ sudo usermod -aG i2c <username>`
@@ -48,7 +32,7 @@ If the group `i2c` doesn't exit, create it first:
 
 `$ sudo groupadd --system i2c`
 
-Finally, you need to install a udev rule to allow members of the group `i2c` to access to i²c devices: 
+Finally, you need to install an udev rule to allow members of the group `i2c` to access i²c devices:
 
 `$ sudo cp /usr/share/ddcutil/data/45-ddcutil-i2c.rules /etc/udev/rules.d`
 
@@ -84,7 +68,23 @@ Display 2
    VCP version:         2.1
 ```
 
-### 3. Install the backend ###
+If the output is the following:
+
+```
+No /dev/i2c devices exist.
+ddcutil requires module i2c-dev.
+```
+
+the module is not compiled into the kernel, and you need to load the `i2c_dev` kernel module.
+Load it automatically during every boot:
+
+`$ echo i2c_dev | sudo tee /etc/modules-load.d/i2c_dev.conf`
+
+or load it once:
+
+`$ sudo modprobe i2c_dev`
+
+### 2. Install the backend ###
 
 Install the backend from PyPI using the following command:
 
@@ -105,7 +105,7 @@ About [pipx](https://pypa.github.io/pipx/):
 >
 >pip is a general-purpose package installer for both libraries and apps with no environment isolation. pipx is made specifically for application installation, as it adds isolation yet still makes the apps available in your shell: pipx creates an isolated environment for each application and its associated packages.
 
-### 4. Install the widget itself ###
+### 3. Install the widget itself ###
 
 Install the [official package](https://store.kde.org/p/2015475) from the KDE store or install it directly from the repository:
 
@@ -119,7 +119,7 @@ $ kpackagetool5 --upgrade plasmoid
 
 **Note**: If you used `pipx` to install the backend in the previous step, the widget setting `Backend executable command` should be `~/.local/bin/ddcci_plasmoid_backend` (which is the default installation path of pipx).
 
-### 5. Display the widget
+### 4. Display the widget
 
 This widget can be displayed within the system tray or as a standalone widget.
 
