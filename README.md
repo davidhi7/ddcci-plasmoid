@@ -144,6 +144,10 @@ fail.
 
 ## History
 
+#### v0.1.9 2023-11-02
+
+* Fix bug that prevents monitors from being properly detected when using ddcutil 2.0.0 (#49)
+
 #### v0.1.8 2023-08-26
 
 * Ignore monitors if `VCP version` detection failed by ddcutil (#39)
