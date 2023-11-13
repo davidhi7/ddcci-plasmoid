@@ -79,5 +79,5 @@ class DdcciMonitor(Monitor):
     vcp_capabilities: VcpFeatureList
 
     @field_serializer("vcp_capabilities")
-    def serialize_vcp_capabilities(self, vcp_capabilities: VcpFeatureList):
+    def serialize_vcp_capabilities(self, vcp_capabilities: VcpFeatureList) -> dict:
         return {f"{code:X}": value for code, value in vcp_capabilities.items()}

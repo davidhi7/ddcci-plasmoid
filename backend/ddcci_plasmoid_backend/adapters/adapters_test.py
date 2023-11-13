@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from unittest import mock
 
 import pytest
@@ -5,18 +7,12 @@ import pytest
 from ddcci_plasmoid_backend.adapters import adapters
 from ddcci_plasmoid_backend.adapters.adapters import (
     _ensure_valid_property_value,
+    _get_adapter_type,
     _limit_continuous_property_value,
     _validate_non_continuous_property_value,
-    _get_adapter_type,
 )
-from ddcci_plasmoid_backend.adapters.monitor_adapter import (
-    Monitor,
-    Property,
-)
-from ddcci_plasmoid_backend.errors import (
-    IllegalPropertyValueError,
-    UnsupportedPropertyError,
-)
+from ddcci_plasmoid_backend.adapters.monitor_adapter import Monitor, Property
+from ddcci_plasmoid_backend.errors import IllegalPropertyValueError, UnsupportedPropertyError
 
 sample_monitor = Monitor.model_validate(
     {
