@@ -55,6 +55,8 @@ def _validate_non_continuous_property_value(
     Returns:
         `True` if `value` is accepted, otherwise `False`
     """
+    if property not in monitor.property_values:
+        raise UnsupportedPropertyError(monitor.adapter, monitor.id, property)
     return value in monitor.property_values[property].choices
 
 
@@ -73,6 +75,8 @@ def _limit_continuous_property_value(
     Returns:
         New `value`
     """
+    if property not in monitor.property_values:
+        raise UnsupportedPropertyError(monitor.adapter, monitor.id, property)
     property_instance: ContinuousValue = monitor.property_values[property]
     return min(
         max(value, property_instance.min_value),
@@ -96,6 +100,8 @@ def _ensure_valid_property_value(
         Validated `value`, or the nearest accepted value if `property` is a continuous property and
         `value` was too great or little before.
     """
+    if property not in monitor.property_values:
+        raise UnsupportedPropertyError(monitor.adapter, monitor.id, property)
     if isinstance(monitor.property_values[property], NonContinuousValue):
         if not _validate_non_continuous_property_value(monitor, property, value):
             raise IllegalPropertyValueError(
@@ -209,7 +215,7 @@ async def set_monitor_property(
 async def set_all_monitors(
     property_name: str, value: int | Callable[[list[Monitor], Property], int]
 ) -> int:
-    """Assigns a new value to all monitors. Requires DETECT_OUTPUT cash
+    """Assigns a new value to all monitors. Requires DETECT_OUTPUT cache.
 
     Args:
         property_name: String representation of the property
@@ -260,6 +266,7 @@ async def set_all_monitors(
                     monitor_specific_value,
                 )
             )
+            print("here")
             tasks.append(task)
 
     await asyncio.gather(*tasks)
