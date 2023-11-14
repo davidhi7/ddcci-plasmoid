@@ -19,7 +19,11 @@ import fasteners
 from ddcci_plasmoid_backend import config
 from ddcci_plasmoid_backend.adapters import adapters
 from ddcci_plasmoid_backend.adapters.adapters import monitor_adapter_classes
-from ddcci_plasmoid_backend.adapters.monitor_adapter import CONTINUOUS_PROPERTIES, Monitor, Property
+from ddcci_plasmoid_backend.adapters.monitor_adapter import (
+    CONTINUOUS_PROPERTIES,
+    Monitor,
+    Property,
+)
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -107,23 +111,12 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         help="Positive or negative integer to add to current value",
     )
 
-    # Simple conversion function to split configuration identifiers formatted as `section.key` into
-    # separate variables, raising a ValueError if the argument is wrongly formatted
-    def composed_config_key(argument: str) -> tuple[str, str]:
-        section, key = argument.split(".")
-        return section, key
-
     config_parser = sub_parsers.add_parser(
-        "config", help="Get or set a configuration value"
+        "config", help="Get or set configuration values"
     )
-    config_parser.add_argument(
-        "key",
-        metavar="section.key",
-        type=composed_config_key,
-        help="Configuration section and key",
-    )
+    config_parser.add_argument("section", help="Configuration section", nargs="?")
+    config_parser.add_argument("key", help="Configuration key", nargs="?")
     config_parser.add_argument("value", help="New configuration value", nargs="?")
-
     return argument_parser
 
 
@@ -231,10 +224,25 @@ def handle_arguments(argv: list[str]) -> int:
         print(version("ddcci-plasmoid-backend"))
         return 0
     if arguments["command"] == "config":
-        section, key = arguments["key"]
+        section = arguments["section"]
+        if not section:
+            print_output_json(
+                "config",
+                response={
+                    section: dict(config.config[section])
+                    for section in config.config.sections()
+                },
+            )
+            return 0
+        key = arguments["key"]
+        if not key:
+            print_output_json(
+                "config", response={section: dict(config.config[section])}
+            )
+            return 0
+        value = arguments["value"]
         # If a value argument is provided, the config value is set, otherwise it is only read
-        if arguments["value"]:
-            value = arguments["value"]
+        if value:
             config.set_config_value(
                 config.config,
                 section,

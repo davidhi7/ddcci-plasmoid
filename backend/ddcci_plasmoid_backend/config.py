@@ -82,7 +82,7 @@ def set_config_value(
         msg = f"Section `{section}` does not exist"
         raise ConfigurationError(msg)
     if key not in CONFIG_SCHEME[section].keys():
-        msg = f"Key `{section}` does not exist within section `{section}`"
+        msg = f"Key `{key}` does not exist within section `{section}`"
         raise ConfigurationError(msg)
     # Try to parse the value and then convert it back into a string, to test whether the value is
     # acceptable and to normalize it
