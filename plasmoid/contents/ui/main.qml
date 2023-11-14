@@ -6,6 +6,8 @@ import org.kde.plasma.core 2.0 as PlasmaCore
 import org.kde.plasma.components 3.0 as PlasmaComponents
 import org.kde.plasma.extras 2.0 as PlasmaExtras
 
+import org.kde.kirigami 2.20 as Kirigami
+
 import "code/backend_interface.js" as Backend
 
 Item {
@@ -34,28 +36,8 @@ Item {
     }
 
     // Executable dataSource for all commands but regular backend polling
-    PlasmaCore.DataSource {
+    ShellDataSource {
         id: executable
-        engine: "executable"
-        connectedSources: []
-        function exec(command, callback) {
-            log(`Execute command: ${command}`);
-            const wrappedCallback = (calledCommand, data) => {
-                if (calledCommand === command) {
-                    const exitCode = data["exit code"];
-                    const stdout = data.stdout;
-                    const stderr = data.stderr;
-                    log(`exitCode: ${command}: ${exitCode}`);
-                    log(`stdout:   ${command}: ${removeTrailingNewlines(stdout)}`);
-                    log(`stderr:   ${command}: ${removeTrailingNewlines(stderr)}`);
-                    callback(exitCode, stdout, stderr);
-                    disconnectSource(command);
-                    onNewData.disconnect(wrappedCallback);
-                }
-            };
-            onNewData.connect(wrappedCallback);
-            connectSource(command);
-        }
     }
 
     // DataSource for regular backend polling
@@ -170,7 +152,6 @@ Item {
         }
 
         ColumnLayout {
-
             Layout.margins: PlasmaCore.Units.gridUnit
 
             // Error notifications
@@ -243,8 +224,21 @@ Item {
         }
     }
 
+    // Handle `refresh monitors` button
     function action_refreshMonitors() {
         monitorDataSource.runOnce();
+    }
+
+    // Write the plasmoid configuration to the backend
+    function write_backend_configuration() {
+        for (let key in plasmoid.configuration) {
+            if (key.startsWith("ddcci_") && !key.endsWith("Default")) {
+                let [ config_section ] = key.split("_", 1);
+                // Remove the leading `section_` part of key
+                let config_key = key.substr(config_section.length + 1);
+                executable.exec(`${backendCommand} config ${config_section} ${config_key} ${plasmoid.configuration[key]}`);
+            }
+        }
     }
 
     Component.onCompleted: function() {
@@ -253,7 +247,9 @@ Item {
         });
         monitorDataSource.start();
         // code to add new action: Plasmoid.setAction("actionId", i18_n("text"), "iconName") (i18_n without underscore)
-        Plasmoid.setAction('refreshMonitors', i18n("Refresh monitors"), 'view-refresh-symbolic');
         // Instead of connecting to a signal of this action, a function called `action_{actionId}` is expected (here action_refreshMonitors)
+        Plasmoid.setAction('refreshMonitors', i18n("Refresh monitors"), 'view-refresh-symbolic');
+
+        write_backend_configuration();
     }
 }

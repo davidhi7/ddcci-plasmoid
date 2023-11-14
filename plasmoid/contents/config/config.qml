@@ -5,6 +5,11 @@ ConfigModel {
     ConfigCategory {
         name: i18n("General")
         icon: 'configure'
-        source: 'configGeneral.qml'
+        source: 'config/general.qml'
+    }
+    ConfigCategory {
+        name: i18n("External monitors")
+        icon: 'monitor'
+        source: 'config/ddcci.qml'
     }
 }

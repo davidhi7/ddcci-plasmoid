@@ -4,7 +4,6 @@
 
     <group name="General">
         <entry name="executable" type="String">
-            <!-- <default>cat detect_mock.json #</default> -->
             <default>ddcci_plasmoid_backend</default>
         </entry>
         <entry name="stepSize" type="Int">
@@ -12,6 +11,23 @@
         </entry>
         <entry name="enableAdvancedMode" type="Bool">
             <default>false</default>
+        </entry>
+        <!-- TODO disable -->
+        <entry name="enableLogging" type="Bool">
+            <default>true</default>
+        </entry>
+        <!-- DDC/CI specific settings -->
+        <entry name="ddcci_ddcutil_executable" type="String">
+            <default>ddcutil</default>
+        </entry>
+        <entry name="ddcci_ddcutil_sleep_multiplier" type="Double">
+            <default>1.0</default>
+        </entry>
+        <entry name="ddcci_ddcutil_no_verify" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="ddcci_brute_force_attempts" type="Int">
+            <default>0</default>
         </entry>
     </group>
 </kcfg>
