@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import re
 import subprocess
@@ -44,8 +43,8 @@ class MonitorID:
         return True
 
 
-async def detect():
-    async def fetch_monitor_data(node: Node) -> MonitorData:
+def detect():
+    def fetch_monitor_data(node: Node) -> MonitorData:
         display_id = get_monitor_id(node)
         display_name = ""
         if "EDID synopsis" in node.child_by_key:
@@ -56,7 +55,7 @@ async def detect():
 
         bus_id = int(re.search(r"\d+$", node.child_by_key["I2C bus"].value).group())
 
-        result = await async_subprocess_wrapper(
+        result = subprocess_wrapper(
             f"ddcutil getvcp --bus {bus_id} --brief {brightness_feature_code:x}"
         )
 
@@ -74,7 +73,7 @@ async def detect():
     logger.debug(f"Found {len(content.children)} entries at root level")
 
     found_monitors: list[MonitorID] = []
-    awaitables = []
+    monitor_data = []
     for child in content.children:
         if not re.fullmatch(r"Display \d+", child.key.strip()):
             logger.debug(
@@ -105,9 +104,12 @@ async def detect():
             # For the unlikely case that no EDID synopsis is included, skip all duplication tests
             logger.debug(f"id={monitor_id} No EDID synopsis returned")
 
-        awaitables.append(fetch_monitor_data(child))
+        try:
+            monitor_data.append(fetch_monitor_data(child))
+        except subprocess.CalledProcessError as err:
+            monitor_data.append(err)
 
-    return await asyncio.gather(*awaitables, return_exceptions=True)
+    return monitor_data
 
 
 def set_brightness(bus_id: int, brightness: int) -> None:
@@ -135,30 +137,6 @@ def subprocess_wrapper(cmd: str) -> CommandOutput:
     stderr = proc.stderr.decode()
     command_output = {
         "returnCode": proc.returncode,
-        "stdout": stdout,
-        "stderr": stderr,
-    }
-
-    log_subprocess_output(cmd, command_output)
-    if proc.returncode > 0:
-        raise subprocess.CalledProcessError(
-            returncode=proc.returncode, cmd=cmd, output=stdout, stderr=stderr
-        )
-    return command_output
-
-
-async def async_subprocess_wrapper(cmd: str) -> CommandOutput:
-    logger.debug("Execute command: `" + cmd + "`")
-    proc = await asyncio.subprocess.create_subprocess_shell(
-        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    )
-    # it's safe to assume that the return code is not None at this point
-    return_code: int = 1 if proc.returncode is None else proc.returncode
-    stdout, stderr = await proc.communicate()
-    stdout = strip_ddcutil_stdout_warnings(stdout.decode())
-    stderr = stderr.decode()
-    command_output = {
-        "returnCode": return_code,
         "stdout": stdout,
         "stderr": stderr,
     }
