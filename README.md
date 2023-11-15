@@ -144,6 +144,10 @@ fail.
 
 ## History
 
+#### v0.1.0 2023-11-16
+
+* No longer run ddcutil commands concurrently to prevent detection issues (#47)
+
 #### v0.1.9 2023-11-02
 
 * Fix bug that prevents monitors from being properly detected when using ddcutil 2.0.0 (#49)
