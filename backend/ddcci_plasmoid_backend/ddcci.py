@@ -1,7 +1,7 @@
 import logging
 import re
 import subprocess
-from typing import TypedDict, Optional
+from typing import Optional, TypedDict
 
 from ddcci_plasmoid_backend.Node import Node
 
@@ -129,7 +129,7 @@ def get_monitor_id(node: Node):
     return int(re.search(r"\d+", node.key).group())
 
 
-# Wrap calls for mocking
+# Wrap sync and async subprocess calls for mocking
 def subprocess_wrapper(cmd: str) -> CommandOutput:
     logger.debug("Execute command: `" + cmd + "`")
     proc = subprocess.run(cmd.split(" "), capture_output=True)
