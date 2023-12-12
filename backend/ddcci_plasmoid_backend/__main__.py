@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import getpass
 import json
 import logging
@@ -52,8 +51,6 @@ def main():
             file_handler.setLevel(logging.DEBUG)
             logging.getLogger().addHandler(file_handler)
 
-    # supress log message `DEBUG asyncio: Using selector: EpollSelector`
-    logging.getLogger("asyncio").setLevel(logging.WARNING)
     logger = logging.getLogger(__name__)
     logger.debug(f'backend version: {version("ddcci-plasmoid-backend")}')
     logger.debug(f"ddcutil version: {get_ddcutil_version()}")
@@ -82,7 +79,7 @@ def main():
     ):
         if arguments["command"] == "detect":
             try:
-                result = asyncio.run(ddcci.detect())
+                result = ddcci.detect()
             except subprocess.CalledProcessError as err:
                 logger.debug(err)
                 handle_error(err)

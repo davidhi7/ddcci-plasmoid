@@ -129,7 +129,7 @@ def get_monitor_id(node: Node):
     return int(re.search(r"\d+", node.key).group())
 
 
-# Wrap sync and async subprocess calls for mocking
+# Wrap calls for mocking
 def subprocess_wrapper(cmd: str) -> CommandOutput:
     logger.debug("Execute command: `" + cmd + "`")
     proc = subprocess.run(cmd.split(" "), capture_output=True)
