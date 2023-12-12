@@ -51,8 +51,6 @@ def main():
             file_handler.setLevel(logging.DEBUG)
             logging.getLogger().addHandler(file_handler)
 
-    # supress log message `DEBUG asyncio: Using selector: EpollSelector`
-    logging.getLogger("asyncio").setLevel(logging.WARNING)
     logger = logging.getLogger(__name__)
     logger.debug(f'backend version: {version("ddcci-plasmoid-backend")}')
     logger.debug(f"ddcutil version: {get_ddcutil_version()}")
