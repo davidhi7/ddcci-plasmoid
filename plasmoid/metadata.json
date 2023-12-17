@@ -15,9 +15,11 @@
         "Name": "Display Brightness",
         "Name[zh_CN]": "显示器亮度",
         "Name[de]": "Monitor-Helligkeit",
+        "Name[nl]": "Schermhelderheid",
         "Description": "DDC/CI-based brightness control utility for external monitors",
         "Description[zh_CN]": "基于 DDC/CI-based 的外接显示器亮度控制工具",
-        "Description[de]": "DDC/CI-basiertes Dienstprogramm zur Helligkeitsregelung für externe Monitore"
+        "Description[de]": "DDC/CI-basiertes Dienstprogramm zur Helligkeitsregelung für externe Monitore",
+        "Description[nl]": "Een op DDC/CI gebaseerd schermhelderheidshulpmiddel voor externe beeldschermen"
     },
     "X-Plasma-NotificationArea": true,
     "X-Plasma-NotificationAreaCategory": "Hardware",
