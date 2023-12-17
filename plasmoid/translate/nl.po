@@ -1,0 +1,46 @@
+# Translation of ddcci-brightness in LANGUAGE
+# Copyright (C) 2023
+# This file is distributed under the same license as the ddcci-brightness package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ddcci-brightness\n"
+"Report-Msgid-Bugs-To: https://github.com/davidhi7/ddcci-plasmoid\n"
+"POT-Creation-Date: 2023-04-15 20:12+0200\n"
+"PO-Revision-Date: 2023-12-17 21:47+0100\n"
+"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
+"Language-Team: \n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.1\n"
+
+#: ../contents/config/config.qml
+msgid "General"
+msgstr "Algemeen"
+
+#: ../contents/ui/configGeneral.qml
+msgid "Step size:"
+msgstr "Hoeveelheid:"
+
+#: ../contents/ui/configGeneral.qml
+msgid "Backend executable command:"
+msgstr "Uitvoerbaar bestand (backend):"
+
+#: ../contents/ui/main.qml
+msgid "Error:"
+msgstr "Foutmelding:"
+
+#: ../contents/ui/main.qml
+msgid "Display Brightness"
+msgstr "Schermhelderheid"
+
+#: ../contents/ui/main.qml
+msgid "No monitors detected"
+msgstr "Er zijn geen beeldschermen aangetroffen"
+
+#: ../contents/ui/main.qml
+msgid "Refresh monitors"
+msgstr "Zoeken naar beeldschermen"
