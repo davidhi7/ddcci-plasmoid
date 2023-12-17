@@ -6,19 +6,21 @@
             }
         ],
         "Category": "System Information",
-        "Description": "DDC/CI-based brightness control utility for external monitors",
         "Icon": "brightness-high",
         "Id": "de.davidhi.ddcci-brightness",
-        "Name": "Display Brightness",
         "Version": "0.1.9",
         "Website": "https://github.com/davidhi7/ddcci-plasmoid",
-        "Description[zh_CN]": "基于 DDC/CI-based 的外接显示器亮度控制工具",
+        "BugReportUrl": "https://github.com/davidhi7/ddcci-plasmoid/issues",
+        "License": "MIT",
+        "Name": "Display Brightness",
         "Name[zh_CN]": "显示器亮度",
-        "Description[de]": "DDC/CI-basiertes Dienstprogramm zur Helligkeitsregelung für externe Monitore",
-        "Name[de]": "Monitor-Helligkeit"
+        "Name[de]": "Monitor-Helligkeit",
+        "Description": "DDC/CI-based brightness control utility for external monitors",
+        "Description[zh_CN]": "基于 DDC/CI-based 的外接显示器亮度控制工具",
+        "Description[de]": "DDC/CI-basiertes Dienstprogramm zur Helligkeitsregelung für externe Monitore"
     },
     "X-Plasma-NotificationArea": true,
     "X-Plasma-NotificationAreaCategory": "Hardware",
-    "X-Plasma-API-Minimum-Version": "6.0.0",
+    "X-Plasma-API-Minimum-Version": "6.0",
     "KPackageStructure": "Plasma/Applet"
 }
