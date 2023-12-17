@@ -133,13 +133,14 @@ PlasmoidItem {
                 PlasmaComponents.ToolButton {
                     Layout.alignment: Qt.AlignRight
 
-                    property QtObject /*QAction*/ qAction: Plasmoid.action('refreshMonitors')
+                    // Using `action` fails
+                    property QtObject /*Plasmacore.Action*/ action_: Plasmoid.contextualActions[0]
 
-                    icon.name: 'view-refresh-symbolic'
+                    icon.name: action_.icon.name
                     PlasmaComponents.ToolTip {
-                        text: parent.qAction.text
+                        text: parent.action_.text
                     }
-                    onClicked: qAction.trigger()
+                    onClicked: action_.trigger()
                 }
             }
         }
@@ -291,9 +292,13 @@ PlasmoidItem {
         }
     }
 
-    function action_refreshMonitors() {
-        monitorDataSource.runOnce();
-    }
+    Plasmoid.contextualActions: [
+        PlasmaCore.Action {
+            text: i18n("Refresh monitors")
+            icon.name: "view-refresh-symbolic"
+            onTriggered: monitorDataSource.runOnce();
+        }
+    ]
 
     Connections {
         target: plasmoid.configuration
@@ -308,8 +313,5 @@ PlasmoidItem {
 
     Component.onCompleted: function() {
         monitorDataSource.start();
-        // Plasmoid.setAction("actionId", i18_n("text"), "iconName") (i18_n without underscore)
-        Plasmoid.setAction('refreshMonitors', i18n("Refresh monitors"), 'view-refresh-symbolic');
-        // Instead of connecting to a signal of this action, a function called `action_{actionId}` is expected (here action_refreshMonitors)
     }
 }
