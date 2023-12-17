@@ -8,7 +8,7 @@
         "Category": "System Information",
         "Icon": "brightness-high",
         "Id": "de.davidhi.ddcci-brightness",
-        "Version": "0.1.9",
+        "Version": "0.1.10",
         "Website": "https://github.com/davidhi7/ddcci-plasmoid",
         "BugReportUrl": "https://github.com/davidhi7/ddcci-plasmoid/issues",
         "License": "MIT",

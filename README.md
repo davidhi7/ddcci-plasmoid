@@ -107,7 +107,9 @@ About [pipx](https://pypa.github.io/pipx/):
 
 ### 3. Install the widget itself ###
 
-Install the [official package](https://store.kde.org/p/2015475) from the KDE store or install it directly from the repository:
+Using the [official package](https://store.kde.org/p/2015475) from the KDE store is the recommended way to install this widget.
+
+Alternatively, you can install the widget directly from this repopsitory:
 
 ````bash
 $ git clone https://github.com/davidhi7/ddcci-plasmoid.git
@@ -116,6 +118,8 @@ $ kpackagetool5 --install plasmoid
 # or upgrade the plasmoid:
 $ kpackagetool5 --upgrade plasmoid
 ````
+
+**Note**: The `main` branch is already ported to KDE Plasma 6. If you wish to install the plasmoid for KDE Plasma 5, run `$ git checkout kf5` inside the repository before invoking `kpackagetool5`. 
 
 **Note**: If you used `pipx` to install the backend in the previous step, the widget setting `Backend executable command` should be `~/.local/bin/ddcci_plasmoid_backend` (which is the default installation path of pipx).
 
@@ -143,6 +147,10 @@ This is a bug in older ddcutil versions which it is fixed in ddcutil v1.4.1. In 
 fail.
 
 ## History
+
+#### v0.1.10-kf6 2023-12-17
+
+* Port to KDE Plasma 6 (#52, thanks @alikates)
 
 #### v0.1.0 2023-11-16
 
