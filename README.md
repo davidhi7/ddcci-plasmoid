@@ -107,7 +107,7 @@ About [pipx](https://pypa.github.io/pipx/):
 
 ### 3. Install the widget itself ###
 
-Using the [official package](https://store.kde.org/p/2015475) from the KDE store is the recommended way to install this widget.
+Using the [official package for KDE Plasma 6](https://store.kde.org/p/2114471/) or for [KDE Plasma 5](https://store.kde.org/p/2015475) from the KDE store is the recommended way to install this widget.
 
 Alternatively, you can install the widget directly from this repopsitory:
 
