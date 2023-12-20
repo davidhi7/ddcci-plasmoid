@@ -12,9 +12,12 @@
         <entry name="enableAdvancedMode" type="Bool">
             <default>false</default>
         </entry>
-        <!-- TODO disable -->
-        <entry name="enableLogging" type="Bool">
+        <entry name="general_enable_logging" type="Bool">
+            <!-- TODO disable -->
             <default>true</default>
+        </entry>
+        <entry name="general_log_file" type="String">
+            <default></default>
         </entry>
         <!-- DDC/CI specific settings -->
         <entry name="ddcci_ddcutil_executable" type="String">

@@ -26,8 +26,12 @@ Item {
     property bool outsideSysTray: !(plasmoid.containmentDisplayHints & PlasmaCore.Types.ContainmentDrawsPlasmoidHeading)
 
     function log(message) {
-        if (enableLogging) {
+        if (plasmoid.configuration.general_enable_logging) {
             console.log(`LOGGING: ${message}`);
+            if (plasmoid.configuration.general_log_file !== "") {
+                console.log(plasmoid.configuration.general_log_file)
+                executable.exec(`echo "${message}" >> "${plasmoid.configuration.general_log_file}"`);
+            }
         }
     }
 
@@ -35,7 +39,7 @@ Item {
         return arg.replace(/\n$/, '');
     }
 
-    // Executable dataSource for all commands but regular backend polling
+    // Executable DataSource for all commands but regular backend polling
     ShellDataSource {
         id: executable
     }
@@ -103,12 +107,12 @@ Item {
     function handleError(stdout, stderr) {
         try {
             const errorResponse = JSON.parse(stdout);
-            console.log(`${errorResponse.command}: ${errorResponse.error}`);
+            log(`${errorResponse.command}: ${errorResponse.error}`);
             error(errorResponse.error);
         } catch(parse_error) {
             stdout = stdout.trim() ? ('\n    ' + stdout.trim()) : ''
             stderr = stderr.trim() ? ('\n    ' + stderr.trim()) : ''
-            console.error('Error:' + stdout + stderr);
+            log('Error:' + stdout + stderr);
             error(i18n("Error:") + stdout + stderr);
         }
     }
