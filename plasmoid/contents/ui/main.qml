@@ -241,6 +241,7 @@ Item {
                         onMoved: () => {
                             // Should also be locked during mouse wheel scrolling.
                             valuesLock = true
+                            value = Math.round(value)
                             brightness = value
 
                             // Handle mouse wheel debounce only when the slider is not pressed.
