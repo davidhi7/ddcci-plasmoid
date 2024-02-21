@@ -8,7 +8,6 @@ from ddcci_plasmoid_backend.Node import Node
 logger = logging.getLogger(__name__)
 brightness_feature_code = 0x10
 
-
 class CommandOutput(TypedDict):
     returnCode: int
     stdout: str
@@ -19,6 +18,7 @@ class MonitorData(TypedDict):
     id: int
     name: str
     bus_id: int
+    serial_number: Optional[str]  # Include EDID serial number
     brightness: int
 
 
@@ -26,30 +26,26 @@ class MonitorData(TypedDict):
 # ddcutil to look for duplicate monitors. Issue #1 shows that comparing by Serial number only is not sufficient, as the
 # monitors of the reporter only reported a binary serial number.
 class MonitorID:
-    def __init__(self, serial_number: str, binary_serial_number: str):
+    def __init__(self, bus_id: int, serial_number: str, binary_serial_number: str):
+        self.bus_id = bus_id
         self.serial_number = serial_number
         self.binary_serial_number = binary_serial_number
 
     def __eq__(self, other: "MonitorID") -> bool:
-        # If at least one serial number value is not empty, and they are not equal, they are different monitors
-        if (
-            self.serial_number or other.serial_number
-        ) and self.serial_number != other.serial_number:
-            return False
-        if (
-            self.binary_serial_number or other.binary_serial_number
-        ) and self.binary_serial_number != other.binary_serial_number:
-            return False
-        return True
+        return (self.bus_id == other.bus_id) and (self.serial_number == other.serial_number) and (
+            self.binary_serial_number == other.binary_serial_number
+        )
 
 
 def detect():
     def fetch_monitor_data(node: Node) -> MonitorData:
         display_id = get_monitor_id(node)
         display_name = ""
+        serial_number = None  # Initialize serial number
         if "EDID synopsis" in node.child_by_key:
             display_name = get_EDID_value(node, "Model")
-        # Use generic name if the EDID model is either empty or not present
+            serial_number = get_EDID_value(node, "Serial number")  # Extract serial number
+
         if not display_name:
             display_name = "Unknown display"
 
@@ -65,6 +61,7 @@ def detect():
             "id": display_id,
             "name": display_name,
             "bus_id": bus_id,
+            "serial_number": serial_number,
             "brightness": int(display_brightness_raw),
         }
 
@@ -72,7 +69,7 @@ def detect():
     content = Node.parse_indented_text(output["stdout"].split("\n"))
     logger.debug(f"Found {len(content.children)} entries at root level")
 
-    found_monitors: list[MonitorID] = []
+    found_monitors = []
     monitor_data = []
     for child in content.children:
         if not re.fullmatch(r"Display \d+", child.key.strip()):
@@ -87,10 +84,9 @@ def detect():
             )
             continue
         if "EDID synopsis" in child.child_by_key:
-            # monitors connected to DisplayPort may appear twice. This is apparently related to DisplayPort MST.
-            # Since the EDID data of both entries is identical, we simply remove duplicate monitors based on their
-            # serial number
+            bus_id = int(re.search(r"\d+$", child.child_by_key["I2C bus"].value).group())
             monitorId = MonitorID(
+                bus_id=bus_id,
                 serial_number=get_EDID_value(child, "Serial number"),
                 binary_serial_number=get_EDID_value(child, "Binary serial number"),
             )
@@ -101,7 +97,6 @@ def detect():
                 continue
             found_monitors.append(monitorId)
         else:
-            # For the unlikely case that no EDID synopsis is included, skip all duplication tests
             logger.debug(f"id={monitor_id} No EDID synopsis returned")
 
         try:
@@ -110,6 +105,7 @@ def detect():
             monitor_data.append(err)
 
     return monitor_data
+
 
 
 def set_brightness(bus_id: int, brightness: int) -> None:
@@ -129,7 +125,7 @@ def get_monitor_id(node: Node):
     return int(re.search(r"\d+", node.key).group())
 
 
-# Wrap calls for mocking
+# Wrap sync and async subprocess calls for mocking
 def subprocess_wrapper(cmd: str) -> CommandOutput:
     logger.debug("Execute command: `" + cmd + "`")
     proc = subprocess.run(cmd.split(" "), capture_output=True)
