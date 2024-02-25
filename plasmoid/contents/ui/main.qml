@@ -214,6 +214,7 @@ Item {
                         from: 0
                         to: 100
                         value: brightness
+                        snapMode: PlasmaComponents.Slider.SnapOnRelease
                         stepSize: plasmoid.configuration.stepSize || 1
 
                         onValueChanged: function() {
@@ -223,7 +224,7 @@ Item {
                                 brightness = roundNumberInStep(value, stepSize)
                                 value = brightness
                                 // Fire command
-                                mouseWheelScrollingDebounceTimer.restart()
+                                brightnessChangedDebounceTimer.restart()
                             }
                         }
 
@@ -241,9 +242,9 @@ Item {
                         }
 
                         Timer {
-                            id: mouseWheelScrollingDebounceTimer
+                            id: brightnessChangedDebounceTimer
 
-                            // How long does it take to trigger when the mouse wheel stops scrolling
+                            // How long does it take to trigger when the mouse wheel stops scrolling or slider stops sliding
                             interval: 400
 
                             // will only be triggered once after restart() called
@@ -256,8 +257,7 @@ Item {
                             }
                         }
 
-                        // https://invent.kde.org/plasma/libplasma/-/commit/aea3d4b131070d8388edf84c9c2a32f7b4203617
-                        // Backport for kf5
+                        // Backport of https://invent.kde.org/plasma/libplasma/-/commit/aea3d4b131070d8388edf84c9c2a32f7b4203617
                         wheelEnabled: false
                         MouseArea {
                             property int wheelDelta: 0
