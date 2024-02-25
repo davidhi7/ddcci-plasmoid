@@ -8,8 +8,6 @@ import org.kde.plasma.extras 2.0 as PlasmaExtras
 
 Item {
     id: root
-    // Do never apply new values if one slider is not released yet
-    property bool valuesLock: false
     property bool outsideSysTray: !(plasmoid.containmentDisplayHints & PlasmaCore.Types.ContainmentDrawsPlasmoidHeading)
 
     // https://github.com/Zren/plasma-applet-commandoutput/blob/master/package/contents/ui/main.qml
@@ -58,13 +56,10 @@ Item {
                 return;
             }
 
-            // if the lock is held, simply do nothing and wait for the next refresh
-            if (!valuesLock) {
-                monitorModel.clear();
-			    const response = JSON.parse(stdout);
-                for (let instance of response.value) {
-                    monitorModel.append(instance);
-                }
+            monitorModel.clear();
+            const response = JSON.parse(stdout);
+            for (let instance of response.value) {
+                monitorModel.append(instance);
             }
 
             commandSuccess(cmd);
@@ -221,6 +216,30 @@ Item {
                         value: brightness
                         stepSize: plasmoid.configuration.stepSize || 1
 
+                        onValueChanged: function() {
+                            if (brightness != value) {
+
+                                // Round value in step
+                                brightness = roundNumberInStep(value, stepSize)
+                                value = brightness
+                                // Fire command
+                                mouseWheelScrollingDebounceTimer.restart()
+                            }
+                        }
+
+                        function roundNumberInStep(number, step) {
+                            const halfStep = step / 2
+
+                            const integerPart = (Math.floor(number / step) * step)
+                            const diffPart = number - integerPart
+
+                            if (diffPart >= halfStep) {
+                                return integerPart + step
+                            } else {
+                                return integerPart
+                            }
+                        }
+
                         Timer {
                             id: mouseWheelScrollingDebounceTimer
 
@@ -233,29 +252,46 @@ Item {
                             triggeredOnStart: false
 
                             onTriggered: {
-                                valuesLock = false
                                 executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
                             }
                         }
 
-                        onMoved: () => {
-                            // Should also be locked during mouse wheel scrolling.
-                            valuesLock = true
-                            brightness = value
+                        // https://invent.kde.org/plasma/libplasma/-/commit/aea3d4b131070d8388edf84c9c2a32f7b4203617
+                        // Backport for kf5
+                        wheelEnabled: false
+                        MouseArea {
+                            property int wheelDelta: 0
 
-                            // Handle mouse wheel debounce only when the slider is not pressed.
-                            if (!pressed) {
-                                mouseWheelScrollingDebounceTimer.restart()
+                            anchors {
+                                fill: parent
+                                leftMargin: slider.leftPadding
+                                rightMargin: slider.rightPadding
                             }
-                        }
+                            LayoutMirroring.enabled: false
 
-                        onPressedChanged: function() {
-                            if (pressed) {
-                                valuesLock = true
-                            } else {
-                                // Slider is released
-                                valuesLock = false
-                                executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                            acceptedButtons: Qt.NoButton
+
+                            onWheel: wheel => {
+                                const lastValue = slider.value
+                                // We want a positive delta to increase the slider for up/right scrolling,
+                                // independently of the scrolling inversion setting
+                                // The x-axis is also inverted (scrolling right produce negative values)
+                                const delta = (wheel.angleDelta.y || -wheel.angleDelta.x) * (wheel.inverted ? -1 : 1)
+                                wheelDelta += delta;
+                                // magic number 120 for common "one click"
+                                // See: https://doc.qt.io/qt-5/qml-qtquick-wheelevent.html#angleDelta-prop
+
+                                while (wheelDelta >= 120) {
+                                    wheelDelta -= 120;
+                                    slider.increase();
+                                }
+                                while (wheelDelta <= -120) {
+                                    wheelDelta += 120;
+                                    slider.decrease();
+                                }
+                                if (lastValue !== sliders.value) {
+                                    slider.moved();
+                                }
                             }
                         }
                     }
