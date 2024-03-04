@@ -88,7 +88,7 @@ def configure_argument_parser() -> argparse.ArgumentParser:
         "property", choices=continuous_properties, help="Monitor property"
     )
     increment_parser.add_argument(
-        "increase",
+        "increment",
         type=int,
         help="Positive or negative integer to add to current value",
     )
@@ -308,7 +308,7 @@ def handle_arguments(argv: list[str]) -> int:
                     )
                     / len(monitors)
                 )
-                return current_value + arguments["increase"]
+                return current_value + arguments["increment"]
 
             asyncio.run(
                 adapters.set_all_monitors(

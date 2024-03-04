@@ -266,7 +266,6 @@ async def set_all_monitors(
                     monitor_specific_value,
                 )
             )
-            print("here")
             tasks.append(task)
 
     await asyncio.gather(*tasks)
