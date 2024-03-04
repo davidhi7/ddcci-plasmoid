@@ -1,9 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Controls 2.15 as QQC2
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as QQC
 
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.kirigami 2.4 as Kirigami
+import org.kde.kirigami as Kirigami
 
 ColumnLayout {
     enum Type {
@@ -15,7 +14,7 @@ ColumnLayout {
 
     property var input_int_validator: IntValidator{bottom: 0}
     property var input_double_validator: DoubleValidator{bottom: 0}
-    property var input_string_validator: RegExpValidator{}
+    property var input_string_validator: RegularExpressionValidator{}
 
     required property string name
     required property string description
@@ -28,11 +27,11 @@ ColumnLayout {
     property alias checked: toggle.checked
 
     RowLayout {
-        QQC2.CheckBox {
+        QQC.CheckBox {
             id: toggle
             text: name
         }
-        QQC2.TextField {
+        QQC.TextField {
             id: textInput
             validator: {
                 if (type == ExplainedConfigItem.Type.Int) {
@@ -46,18 +45,18 @@ ColumnLayout {
             visible: type != ExplainedConfigItem.Type.Bool
             enabled: toggle.checked
         }
-        QQC2.Label {
+        QQC.Label {
             visible: unit
-            color: toggle.checked ? PlasmaCore.Theme.textColor : PlasmaCore.Theme.disabledTextColor
+            color: toggle.checked ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
             text: unit
         }
     }
 
-    QQC2.Label {
+    QQC.Label {
         text: description
         onLinkActivated: link => Qt.openUrlExternally(link);
         visible: description
-        leftPadding: 2 * PlasmaCore.Units.largeSpacing
-        font: PlasmaCore.Theme.smallestFont
+        leftPadding: 2 * Kirigami.Units.largeSpacing
+        font: Kirigami.Theme.smallestFont
     }
 }

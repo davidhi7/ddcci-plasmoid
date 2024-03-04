@@ -1,12 +1,11 @@
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Layouts
 
-import org.kde.plasma.plasmoid 2.0
-import org.kde.plasma.core 2.1 as PlasmaCore
-import org.kde.plasma.components 3.0 as PlasmaComponents
-import org.kde.plasma.extras 2.0 as PlasmaExtras
+import org.kde.plasma.plasmoid
+import org.kde.plasma.components as PlasmaComponents
+import org.kde.plasma.extras as PlasmaExtras
 
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.kirigami as Kirigami
 
 PlasmaComponents.ItemDelegate {
     required property var model
@@ -22,18 +21,14 @@ PlasmaComponents.ItemDelegate {
                 level: 4
                 text: model.name
 
-                // TODO is this right?
                 Layout.fillWidth: true
             }
 
-            PlasmaComponents.ComboBox {
-                model: ["1", "2", "3", "4", "5"]
+            PlasmaComponents.ToolButton {
+                icon.name: 'system-shutdown-symbolic'
                 Layout.alignment: Qt.AlignRight
+                // TODO handler
             }
-        }
-
-        HorizontalLine {
-            // color: PlasmaCore.Theme.highlightColor
         }
 
         ContinuousFeatureSlider {

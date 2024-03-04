@@ -1,9 +1,10 @@
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Layouts
 
-import org.kde.plasma.plasmoid 2.0
-import org.kde.plasma.components 3.0 as PlasmaComponents
-import org.kde.plasma.core 2.1 as PlasmaCore
+import org.kde.plasma.plasmoid
+import org.kde.plasma.components as PlasmaComponents
+
+import org.kde.kirigami as Kirigami
 
 RowLayout {
     required property string propertyName
@@ -12,7 +13,7 @@ RowLayout {
     property alias value: slider.value
 
     Layout.alignment: Qt.AlignRight
-    spacing: PlasmaCore.Units.gridUnit
+    spacing: Kirigami.Units.gridUnit
 
     signal locked()
     signal released(int value)
@@ -20,20 +21,17 @@ RowLayout {
     PlasmaComponents.Label {
         text: propertyName
 
-        // TODO test layout stuff
-        // Layout.fillWidth: true
         horizontalAlignment: Qt.AlignLeft
     }
 
     PlasmaComponents.Slider {
         id: slider
 
-        // TODO test layout stuff
         Layout.fillWidth: !outsideSysTray
         from: 0
         to: 100
         stepSize: Math.max(propertyStepSize, 1)
-
+        
         Timer {
             id: mouseWheelScrollingDebounceTimer
 

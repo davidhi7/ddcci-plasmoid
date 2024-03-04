@@ -1,8 +1,8 @@
-import org.kde.plasma.core 2.0 as PlasmaCore
+import org.kde.plasma.plasma5support as Plasma5Support
 
 import "code/util.js" as Util
 
-PlasmaCore.DataSource {
+Plasma5Support.DataSource {
     engine: "executable"
     connectedSources: []
     function exec(command, callback) {

@@ -1,16 +1,17 @@
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
+import QtQuick
+import QtQuick.Layouts
 
-import org.kde.plasma.plasmoid 2.0
-import org.kde.plasma.core 2.0 as PlasmaCore
-import org.kde.plasma.components 3.0 as PlasmaComponents
-import org.kde.plasma.extras 2.0 as PlasmaExtras
+import org.kde.plasma.plasmoid
+import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.components as PlasmaComponents
+import org.kde.plasma.extras as PlasmaExtras
+import org.kde.plasma.plasma5support as Plasma5Support
 
-import org.kde.kirigami 2.20 as Kirigami
+import org.kde.kirigami as Kirigami
 
 import "code/backend_interface.js" as Backend
 
-Item {
+PlasmoidItem {
     id: root
     // --- Global variables ---
     // Enable or disable debug logging
@@ -46,7 +47,7 @@ Item {
 
     // DataSource for regular backend polling
     // TODO error handling
-    PlasmaCore.DataSource {
+    Plasma5Support.DataSource {
         id: monitorDataSource
         engine: "executable"
         connectedSources: []
@@ -121,22 +122,22 @@ Item {
         id: monitorModel
     }
 
-    Plasmoid.fullRepresentation: ColumnLayout {
+    fullRepresentation: ColumnLayout {
         PlasmaExtras.PlasmoidHeading {
             id: heading
             // Don't render heading if this is part of the systemtray
-            // Inside the systray, context menu options (like `refresh monitors`) are already rendered in the systray heading, so we don't need to do deal with this
+            // Inside the systray, actions (like refresh monitors) are already rendered in the systray heading, so we don't need to do deal with this
             visible: root.outsideSysTray
 
 
             Layout.alignment: Qt.AlignTop
-            leftPadding: PlasmaCore.Units.smallSpacing
-            rightPadding: PlasmaCore.Units.smallSpacing
+            leftPadding: Kirigami.Units.smallSpacing
+            rightPadding: Kirigami.Units.smallSpacing
 
             RowLayout {
                 anchors.fill: parent
 
-                PlasmaExtras.Heading {
+                Kirigami.Heading {
                     level: 1
                     text: i18n("Display Brightness")
                 }
@@ -144,46 +145,33 @@ Item {
                 PlasmaComponents.ToolButton {
                     Layout.alignment: Qt.AlignRight
 
-                    property QtObject /*QAction*/ qAction: Plasmoid.action('refreshMonitors')
+                    // Using `action` fails
+                    property QtObject /*Plasmacore.Action*/ action_: Plasmoid.contextualActions[0]
 
-                    icon.name: 'view-refresh-symbolic'
+                    icon.name: action_.icon.name
                     PlasmaComponents.ToolTip {
-                        text: parent.qAction.text
+                        text: parent.action_.text
                     }
-                    onClicked: qAction.trigger()
+                    onClicked: action_.trigger()
                 }
             }
         }
 
         ColumnLayout {
-            Layout.margins: PlasmaCore.Units.gridUnit
+            Layout.margins: Kirigami.Units.gridUnit
 
-            // Error notifications
-            RowLayout {
-                id: error_layout
-                Layout.minimumWidth: PlasmaCore.Units.gridUnit * 16
+            Kirigami.InlineMessage {
+                id: errorMessage
 
+                Layout.fillWidth: true
                 visible: false
-                spacing: PlasmaCore.Units.gridUnit
-
-                PlasmaComponents.Label {
-                    id: error_text
-                    Layout.fillWidth: true
-                    color: PlasmaCore.Theme.negativeTextColor
-                    wrapMode: Text.WordWrap
-                    font.bold: true
-                }
-
-                PlasmaComponents.ToolButton {
-                    Layout.alignment: Qt.AlignRight
-                    icon.name: 'window-close'
-                    onClicked: error_layout.visible = false
-                }
+                type: Kirigami.MessageType.Error
+                showCloseButton: true
 
                 Component.onCompleted: function() {
                     error.connect(function (message) {
-                        error_text.text = message;
-                        error_layout.visible = true;
+                        errorMessage.text = message;
+                        errorMessage.visible = true;
                     });
                 }
             }
@@ -213,12 +201,6 @@ Item {
                     }
                 }
 
-                // TODO: why is this not working?
-                // Repeater {
-                //     model: monitorModel
-                //     delegate: plasmoid.configuration.enableAdvancedMode ? AdvancedMonitorItem {} : SimpleMonitorItem {}
-                // }
-
                 Item {
                     height: 0
                     Layout.fillWidth: true
@@ -226,11 +208,6 @@ Item {
             }
 
         }
-    }
-
-    // Handle `refresh monitors` button
-    function action_refreshMonitors() {
-        monitorDataSource.runOnce();
     }
 
     // Write the plasmoid configuration to the backend
@@ -245,15 +222,19 @@ Item {
         }
     }
 
+    Plasmoid.contextualActions: [
+        PlasmaCore.Action {
+            text: i18n("Refresh monitors")
+            icon.name: "view-refresh-symbolic"
+            onTriggered: monitorDataSource.runOnce();
+        }
+    ]
+
     Component.onCompleted: function() {
         executable.exec(`${backendCommand} version`, (exitCode, stdout, stderr) => {
             log(`Backend version: ${removeTrailingNewlines(stdout)}`);
         });
         monitorDataSource.start();
-        // code to add new action: Plasmoid.setAction("actionId", i18_n("text"), "iconName") (i18_n without underscore)
-        // Instead of connecting to a signal of this action, a function called `action_{actionId}` is expected (here action_refreshMonitors)
-        Plasmoid.setAction('refreshMonitors', i18n("Refresh monitors"), 'view-refresh-symbolic');
-
         write_backend_configuration();
     }
 }
