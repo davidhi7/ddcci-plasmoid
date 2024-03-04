@@ -36,6 +36,7 @@ Finally, you need to install an udev rule to allow members of the group `i2c` to
 
 `$ sudo cp /usr/share/ddcutil/data/45-ddcutil-i2c.rules /etc/udev/rules.d`
 
+Rebooting your computer may be necessary for these rules to take effect.
 Now, you can verify that ddcutil is working correctly:
 
 `$ ddcutil detect`
@@ -119,9 +120,10 @@ $ kpackagetool5 --install plasmoid
 $ kpackagetool5 --upgrade plasmoid
 ````
 
-**Note**: The `main` branch is already ported to KDE Plasma 6. If you wish to install the plasmoid for KDE Plasma 5, run `$ git checkout kf5` inside the repository before invoking `kpackagetool5`. 
+Note that the `main` branch is ported to KDE Plasma 6. To instal the widget for Plasma 5, run `git checkout kf5` before invoking `kpackagetool5`.
 
-**Note**: If you used `pipx` to install the backend in the previous step, the widget setting `Backend executable command` should be `~/.local/bin/ddcci_plasmoid_backend` (which is the default installation path of pipx).
+> [!IMPORTANT]  
+> If you used `pipx` to install the backend in the previous step, the widget setting `Backend executable command` must be set to `~/.local/bin/ddcci_plasmoid_backend` (without `python3` or anything else before).
 
 ### 4. Display the widget
 
@@ -131,7 +133,7 @@ This widget can be displayed within the system tray or as a standalone widget.
 
 Right-click the arrow of the system tray > open settings > go to *Entries* > scroll down to the entry *Display Brightness* and set the visibility according to your preference.
 
-##### standalone widget
+##### Use as standalone widget:
 
 Right-click your desktop > click *Add widgets* > search for *Display Brightness* and add the widget to your desktop or panels.
 
