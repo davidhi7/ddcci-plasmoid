@@ -8,6 +8,8 @@ import org.kde.plasma.extras 2.0 as PlasmaExtras
 
 Item {
     id: root
+    // Do never apply new values if one slider is not released yet
+    property bool valuesLock: false
     property bool outsideSysTray: !(plasmoid.containmentDisplayHints & PlasmaCore.Types.ContainmentDrawsPlasmoidHeading)
 
     // https://github.com/Zren/plasma-applet-commandoutput/blob/master/package/contents/ui/main.qml
@@ -56,10 +58,13 @@ Item {
                 return;
             }
 
-            monitorModel.clear();
-            const response = JSON.parse(stdout);
-            for (let instance of response.value) {
-                monitorModel.append(instance);
+            // if the lock is held, simply do nothing and wait for the next refresh
+            if (!valuesLock) {
+                monitorModel.clear();
+			    const response = JSON.parse(stdout);
+                for (let instance of response.value) {
+                    monitorModel.append(instance);
+                }
             }
 
             commandSuccess(cmd);
@@ -219,26 +224,21 @@ Item {
 
                         onValueChanged: function() {
                             if (brightness != value) {
-
                                 // Round value in step
-                                brightness = roundNumberInStep(value, stepSize)
+                                brightness = Math.round(value / stepSize) * stepSize
                                 value = brightness
                                 // Fire command
                                 brightnessChangedDebounceTimer.restart()
                             }
                         }
 
-                        function roundNumberInStep(number, step) {
-                            const halfStep = step / 2
+                        onMoved: function() {
+                            // Locked during mouse wheel scrolling
+                            valuesLock = true
+                        }
 
-                            const integerPart = (Math.floor(number / step) * step)
-                            const diffPart = number - integerPart
-
-                            if (diffPart >= halfStep) {
-                                return integerPart + step
-                            } else {
-                                return integerPart
-                            }
+                        onPressedChanged: function() {
+                            valuesLock = pressed
                         }
 
                         Timer {
@@ -254,6 +254,10 @@ Item {
 
                             onTriggered: {
                                 executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                                if (!pressed) {
+                                    // Unlock only if using mouse wheel
+                                    valuesLock = false
+                                }
                             }
                         }
 
