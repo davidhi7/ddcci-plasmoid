@@ -219,13 +219,29 @@ Item {
                         from: 0
                         to: 100
                         value: brightness
+                        snapMode: PlasmaComponents.Slider.SnapOnRelease
                         stepSize: plasmoid.configuration.stepSize || 1
 
-                        Timer {
-                            id: mouseWheelScrollingDebounceTimer
+                        onValueChanged: function() {
+                            if (brightness != value) {
+                                valuesLock = true
+                                // Round value in step
+                                brightness = Math.round(value / stepSize) * stepSize
+                                value = brightness
+                                // Fire command
+                                brightnessChangedDebounceTimer.restart()
+                            }
+                        }
 
-                            // How long does it take to trigger when the mouse wheel stops scrolling
-                            interval: 400
+                        onPressedChanged: function() {
+                            valuesLock = pressed
+                        }
+
+                        Timer {
+                            id: brightnessChangedDebounceTimer
+
+                            // How long does it take to trigger when the mouse wheel stops scrolling or slider stops sliding
+                            interval: 150
 
                             // will only be triggered once after restart() called
                             repeat: false
@@ -233,29 +249,49 @@ Item {
                             triggeredOnStart: false
 
                             onTriggered: {
-                                valuesLock = false
                                 executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                                if (!pressed) {
+                                    // Unlock only if using mouse wheel
+                                    valuesLock = false
+                                }
                             }
                         }
 
-                        onMoved: () => {
-                            // Should also be locked during mouse wheel scrolling.
-                            valuesLock = true
-                            brightness = value
+                        // Backport of https://invent.kde.org/plasma/libplasma/-/commit/aea3d4b131070d8388edf84c9c2a32f7b4203617
+                        wheelEnabled: false
+                        MouseArea {
+                            property int wheelDelta: 0
 
-                            // Handle mouse wheel debounce only when the slider is not pressed.
-                            if (!pressed) {
-                                mouseWheelScrollingDebounceTimer.restart()
+                            anchors {
+                                fill: parent
+                                leftMargin: slider.leftPadding
+                                rightMargin: slider.rightPadding
                             }
-                        }
+                            LayoutMirroring.enabled: false
 
-                        onPressedChanged: function() {
-                            if (pressed) {
-                                valuesLock = true
-                            } else {
-                                // Slider is released
-                                valuesLock = false
-                                executable.exec(plasmoid.configuration.executable + ` set-brightness ${bus_id} ${brightness}`)
+                            acceptedButtons: Qt.NoButton
+
+                            onWheel: wheel => {
+                                const lastValue = slider.value
+                                // We want a positive delta to increase the slider for up/right scrolling,
+                                // independently of the scrolling inversion setting
+                                // The x-axis is also inverted (scrolling right produce negative values)
+                                const delta = (wheel.angleDelta.y || -wheel.angleDelta.x) * (wheel.inverted ? -1 : 1)
+                                wheelDelta += delta;
+                                // magic number 120 for common "one click"
+                                // See: https://doc.qt.io/qt-5/qml-qtquick-wheelevent.html#angleDelta-prop
+
+                                while (wheelDelta >= 120) {
+                                    wheelDelta -= 120;
+                                    slider.increase();
+                                }
+                                while (wheelDelta <= -120) {
+                                    wheelDelta += 120;
+                                    slider.decrease();
+                                }
+                                if (lastValue !== sliders.value) {
+                                    slider.moved();
+                                }
                             }
                         }
                     }
