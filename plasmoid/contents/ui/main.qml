@@ -241,7 +241,7 @@ Item {
                             id: brightnessChangedDebounceTimer
 
                             // How long does it take to trigger when the mouse wheel stops scrolling or slider stops sliding
-                            interval: 400
+                            interval: 150
 
                             // will only be triggered once after restart() called
                             repeat: false
