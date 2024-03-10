@@ -224,17 +224,13 @@ Item {
 
                         onValueChanged: function() {
                             if (brightness != value) {
+                                valuesLock = true
                                 // Round value in step
                                 brightness = Math.round(value / stepSize) * stepSize
                                 value = brightness
                                 // Fire command
                                 brightnessChangedDebounceTimer.restart()
                             }
-                        }
-
-                        onMoved: function() {
-                            // Locked during mouse wheel scrolling
-                            valuesLock = true
                         }
 
                         onPressedChanged: function() {
