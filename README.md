@@ -120,7 +120,7 @@ $ kpackagetool5 --install plasmoid
 $ kpackagetool5 --upgrade plasmoid
 ````
 
-Note that the `main` branch is ported to KDE Plasma 6. To instal the widget for Plasma 5, run `git checkout kf5` before invoking `kpackagetool5`.
+Note that the `main` branch is ported to KDE Plasma 6. To install the widget for Plasma 5, run `git checkout kf5` before invoking `kpackagetool5`.
 
 > [!IMPORTANT]  
 > If you used `pipx` to install the backend in the previous step, the widget setting `Backend executable command` must be set to `~/.local/bin/ddcci_plasmoid_backend` (without `python3` or anything else before).
