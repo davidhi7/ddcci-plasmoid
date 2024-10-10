@@ -1,7 +1,22 @@
 # KDE Plasma Widget for external monitor brightness adjustment
 
-![Screenshot](./screenshots/banner.png)
 
+## This widget is no longer in development
+
+I am happy to announce that KDE Plasma 6.2 (released on 8 Oct. 2024) now features all functionality provided by this widget, and more. Since the Plasma implementation is a lot more robust and includes features that were planned but not yet implemented for this widget, I encourage all users of this project to use the official functionality once Plasma 6.2 is available in your distro.
+
+The Plasma functionality is built into the *Brightness and Colour* Plasma widget, which can be enabled using the following steps:
+1. Right-click the arrow of the system tray
+2. Click *Configure System Tray*
+3. Under *Entries*, find the *Brightness and Colour* widget and set the visibility according to your preference.
+
+Over the past few months I haven't had the time and motivation to work on this project. Moving forward, I’ve decided not to work on the niche use cases discussed in the issues and I won’t be working on this widget anymore.
+
+Thank you all for your support - and a big thanks to the KDE developers for implementing this highly useful functionality!
+
+## Features
+
+![Screenshot](./screenshots/banner.png)
 * This widget allows you to adjust the brightness of external monitors. We accomplish that using [DDC/CI](https://en.wikipedia.org/wiki/Display_Data_Channel#DDC/CI), a protocol that allows your computer to control monitors and change options like the brightness or contrast.
 * A seamless integration into the Plasma desktop is a major goal of this project. The widget is versatile and can be used as a standalone widget or integrated into the system tray.
 * Notebook monitors are currently unsupported because they use different interfaces to communicate with the operating system.
